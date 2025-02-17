@@ -6,7 +6,8 @@
     "dokugen": "dist/dokugen.js"
   },
   "scripts": {
-    "start": "dist/dokugen.js"
+    "start": "dist/dokugen.js",
+    "build": "npx tsc"
   },
   "keywords": [
     "open source readme generator cli tool"
