@@ -1,0 +1,6 @@
+node_modules/
+src/
+tsconfig.json
+package-lock.json
+Dockerfile
+.dockerignore
