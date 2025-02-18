@@ -13,7 +13,7 @@
   const extractFullCode = (projectFiles: string[], projectDir: string): string => {
     let snippets = ""
     const importantFiles = projectFiles.filter(file => 
-      file.match(/\.(ts|js|Dockerfile|go|py|rs|c|cpp|h|hpp|java|kt|swift|php|rb)$/)
+      file.match(/\.(ts|js|go|py|rs|c|cpp|h|hpp|java|kt|swift|php|rb)$/)
     )
   
     importantFiles.forEach(file => {
