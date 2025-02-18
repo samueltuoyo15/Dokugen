@@ -82,7 +82,7 @@
       const fullCode = extractFullCode(projectFiles, projectDir)
       
       console.log(chalk.blue("Analysing project files getting chunks....."))
-      const response = await axios.post<GenerateReadmeResponse>("http:localhost:3001/generate-readme", {
+      const response = await axios.post<GenerateReadmeResponse>("https://dokugen-proxy.vercel.app/generate-readme", {
         projectType,
         projectFiles,
         fullCode,
