@@ -1,13 +1,12 @@
 {
   "name": "dokugen",
-  "version": "1.2.0",
-  "main": "src/dokugen.ts",
+  "version": "1.4.0",
+  "main": "./dist/dokugen.ts",
   "bin": {
-    "dokugen": "dist/dokugen.js"
+    "dokugen": "./dist/dokugen.js"
   },
-  "scripts": {
-    "start": "dist/dokugen.js",
-    "build": "npx tsc"
+  "script":{
+    "start": "./dist/dokugen.js"
   },
   "keywords": [
     "open source readme generator cli tool"
@@ -26,6 +25,7 @@
     "axios": "^1.7.9",
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
+    "dokkugen": "^1.0.0",
     "fs-extra": "^11.3.0",
     "inquirer": "^12.4.2",
     "readline": "^1.3.0"

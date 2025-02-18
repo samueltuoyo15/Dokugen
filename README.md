@@ -1,21 +1,24 @@
-# Dokugen: Your Automated README Generator
+# Dokugen - Automagically Generated READMEs
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/your-username/dokugen/graphs/commit-activity)
+[![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)
 
-Dokugen is a command-line tool designed to automatically generate high-quality README files for your projects.  Spend less time writing documentation and more time building!
+Dokugen is a CLI tool designed to automatically generate high-quality README.md files for your projects. Say goodbye to README-writing fatigue and hello to instant, professional documentation!
 
-## Features
+## Table of Contents
 
--   **Automatic Project Analysis:** Detects project type (JavaScript/TypeScript, Python, Golang, Rust, Java, Frontend React/Next/Vue) and identifies project files.
--   **Interactive Configuration:** Asks key questions about your project, such as whether it uses Docker, exposes an API, or utilizes a database.
--   **Comprehensive README Generation:** Creates a well-structured README.md file with installation steps, usage guide, Docker setup (if applicable), contribution guidelines, and license information.
--   **Overwrite Protection:**  Prompts before overwriting existing README files.
--   **Code Snippet Inclusion:** Extracts relevant code snippets from your project files to provide practical examples in the README.
+- [Installation](#installation)
+- [Usage](#usage)
+- [Project Structure](#project-structure)
+- [API Endpoints](#api-endpoints)
+- [Database Setup](#database-setup)
+- [Docker Setup](#docker-setup)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Installation
 
-To install Dokugen, you'll need Node.js and npm (Node Package Manager) installed on your system.
+To install Dokugen, make sure you have Node.js and npm installed. Then, run:
 
 ```bash
 npm install -g dokugen
@@ -23,45 +26,75 @@ npm install -g dokugen
 
 ## Usage
 
-Navigate to your project directory in the terminal.
-
-```bash
-cd your-project
-```
-
-Run the `dokugen generate` command to start the README generation process.
+Navigate to your project directory in the terminal and run:
 
 ```bash
 dokugen generate
 ```
 
-The tool will guide you through a series of questions about your project.  Answer them to customize your README.
+The tool will scan your project, ask a few questions to tailor the README, and generate a `README.md` file for you. If a `README.md` file already exists, you'll be prompted to overwrite it.
+
+## Project Structure
+
+Here's a quick look at the project's file structure:
+
+```
+.
+├── .dockerignore
+├── .gitignore
+├── .npmignore
+├── Dockerfile
+├── README.md
+├── package-lock.json
+├── package.json
+├── src
+│   └── dokugen.ts
+└── tsconfig.json
+```
+
+## API Endpoints
+
+*If this project exposes an API, the details will appear here after you choose to include it during the README generation process.*
+
+For example:
+
+- `GET /users`: Retrieves a list of all users.
+- `POST /users`: Creates a new user.
+- `GET /users/:id`: Retrieves a specific user by ID.
+
+## Database Setup
+
+*If this project uses a database, the setup instructions will be outlined here after you choose to include it during the README generation process.*
+
+For example:
+
+1.  Install PostgreSQL.
+2.  Create a database named `mydatabase`.
+3.  Run migrations using `npm run migrate`.
 
 ## Docker Setup
 
-If you chose to include Docker setup during the generation process, your README will contain instructions similar to these:
+*If you choose to include Docker setup during the README generation process, the steps will be outlined here.*
 
-1.  **Build the Docker image:**
-
-    ```bash
-    docker build -t your-project-name .
-    ```
-
-2.  **Run the Docker container:**
+1.  Build the Docker image:
 
     ```bash
-    docker run -p 3000:3000 your-project-name
+    docker build -t dokugen .
     ```
 
-    (Adjust port numbers as necessary.)
+2.  Run the Docker container:
 
-## Contribution Guidelines
+    ```bash
+    docker run -p 3000:3000 dokugen
+    ```
 
-We welcome contributions to Dokugen! To contribute:
+## Contributing
+
+Contributions are welcome! Here's how you can contribute:
 
 1.  Fork the repository.
 2.  Create a new branch for your feature or bug fix.
-3.  Make your changes and commit them with clear, descriptive messages.
+3.  Make your changes and commit them with clear, concise messages.
 4.  Submit a pull request.
 
 ## License
