@@ -1,4 +1,3 @@
-
   import { program } from "commander"
   import chalk from "chalk"
   import fs from "fs-extra"
@@ -21,8 +20,8 @@
       try {
         const content = fs.readFileSync(path.join(projectDir, file), "utf-8")
         snippets += `\n### ${file}\n\`\`\`\n${content}\n\`\`\`\n`
-      } catch (err) {
-        console.log(chalk.red(`❌ Failed to read ${file}`))
+      } catch (error) {
+        console.log(chalk.red(`❌ Failed to read ${file} ${error}`))
       }
     })
     return snippets || "No code snippets available"
@@ -30,12 +29,12 @@
   
   const validateProjectLanguage = (projectDir: string) => {
     const files = fs.readdirSync(projectDir)
-    if (files.includes("package.json")) return "JavaScript/TypeScript"
-    if (files.includes("requirements.txt") || files.includes("pyproject.toml")) return "Python"
     if (files.includes("go.mod")) return "Golang"
+    if (files.includes("requirements.txt") || files.includes("pyproject.toml")) return "Python"
     if (files.includes("Cargo.toml")) return "Rust"
-    if (files.includes("pom.xml") || files.includes("build.gradle")) return "Java"
+    if (files.includes("package.json")) return "JavaScript/TypeScript"
     if (files.includes("index.html") || files.includes("src/App.tsx") || files.includes("src/App.jsx")) return "Frontend (React)"
+    if (files.includes("pom.xml") || files.includes("build.gradle")) return "Java"
     if (files.includes("next.config.ts") || files.includes("next.config.js") || files.includes("app/page.jsx") || files.includes("app/page.tsx")) return "Frontend (Next Js)"
     if (files.includes("src/App.vue")) return "Frontend (Vue Js)"
   
@@ -46,6 +45,7 @@
     const files: string[] = []
   
     const scan = (folder: string) => {
+      try{
       fs.readdirSync(folder, { withFileTypes: true }).forEach(file => {
         const fullPath = path.join(folder, file.name)
         if (file.isDirectory()) {
@@ -54,6 +54,9 @@
           files.push(fullPath.replace(dir + "/", ""))
         }
       })
+    } catch(error){
+      console.error(error)
+    }
     }
     scan(dir)
     return files
@@ -88,14 +91,18 @@
         fullCode,
         options: {useDocker, hasAPI, hasDatabase},
       })
-      return response?.data?.readme || "Operation Failed"
+      if(response?.data?.readme){
+      console.log(chalk.blue("Proxy Responded with 200 OK"))
+      return response.data.readme 
+      }
+      return "Operation Failed"
     } catch (error) {
       console.log(chalk.red("❌ Error Generating README"), error)
       return "Failed to Generate README"
     }
   }
   
-  program.name("dokugen").version("1.0.0").description("Automatically generate high-quality README for your application")
+  program.name("dokugen").version("1.7.0").description("Automatically generate high-quality README for your application")
   
   program.command("generate").description("Scan project and generate a high-quality README.md").action(async () => {
       console.log(chalk.green("🦸 Generating README.md....."))
@@ -107,7 +114,8 @@
   
       console.log(chalk.blue(`📂 Detected project type: ${projectType}`))
       console.log(chalk.yellow(`📂 Found: ${projectFiles.length} files in the project`))
-  
+       
+      try{
       if (fs.existsSync(existingReadme)) {
         const overwrite = await askYesNo(chalk.red("🤯 Looks like a README file already exists. Overwrite?"))
         if (!overwrite) return console.log(chalk.yellow("👍 README was not modified."))
@@ -118,8 +126,21 @@
   
       const readmeContent = await generateReadme(projectType, projectFiles, projectDir)
       fs.writeFileSync(existingReadme, readmeContent)
-  
       console.log(chalk.green("✅ README Generated Successfully"))
+      } catch(error){
+        console.error(chalk.red("Error Writing File", error))
+      }
     })
   
   program.parse(process.argv)
+  
+
+process.on("SIGINT", async () => {
+  console.log(chalk.yellow("\n⚠️  Process interrupted. Cleaning up..."))
+  process.exit(0);
+})
+
+process.on("unhandledRejection", (error) => {
+  console.error(chalk.red("\n❌ Unhandled Rejection: "), error)
+  process.exit(1)
+})

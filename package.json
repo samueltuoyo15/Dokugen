@@ -1,6 +1,7 @@
 {
   "name": "dokugen",
-  "version": "1.5.0",
+  "version": "1.7.0",
+  "private": false,
   "main": "./dist/dokugen.js",
   "bin": {
     "dokugen": "./dist/dokugen.js"
