@@ -19,7 +19,7 @@ npm install -g dokugen
 Navigate to your project's root directory in the terminal and run the following command:
 
 ```bash
-dokugen generate
+npx dokugen generate
 ```
 
 The tool will guide you through a few questions to customize the README generation process.  If a README.md already exists, you will be prompted to overwrite it.
@@ -30,7 +30,7 @@ Here's an example of running Dokugen in a project directory:
 
 ```bash
 cd my-awesome-project
-dokugen generate
+npx dokugen generate
 ```
 
 The tool will then generate a `README.md` file in your project's root.
@@ -47,7 +47,7 @@ Contributions are welcome! Feel free to submit pull requests with improvements, 
 ## License
 
 This project is open-source and available under the MIT License. See the `LICENSE` file for more information.
-
+### Developers [Samuel Tuoyo](https://github.com/samueltuoyo15) & [Charming DC](https://github.com/Charmingdc)
 ## Badges
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)

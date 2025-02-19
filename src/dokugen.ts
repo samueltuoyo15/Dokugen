@@ -1,6 +1,6 @@
   import { program } from "commander"
-  import chalk from "chalk"
-  import fs from "fs-extra"
+  import * as chalk from "chalk"
+  import * as fs from "fs-extra"
   import path from "path"
   import inquirer from "inquirer"
   import axios from "axios"
@@ -102,7 +102,7 @@
     }
   }
   
-  program.name("dokugen").version("1.7.0").description("Automatically generate high-quality README for your application")
+  program.name("dokugen").version("1.9.0").description("Automatically generate high-quality README for your application")
   
   program.command("generate").description("Scan project and generate a high-quality README.md").action(async () => {
       console.log(chalk.green("🦸 Generating README.md....."))
