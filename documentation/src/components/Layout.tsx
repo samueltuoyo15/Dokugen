@@ -1,5 +1,5 @@
-import { Outlet, Link } from 'react-router-dom';
-import NavBar from './helpers/NavBar.tsx';
+import { Outlet } from 'react-router-dom';
+import NavBar from './helpers/NavBar';
 
 
 const Layout = () => {

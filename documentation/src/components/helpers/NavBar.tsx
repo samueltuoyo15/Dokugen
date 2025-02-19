@@ -25,7 +25,7 @@ const NavBar = () => {
    
    
    <ul 
-     class='drop-down'
+     className='drop-down'
      style={{left: openMenu ? '0' : '-100%'}}
      onClick={() => setOpenMenu(!openMenu)}>
     <li>
