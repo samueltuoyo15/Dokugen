@@ -1,6 +1,10 @@
 const Installation = () => {
  return (
-  <h1> Installation </h1>
+  <section>
+   <div className='section-heading'>
+    <h1> Installation </h1>
+   </div>
+  </section>
  )
 }
 
