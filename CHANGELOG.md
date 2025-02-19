@@ -2,8 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.9.0] - 2025-02-19
+## [2.0.0] - 2025-02-19
 ### Added
+- Support for Window Operating system and Mac Os
+
+## [1.9.0] - 2025-02-19
+### Currently working on
 - Support for Window Operating system and Mac Os
 
 ## [1.8.0] - 2025-02-18
