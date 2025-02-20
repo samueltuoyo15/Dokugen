@@ -15,13 +15,12 @@ export default async (req: VercelRequest, res: VercelResponse) => {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method not allowed" })
   }
-  if (!projectType || !projectFiles || !fullCode || !options) {
-  return res.status(400).json({ error: "Missing required fields in request body" })
- }
 
   try {
     const { projectType, projectFiles, fullCode, options } = req.body
-
+     if (!projectType || !projectFiles || !fullCode || !options) {
+    return res.status(400).json({ error: "Missing required fields in request body" })
+     }
     const filesList = Array.isArray(projectFiles) ? projectFiles.join("\n") : "No files provided"
     const hasAPI = options?.hasAPI ? "- **API Endpoints**\n" : ""
     const hasDatabase = options?.hasDatabase ? "- **Database Setup**\n" : ""
