@@ -1,13 +1,13 @@
 {
   "name": "dokugen",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "private": false,
   "main": "./bin/dokugen.mjs",
   "type": "module",
   "scripts": {
-  "postinstall": "node scripts/postinstall.mjs"
+    "postinstall": "node scripts/postinstall.mjs"
   },
-   "bin": {
+  "bin": {
     "dokugen": "bin/dokugen.mjs"
   },
   "keywords": [
@@ -30,11 +30,14 @@
     "axios": "^1.7.9",
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
+    "dotenv": "^16.4.7",
     "fs-extra": "^11.3.0",
     "inquirer": "^12.4.2"
   },
   "devDependencies": {
+    "@google/generative-ai": "^0.21.0",
     "@types/node": "^22.13.4",
+    "@vercel/node": "^5.1.7",
     "typescript": "^5.7.3"
   }
 }

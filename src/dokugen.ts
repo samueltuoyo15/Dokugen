@@ -1,6 +1,6 @@
   import { program } from "commander"
-  import * as chalk from "chalk"
-  import * as fs from "fs-extra"
+  import chalk from "chalk"
+  import fs from "fs-extra"
   import path from "path"
   import inquirer from "inquirer"
   import axios from "axios"
@@ -10,38 +10,46 @@
   readme: string;
   }
 
-  const extractFullCode = (projectFiles: string[], projectDir: string): string => {
-    let snippets = ""
+  const extractFullCode = async (projectFiles: string[], projectDir: string): Promise<string> => {
+    let snippets: string[] = []
     const importantFiles = projectFiles.filter(file => 
-      file.match(/\.(ts|js|go|py|rs|c|cpp|h|hpp|java|kt|swift|php|rb)$/)
+      file.match(/\.(ts|js|json|jsx|tsx|html|go|ejs|mjs|py|rs|c|cs|cpp|h|hpp|java|kt|swift|php|rb)$/)
     )
   
-    importantFiles.forEach(file => {
+    const readPromises = importantFiles.map(async (file) => {
+      const filePath = path.resolve(projectDir, file)
+      if(!fs.existsSync(filePath)){
+          return 
+        }
       try {
-        const content = fs.readFileSync(path.join(projectDir, file), "utf-8")
-        snippets += `\n### ${file}\n\`\`\`\n${content}\n\`\`\`\n`
-      } catch (error) {
-        console.log(chalk.red(`❌ Failed to read ${file} ${error}`))
-      }
+        const content = await fs.promises.readFile(filePath, "utf-8")
+        snippets.push(`\n### ${file}\n\`\`\`\n${content}\n\`\`\`\n`)
+      } catch {}
+      return content 
     })
-    return snippets || "No code snippets available"
+    await Promise.all(readPromises)
+    return snippets.length > 0 ? snippets.join("") : "No code snippets available"
   }
   
   const validateProjectLanguage = (projectDir: string) => {
     const files = fs.readdirSync(projectDir)
-    if (files.includes("go.mod")) return "Golang"
-    if (files.includes("requirements.txt") || files.includes("pyproject.toml")) return "Python"
-    if (files.includes("Cargo.toml")) return "Rust"
-    if (files.includes("package.json")) return "JavaScript/TypeScript"
-    if (files.includes("index.html") || files.includes("src/App.tsx") || files.includes("src/App.jsx")) return "Frontend (React)"
-    if (files.includes("pom.xml") || files.includes("build.gradle")) return "Java"
-    if (files.includes("next.config.ts") || files.includes("next.config.js") || files.includes("app/page.jsx") || files.includes("app/page.tsx")) return "Frontend (Next Js)"
-    if (files.includes("src/App.vue")) return "Frontend (Vue Js)"
+    const languages: string[] = []
+    if (files.includes("go.mod")) languages.push("Golang")
+    if (files.includes("requirements.txt") || files.includes("pyproject.toml")) languages.push("Python")
+    if (files.includes("Cargo.toml")) languages.push("Rust")
+    if (files.includes("package.json")) languages.push("JavaScript/TypeScript")
+    if (files.includes("index.html") || files.includes("src/App.tsx") || files.includes("src/App.jsx")) languages.push("Frontend (React)")
+    if (files.includes("pom.xml") || files.includes("build.gradle")) languages.push("Java")
+    if (files.includes("next.config.ts") || files.includes("next.config.js") || files.includes("app/page.jsx") || files.includes("app/page.tsx")) languages.push("Frontend (Next Js)")
+    if (files.includes("src/App.vue")) languages.push("Frontend (Vue Js)")
   
-    return "Unknown"
+    if(languages.length === 0){
+    return("Unknown please make sure u have a (e.g., package.json, go.mod, Cargo.toml, etc.)")
+    }
+    return languages.join(", ")
   }
   
-  const scanFiles = (dir: string, ignoreDir: string[] = ["node_modules", ".git", ".vscode", "package-lock.json", "dist"]) => {
+  const scanFiles = (dir: string, ignoreDir: string[] = ["node_modules", ".git", ".vscode", ".next", "package-lock.json", "dist"]) => {
     const files: string[] = []
   
     const scan = (folder: string) => {
@@ -59,6 +67,10 @@
     }
     }
     scan(dir)
+    if(files.length === 0) {
+     console.log(chalk.yellow("No files found in your project"))
+     process.exit(0)
+     }
     return files
   }
   
@@ -76,33 +88,40 @@
   
   const generateReadme = async (projectType: string, projectFiles: string[], projectDir: string): Promise<string> => {
     try {
-      console.log(chalk.blue("😌 🔥 Generating README...."))
-  
+      console.log(chalk.blue("Analysing project files getting chunks....."))
+      
       const useDocker = await askYesNo("Do you want to include Docker setup in the README?")
       const hasAPI = await askYesNo("Does this project expose an API?")
       const hasDatabase = await askYesNo("Does this project use a database?")
   
-      const fullCode = extractFullCode(projectFiles, projectDir)
+      const fullCode = await extractFullCode(projectFiles, projectDir)
       
-      console.log(chalk.blue("Analysing project files getting chunks....."))
-      const response = await axios.post<GenerateReadmeResponse>("https://dokugen-proxy.vercel.app/generate-readme", {
+       console.log(chalk.blue("😌 🔥 Generating README...."))
+      const response = await axios.post<GenerateReadmeResponse>("https://your-vercel-project.vercel.app/api/generate-readme", {
         projectType,
         projectFiles,
         fullCode,
         options: {useDocker, hasAPI, hasDatabase},
       })
-      if(response?.data?.readme){
-      console.log(chalk.blue("Proxy Responded with 200 OK"))
-      return response.data.readme 
-      }
+      
+      if (!response.data.readme) {
+      console.log(chalk.red("❌ API did not return a README."))
       return "Operation Failed"
-    } catch (error) {
-      console.log(chalk.red("❌ Error Generating README"), error)
-      return "Failed to Generate README"
+    }
+      console.log(chalk.blue("Proxy Responded with 200 OK"))
+      console.log(chalk.green("✅ README Generated Successfully"))
+      return response.data.readme 
+    } catch (error: any) {
+      if (error?.message.includes("User force closed the prompt")) {
+      console.error(chalk.yellow("⚠️  User interrupted the process. README may be incomplete."))
+      return "README Generation Interrupted"
+    }
+    console.error(chalk.red("❌ Error Generating README: "), error)
+    return "Failed to Generate README"
     }
   }
   
-  program.name("dokugen").version("2.1.0").description("Automatically generate high-quality README for your application")
+  program.name("dokugen").version("2.2.0").description("Automatically generate high-quality README for your application")
   
   program.command("generate").description("Scan project and generate a high-quality README.md").action(async () => {
       console.log(chalk.green("🦸 Generating README.md....."))
@@ -118,16 +137,17 @@
       try{
       if (fs.existsSync(existingReadme)) {
         const overwrite = await askYesNo(chalk.red("🤯 Looks like a README file already exists. Overwrite?"))
-        if (!overwrite) return console.log(chalk.yellow("👍 README was not modified."))
-        
+        if (!overwrite) {
+          console.log(chalk.yellow("👍 README was not modified."))
+          return 
+          }
         fs.unlinkSync(existingReadme)
         console.log(chalk.green("🗑️ Existing README has been deleted. Now generating..."))
       }
   
       const readmeContent = await generateReadme(projectType, projectFiles, projectDir)
       fs.writeFileSync(existingReadme, readmeContent)
-      console.log(chalk.green("✅ README Generated Successfully"))
-      } catch(error){
+       } catch(error){
         console.error(chalk.red("Error Writing File", error))
       }
     })
@@ -136,7 +156,7 @@
   
 
 process.on("SIGINT", async () => {
-  console.log(chalk.yellow("\n⚠️  Process interrupted. Cleaning up..."))
+  console.log(chalk.yellow("\n⚠️  Process interrupted. Any partial changes will be discarded"))
   process.exit(0);
 })
 
@@ -144,3 +164,5 @@ process.on("unhandledRejection", (error) => {
   console.error(chalk.red("\n❌ Unhandled Rejection: "), error)
   process.exit(1)
 })
+
+
