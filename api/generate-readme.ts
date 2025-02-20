@@ -1,4 +1,4 @@
-import { VercelRequest, VercelResponse } from "@vercel/node"
+import type { VercelRequest, VercelResponse } from "@vercel/node"
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import dotenv from "dotenv"
 dotenv.config()
@@ -9,7 +9,7 @@ const model = genAI.getGenerativeModel({
   systemInstruction: process.env.MODEL_INSTRUCTION || "",
 })
 
-const generationConfig = process.env.CONFIG_PAYLOAD ? JSON.parse(process.env.CONFIG_PAYLOAD) : ""
+const generationConfig = process.env.CONFIG_PAYLOAD ? JSON.parse(process.env.CONFIG_PAYLOAD) : {}
 
 export default async (req: VercelRequest, res: VercelResponse) => {
   if (req.method !== "POST") {
