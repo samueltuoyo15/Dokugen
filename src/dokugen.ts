@@ -1,7 +1,7 @@
   import { program } from "commander"
   import chalk from "chalk"
   import fs from "fs-extra"
-  import path from "path"
+  import * as path from "path"
   import inquirer from "inquirer"
   import axios from "axios"
  
@@ -25,7 +25,6 @@
         const content = await fs.promises.readFile(filePath, "utf-8")
         snippets.push(`\n### ${file}\n\`\`\`\n${content}\n\`\`\`\n`)
       } catch {}
-      return content 
     })
     await Promise.all(readPromises)
     return snippets.length > 0 ? snippets.join("") : "No code snippets available"
@@ -97,7 +96,7 @@
       const fullCode = await extractFullCode(projectFiles, projectDir)
       
        console.log(chalk.blue("😌 🔥 Generating README...."))
-      const response = await axios.post<GenerateReadmeResponse>("https://your-vercel-project.vercel.app/api/generate-readme", {
+      const response = await axios.post<GenerateReadmeResponse>("https://dokugen-ochre.vercel.app/api/generate-readme", {
         projectType,
         projectFiles,
         fullCode,
@@ -121,7 +120,7 @@
     }
   }
   
-  program.name("dokugen").version("2.2.0").description("Automatically generate high-quality README for your application")
+  program.name("dokugen").version("2.1.0").description("Automatically generate high-quality README for your application")
   
   program.command("generate").description("Scan project and generate a high-quality README.md").action(async () => {
       console.log(chalk.green("🦸 Generating README.md....."))

@@ -2,15 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
-## [2.2.0] - 2025-02-20
-### Added
-- Support for Window Operating system and Mac Os
-- Fixed Windows Permissions issues
-- more uer friendly error messages
-
 ## [2.1.0] - 2025-02-19
 ### Added
 - Support for window os
+- Fixed Windows Permissions issues
 
 ## [1.9.0] - 2025-02-19
 ### Currently working on
