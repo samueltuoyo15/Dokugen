@@ -120,7 +120,7 @@
     }
   }
   
-  program.name("dokugen").version("2.1.0").description("Automatically generate high-quality README for your application")
+  program.name("dokugen").version("2.2.0").description("Automatically generate high-quality README for your application")
   
   program.command("generate").description("Scan project and generate a high-quality README.md").action(async () => {
       console.log(chalk.green("🦸 Generating README.md....."))
