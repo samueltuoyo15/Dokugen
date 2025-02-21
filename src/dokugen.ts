@@ -73,6 +73,35 @@
     return files
   }
   
+  
+  const checkDependency = (filePath: string, keywords: string[]): boolean => {
+  if (!fs.existsSync(filePath)) return false
+  const content = fs.readFileSync(filePath, "utf-8").toLowerCase()
+  return keywords.some(keyword => content.includes(keyword.toLowerCase()))
+}
+
+const detectProjectFeatures = (projectFiles: string[], projectDir: string) => {
+  const hasDocker = projectFiles.includes("Dockerfile") || projectFiles.includes("docker-compose.yml")
+
+  const hasAPI =
+    checkDependency(path.join(projectDir, "package.json"), ["express", "fastify", "koa", "hapi"]) ||
+    checkDependency(path.join(projectDir, "go.mod"), ["net/http", "gin-gonic", "fiber"]) ||
+    checkDependency(path.join(projectDir, "Cargo.toml"), ["actix-web", "rocket"]) ||
+    checkDependency(path.join(projectDir, "requirements.txt"), ["flask", "django", "fastapi"]) ||
+    checkDependency(path.join(projectDir, "pyproject.toml"), ["flask", "django", "fastapi"]) ||
+    checkDependency(path.join(projectDir, "pom.xml"), ["spring-boot", "jakarta.ws.rs"])
+
+  const hasDatabase =
+    checkDependency(path.join(projectDir, "package.json"), ["mongoose", "sequelize", "typeorm", "pg", "mysql", "sqlite", "redis"]) ||
+    checkDependency(path.join(projectDir, "go.mod"), ["gorm.io/gorm", "database/sql", "pgx"]) ||
+    checkDependency(path.join(projectDir, "Cargo.toml"), ["diesel", "sqlx", "redis"]) ||
+    checkDependency(path.join(projectDir, "requirements.txt"), ["sqlalchemy", "psycopg2", "pymongo", "redis"]) ||
+    checkDependency(path.join(projectDir, "pyproject.toml"), ["sqlalchemy", "psycopg2", "pymongo", "redis"]) ||
+    checkDependency(path.join(projectDir, "pom.xml"), ["spring-data", "jdbc", "hibernate"])
+
+  return { hasDocker, hasAPI, hasDatabase }
+}
+  
   const askYesNo = async (message: string): Promise<boolean> => {
     const answer = await inquirer.prompt([
       {
@@ -89,18 +118,17 @@
     try {
       console.log(chalk.blue("Analysing project files getting chunks....."))
       
-      const useDocker = await askYesNo("Do you want to include Docker setup in the README?")
-      const hasAPI = await askYesNo("Does this project expose an API?")
-      const hasDatabase = await askYesNo("Does this project use a database?")
-  
+      const { useDocker, hasAPI, hasDatabase } = detectProjectFeatures(projectFiles, projectDir)
+      const isOpenSource = await askYesNo("Do you want to include contribution guidelines to your README?")
+     
       const fullCode = await extractFullCode(projectFiles, projectDir)
       
-       console.log(chalk.blue("😌 🔥 Generating README...."))
+      console.log(chalk.blue("😌 🔥 Generating README...."))
       const response = await axios.post<GenerateReadmeResponse>("https://dokugen-ochre.vercel.app/api/generate-readme", {
         projectType,
         projectFiles,
         fullCode,
-        options: {useDocker, hasAPI, hasDatabase},
+        options: {useDocker, hasAPI, hasDatabase, isOpenSource},
       })
       
       if (!response.data.readme) {
