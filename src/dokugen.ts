@@ -55,7 +55,7 @@ const validateProjectLanguage = async (projectDir: string): Promise<string> => {
   return languages.length ? languages.join(", ") : "Unknown (Ensure your project has key files like package.json, go.mod, etc.)"
 }
 
-const scanFiles = async (dir: string, ignoreDirs = ["node_modules", ".git", ".vscode", ".next", "package-lock.json", "dist"]): Promise<string[]> => {
+const scanFiles = async (dir: string, ignoreDirs = ["node_modules", "documentation", ".git", ".vscode", ".next", "package-lock.json", "dist"]): Promise<string[]> => {
   const files: string[] = []
 
   const scan = async (folder: string) => {
