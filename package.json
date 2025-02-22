@@ -1,6 +1,6 @@
 {
   "name": "dokugen",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "private": false,
   "main": "./bin/dokugen.mjs",
   "type": "module",
@@ -8,7 +8,7 @@
     "postinstall": "node scripts/postinstall.mjs"
   },
   "bin": {
-    "doccugen": "bin/dokugen.mjs"
+    "dokugen": "bin/dokugen.mjs"
   },
   "keywords": [
     "open source",

@@ -75,7 +75,14 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     - **Contribution Guide**
     - **License Info (if applicable)**
     - **Badges (if applicable)**
+    
+    ## Additional Requirement:
+    - At the bottom of the README, you must always include the following badge:
 
+    \`\`\`
+    [![Built with Dokugen](https://img.shields.io/badge/Built%20with-Dokugen-brightgreen)](https://github.com/samueltuoyo15/Dokugen)
+    \`\`\`
+    
     The README must **sound like a human wrote it.**  
     Do **not** say things like "Here is a README for you."
     Do **not** wrap it in markdown code blocks (e.g., \`\`\`markdown or \`\`\`).  
