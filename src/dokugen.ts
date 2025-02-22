@@ -139,7 +139,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
   }
 }
 
-program.name("doccugen").version("3.6.0").description("Automatically generate high-quality README for your application")
+program.name("doccugen").version("3.7.0").description("Automatically generate high-quality README for your application")
 program.command("generate").description("Scan project and generate a README.md").action(async () => {
   console.log(chalk.green("🦸 Generating README.md..."))
 

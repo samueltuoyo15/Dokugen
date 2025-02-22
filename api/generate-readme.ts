@@ -96,10 +96,3 @@ export default async (req: VercelRequest, res: VercelResponse) => {
   }
 }
 
-
-const generateCacheKey = (projectType: string, projectFiles: string[], fullCode: string) => {
-  const hash = crypto.createHash("sha256")
-  hash.update(projectType + projectFiles.join("") + fullCode)
-  return `readme:${hash.digest("hex")}`
-}
-
