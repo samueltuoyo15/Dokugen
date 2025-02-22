@@ -55,6 +55,7 @@ This project is open-source and available under the MIT License. See the `LICENS
 
 ## Acknowledgements
 
+
 This project uses the following open-source libraries:
 
 *   [commander](https://github.com/tj/commander.js)
