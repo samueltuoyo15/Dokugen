@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node"
-import { kv } from "@vercel/kv"
+//import { kv } from "@vercel/kv"
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import dotenv from "dotenv"
 dotenv.config()
@@ -23,8 +23,8 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       return res.status(400).json({ error: "Missing required fields in request body" })
     }
 
-    const cacheKey = `readme:${projectType}:${fullCode.length}`
-    const cachedReadme = await kv.get<string>(cacheKey)
+  //  const cacheKey = `readme:${projectType}:${fullCode.length}`
+ //   const cachedReadme = await kv.get<string>(cacheKey)
 
     if (cachedReadme) {
       return res.status(200).json({ readme: cachedReadme })
@@ -79,7 +79,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
 
     const result = await chatSession.sendMessage(prompt)
     const readmeContent = result.response.text() || "README generation failed."
-    await kv.set(cacheKey, readmeContent, { ex: 3600 })
+  //  await kv.set(cacheKey, readmeContent, { ex: 3600 })
     return res.status(200).json({ readme: readmeContent })
   } catch (error) {
     console.error("❌ Error generating README:", error)
