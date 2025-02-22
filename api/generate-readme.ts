@@ -68,11 +68,6 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     ## **Usage**
     ${hasApiRoutes ? "Refer to the API documentation for endpoints:" : "Provide a usage example based on available files."}
 
-    ## **Project Structure**
-    \`\`\`
-   ${projectFiles.map(file => `- ${file}`).join("\n")}
-    \`\`\`
-
     ## **Key Features**
     - (Extract features based on project structure)
 

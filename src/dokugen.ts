@@ -1,3 +1,4 @@
+
 import { program } from "commander"
 import chalk from "chalk"
 import fs from "fs-extra"
@@ -16,8 +17,10 @@ const extractFullCode = async (projectFiles: string[], projectDir: string): Prom
       .map(async file => {
         try {
           const content = await fs.readFile(path.resolve(projectDir, file), "utf-8")
-          return `\n### ${file}\n\`\`\`\n${content}\n\`\`\`\n`
-        } catch {
+          const lines = content.split("\n").slice(0, 50).join("\n")
+          const fileExtension = path.extname(file).substring(1) || "plain text"
+          return `\n### ${file}\n\`\`\`${fileExtension}\n${lines}\n\`\`\`\n`
+        }catch {
           return null
         }
       })
@@ -49,13 +52,13 @@ const validateProjectLanguage = async (projectDir: string): Promise<string> => {
   }
 
   for (const file of files) {
-    if (langMap[file]) languages.push(langMap[file])
+    if (langMap[file as keyof typeof langMap]) languages.push(langMap[file as keyof typeof langMap])
   }
 
   return languages.length ? languages.join(", ") : "Unknown (Ensure your project has key files like package.json, go.mod, etc.)"
 }
 
-const scanFiles = async (dir: string, ignoreDirs = ["node_modules", "documentation", ".git", ".vscode", ".next", "package-lock.json", "dist"]): Promise<string[]> => {
+const scanFiles = async (dir: string, ignoreDirs = ["node_modules", "documentation", "out", "coverage", ".turbo", "test", "docs", "uploads", ".git", ".vscode", ".next", "package-lock.json", "dist"]): Promise<string[]> => {
   const files: string[] = []
 
   const scan = async (folder: string) => {
@@ -71,7 +74,9 @@ const scanFiles = async (dir: string, ignoreDirs = ["node_modules", "documentati
           }
         })
       )
-    } catch {}
+    } catch(error){
+      console.error(error)
+    }
   }
 
   await scan(dir)
@@ -134,8 +139,9 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
 
     console.log(chalk.green("✅ README Generated Successfully"))
     return data.readme || "Operation Failed"
-  } catch {
-    return "Failed to Generate README"
+  } catch(error){
+    console.log("Failed to Generate README", error)
+    return "Failed"
   }
 }
 
