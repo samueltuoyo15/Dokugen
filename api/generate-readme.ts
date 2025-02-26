@@ -1,4 +1,4 @@
-import supabase from "../lib/supabase"
+//import supabase from "../lib/supabase"
 import type { VercelRequest, VercelResponse } from "@vercel/node"
 import { kv } from "@vercel/kv"
 import crypto from "crypto"
@@ -33,8 +33,8 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       return res.status(400).json({ error: "Missing required fields in request body" })
     }
     
-    const machineId = crypto.randomUUID()
-    await supabase.from("active_users").upsert([{ machine_id: machineId}])
+    //const machineId = crypto.randomUUID()
+    //await supabase.from("active_users").upsert([{ machine_id: machineId}])
     const cacheKey = generateCacheKey(projectType, projectFiles, fullCode)
     const cachedReadme = (await kv.get<string>(cacheKey)) || null
 
