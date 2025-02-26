@@ -12,13 +12,13 @@ interface GenerateReadmeResponse {
 const extractFullCode = async (projectFiles: string[], projectDir: string): Promise<string> => {
   const snippets = await Promise.all(
     projectFiles
-      .filter(file => file.match(/\.(ts|js|json|jsx|tsx|html|go|ejs|mjs|py|rs|c|cs|cpp|h|hpp|java|kt|swift|php|rb)$/))
+      .filter(file => file.match(/\.(ts|js|json|jsx|tsx|html|go|ejs|mjs|py|rs|c|cs|cpp|h|hpp|java|kt|swift|php|rb|dart|scala|lua|sh|bat|asm|vb|cshtml|razor|m)$/))
       .map(async file => {
         try {
-          const content = await fs.readFile(path.resolve(projectDir, file), "utf-8")
-          const lines = content.split("\n").slice(0, 50).join("\n")
-          const fileExtension = path.extname(file).substring(1) || "plain text"
-          return `\n### ${file}\n\`\`\`${fileExtension}\n${lines}\n\`\`\`\n`
+          const contentStream = fs.createReadStream(path.resolve(projectDir, file), "utf-8")
+          let content = ""
+          for await (const chunk of contentStream) content += chunk
+          return `## ${file}\n\`\`\`${path.extname(file).slice(1) || "txt"}\n${content}\n\`\`\`\n`
         } catch {
           return null
         }
@@ -28,56 +28,61 @@ const extractFullCode = async (projectFiles: string[], projectDir: string): Prom
   return snippets.filter(Boolean).join("") || "No code snippets available"
 }
 
-const validateProjectLanguage = async (projectDir: string): Promise<string> => {
+const detectProjectType = async (projectDir: string): Promise<string> => {
   const files = await fs.readdir(projectDir)
-  const languages: string[] = []
+  const isFullStackNext = files.includes("pages") || files.some(f => f.startsWith("app/") || f.startsWith("api/"))
 
-  const langMap = {
+  const langMap: Record<string, string> = {
     "go.mod": "Golang",
     "requirements.txt": "Python",
     "pyproject.toml": "Python",
     "Cargo.toml": "Rust",
-    "package.json": "JavaScript/TypeScript",
-    "index.html": "Frontend (React)",
+    "package.json": isFullStackNext ? "Next.js (Full Stack)" : "JavaScript/TypeScript",
     "src/App.tsx": "Frontend (React)",
     "src/App.jsx": "Frontend (React)",
     "pom.xml": "Java",
     "build.gradle": "Java",
-    "next.config.ts": "Frontend (Next.js)",
-    "next.config.js": "Frontend (Next.js)",
-    "app/page.jsx": "Frontend (Next.js)",
-    "app/page.tsx": "Frontend (Next.js)",
-    "src/App.vue": "Frontend (Vue.js)",
+    "next.config.ts": "Next.js",
+    "next.config.js": "Next.js",
+    "src/App.vue": "Vue.js",
+    "pubspec.yaml": "Flutter/Dart",
+    "Makefile": "C/C++",
+    "Dockerfile": "Docker",
+    "Program.cs": "C# / .NET",
+    "Main.kt": "Kotlin",
+    "App.swift": "Swift",
+    "CMakeLists.txt": "C++",
   }
 
-  for (const file of files) {
-    if (langMap[file as keyof typeof langMap]) languages.push(langMap[file as keyof typeof langMap])
-  }
-
-  return languages.length ? languages.join(", ") : "Unknown"
+  const detected = Object.keys(langMap).find(file => files.includes(file))
+  return detected ? langMap[detected] : "Unknown"
 }
 
-const scanFiles = async (dir: string, ignoreDirs = ["node_modules", "documentation", "out", "coverage", ".turbo", "test", "docs", "uploads", ".git", ".vscode", ".next", "dist"]): Promise<string[]> => {
-  const files: string[] = []
+const scanFiles = async (dir: string): Promise<string[]> => {
+  const ignoreDirs = new Set(["node_modules", "dist", ".git", ".next", "coverage", "out", "test", "uploads", "docs", "build", ".vscode", ".idea", "logs", "public", "storage", "bin", "obj", "lib", "venv", "cmake-build-debug"])
+  const ignoreFiles = new Set(["CHANGELOG.md", ".gitignore", ".npmignore", "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "tsconfig.json", "jest.config.js", "README.md", "*.lock", ".DS_Store", ".env", "Thumbs.db", "tsconfig.*", "*.iml", ".editorconfig", ".prettierrc*", ".eslintrc*"])
 
-  const scan = async (folder: string) => {
+  const files: string[] = []
+  const queue: string[] = [dir]
+
+  while (queue.length) {
+    const folder = queue.shift()
+    if (!folder) continue
+
     try {
       const dirContents = await fs.readdir(folder, { withFileTypes: true })
-      await Promise.all(
-        dirContents.map(async file => {
-          const fullPath = path.join(folder, file.name)
-          if (file.isDirectory() && !ignoreDirs.includes(file.name)) {
-            await scan(fullPath)
-          } else if (file.isFile()) {
-            files.push(fullPath.replace(`${dir}/`, ""))
-          }
-        })
-      )
+      for (const file of dirContents) {
+        const fullPath = path.join(folder, file.name)
+        if (file.isDirectory()) {
+          if (!ignoreDirs.has(file.name)) queue.push(fullPath)
+        } else if (![...ignoreFiles].some(ext => file.name.endsWith(ext))) {
+          files.push(fullPath.replace(`${dir}/`, ""))
+        }
+      }
     } catch {}
   }
 
-  await scan(dir)
-  return files.length ? files : []
+  return files
 }
 
 const checkDependency = async (filePath: string, keywords: string[]): Promise<boolean> => {
@@ -93,13 +98,13 @@ const detectProjectFeatures = async (projectFiles: string[], projectDir: string)
   const hasDocker = projectFiles.some(file => ["Dockerfile", "docker-compose.yml"].includes(file))
 
   const results = await Promise.all([
-    checkDependency(path.join(projectDir, "package.json"), ["express", "fastify", "koa", "hapi"]),
+    checkDependency(path.join(projectDir, "package.json"), ["express", "fastify", "koa"]),
     checkDependency(path.join(projectDir, "go.mod"), ["net/http", "gin-gonic", "fiber"]),
     checkDependency(path.join(projectDir, "Cargo.toml"), ["actix-web", "rocket"]),
     checkDependency(path.join(projectDir, "requirements.txt"), ["flask", "django", "fastapi"]),
     checkDependency(path.join(projectDir, "pyproject.toml"), ["flask", "django", "fastapi"]),
     checkDependency(path.join(projectDir, "pom.xml"), ["spring-boot", "jakarta.ws.rs"]),
-    checkDependency(path.join(projectDir, "package.json"), ["mongoose", "sequelize", "typeorm", "pg", "mysql", "sqlite", "redis"]),
+    checkDependency(path.join(projectDir, "package.json"), ["mongoose", "sequelize", "typeorm", "pg", "mysql", "sqlite"]),
   ])
 
   return {
@@ -140,30 +145,34 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
 }
 
 program.name("dokugen").version("2.5.0").description("Automatically generate high-quality README for your application")
-program.command("generate").description("Scan project and generate a README.md").action(async () => {
-  console.log(chalk.green("🦸 Generating README.md..."))
 
-  const projectDir = process.cwd()
-  const readmePath = path.join(projectDir, "README.md")
+program
+  .command("generate")
+  .description("Scan project and generate a README.md")
+  .action(async () => {
+    console.log(chalk.green("🦸 Generating README.md..."))
 
-  if (await fs.pathExists(readmePath)) {
-    const overwrite = await askYesNo("README.md already exists. Overwrite?")
-    if (!overwrite) {
-      console.log(chalk.yellow("⚠️ Skipping README generation"))
-      return
+    const projectDir = process.cwd()
+    const readmePath = path.join(projectDir, "README.md")
+
+    if (await fs.pathExists(readmePath)) {
+      const overwrite = await askYesNo("README.md already exists. Overwrite?")
+      if (!overwrite) {
+        console.log(chalk.yellow("⚠️ Skipping README generation"))
+        return
+      }
     }
-  }
 
-  const projectType = await validateProjectLanguage(projectDir)
-  const projectFiles = await scanFiles(projectDir)
+    const projectType = await detectProjectType(projectDir)
+    const projectFiles = await scanFiles(projectDir)
 
-  console.log(chalk.blue(`📂 Project Type: ${projectType}`))
-  console.log(chalk.yellow(`📂 Found: ${projectFiles.length} files`))
+    console.log(chalk.blue(`📂 Project Type: ${projectType}`))
+    console.log(chalk.yellow(`📂 Found: ${projectFiles.length} files`))
 
-  const readmeContent = await generateReadme(projectType, projectFiles, projectDir)
-  await fs.writeFile(readmePath, readmeContent)
-  console.log(chalk.green("✅ README.md created"))
-})
+    const readmeContent = await generateReadme(projectType, projectFiles, projectDir)
+    await fs.writeFile(readmePath, readmeContent)
+    console.log(chalk.green("✅ README.md created"))
+  })
 
 program.parse(process.argv)
 

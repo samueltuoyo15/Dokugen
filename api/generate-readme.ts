@@ -1,6 +1,5 @@
 //import supabase from "../lib/supabase"
 import type { VercelRequest, VercelResponse } from "@vercel/node"
-import { kv } from "@vercel/kv"
 import crypto from "crypto"
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import dotenv from "dotenv"
@@ -35,13 +34,6 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     
     //const machineId = crypto.randomUUID()
     //await supabase.from("active_users").upsert([{ machine_id: machineId}])
-    const cacheKey = generateCacheKey(projectType, projectFiles, fullCode)
-    const cachedReadme = (await kv.get<string>(cacheKey)) || null
-
-    if (cachedReadme !== null) {
-      console.log("♻️ Using cached README from KV Store")
-      return res.status(200).json({ readme: cachedReadme })
-    }
 
     console.log("⚡ No cache found. Generating new README...")
 
@@ -96,8 +88,6 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     const readmeContent = result.response.text() || "README generation failed."
 
     console.log("✅ README Generated Successfully")
-
-    await kv.set(cacheKey, readmeContent, { ex: 3600 }) 
 
     return res.status(200).json({ readme: readmeContent })
   } catch (error) {

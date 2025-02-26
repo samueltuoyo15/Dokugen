@@ -38,6 +38,7 @@
   },
   "devDependencies": {
     "@google/generative-ai": "^0.21.0",
+    "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.13.4",
     "@vercel/node": "^5.1.7",
     "typescript": "^5.7.3"
