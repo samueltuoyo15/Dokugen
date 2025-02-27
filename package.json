@@ -3,6 +3,7 @@
   "version": "2.6.0",
   "private": false,
   "main": "./bin/dokugen.ts",
+  "type": "module",
   "scripts": {
     "postinstall": "ts-node scripts/postinstall.ts"
   },
@@ -41,6 +42,7 @@
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.13.4",
     "@vercel/node": "^5.1.7",
+    "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
   }
 }
