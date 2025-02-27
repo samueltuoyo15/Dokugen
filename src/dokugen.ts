@@ -4,9 +4,21 @@ import fs from "fs-extra"
 import * as path from "path"
 import inquirer from "inquirer"
 import axios from "axios"
+import { execSync } from "child_process"
+import os from "os"
 
 interface GenerateReadmeResponse {
   readme: string
+}
+
+const getUserInfo = (): { name: string, email: string } => {
+  try {
+    const gitName = execSync("git config --get user.name", { encoding: "utf-8" }).trim()
+    const gitEmail = execSync("git config --get user.email", { encoding: "utf-8" }).trim()
+    if (gitName && gitEmail) return { name: gitName, email: gitEmail }
+  } catch {}
+
+  return { name: os.userInfo().username || "Unknown", email: process.env.USER || "Unknown" }
 }
 
 const extractFullCode = async (projectFiles: string[], projectDir: string): Promise<string> => {
@@ -51,7 +63,7 @@ const detectProjectType = async (projectDir: string): Promise<string> => {
     "Program.cs": "C# / .NET",
     "Main.kt": "Kotlin",
     "App.swift": "Swift",
-    "CMakeLists.txt": "C++",
+    "CMakeLists.txt": "C++"
   }
 
   const detected = Object.keys(langMap).find(file => files.includes(file))
@@ -60,7 +72,7 @@ const detectProjectType = async (projectDir: string): Promise<string> => {
 
 const scanFiles = async (dir: string): Promise<string[]> => {
   const ignoreDirs = new Set(["node_modules", "dist", ".git", ".next", "coverage", "out", "test", "uploads", "docs", "build", ".vscode", ".idea", "logs", "public", "storage", "bin", "obj", "lib", "venv", "cmake-build-debug"])
-  const ignoreFiles = new Set(["CHANGELOG.md", ".gitignore", ".npmignore", "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "tsconfig.json", "jest.config.js", "README.md", "*.lock", ".DS_Store", ".env", "Thumbs.db", "tsconfig.*", "*.iml", ".editorconfig", ".prettierrc*", ".eslintrc*"])
+  const ignoreFiles = new Set(["CHANGELOG.md", "style.css", "main.css", "output.css", ".gitignore", ".npmignore", "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "tsconfig.json", "jest.config.js", "README.md", "*.lock", ".DS_Store", ".env", "Thumbs.db", "tsconfig.*", "*.iml", ".editorconfig", ".prettierrc*", ".eslintrc*"])
 
   const files: string[] = []
   const queue: string[] = [dir]
@@ -104,13 +116,13 @@ const detectProjectFeatures = async (projectFiles: string[], projectDir: string)
     checkDependency(path.join(projectDir, "requirements.txt"), ["flask", "django", "fastapi"]),
     checkDependency(path.join(projectDir, "pyproject.toml"), ["flask", "django", "fastapi"]),
     checkDependency(path.join(projectDir, "pom.xml"), ["spring-boot", "jakarta.ws.rs"]),
-    checkDependency(path.join(projectDir, "package.json"), ["mongoose", "sequelize", "typeorm", "pg", "mysql", "sqlite"]),
+    checkDependency(path.join(projectDir, "package.json"), ["mongoose", "sequelize", "typeorm", "pg", "mysql", "sqlite"])
   ])
 
   return {
     hasDocker,
     hasAPI: results.slice(0, 6).some(Boolean),
-    hasDatabase: results[6],
+    hasDatabase: results[6]
   }
 }
 
@@ -128,13 +140,16 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
     const isOpenSource = await askYesNo("Include contribution guidelines in README?")
 
     const fullCode = await extractFullCode(projectFiles, projectDir)
+    const userInfo = getUserInfo()
 
     console.log(chalk.blue("🔥 Generating README..."))
+    console.log(userInfo)
     const { data } = await axios.post<GenerateReadmeResponse>("https://dokugen-ochre.vercel.app/api/generate-readme", {
       projectType,
       projectFiles,
       fullCode,
-      options: { hasDocker, hasAPI, hasDatabase, includeSetup, isOpenSource },
+      userInfo,
+      options: { hasDocker, hasAPI, hasDatabase, includeSetup, isOpenSource }
     })
 
     console.log(chalk.green("✅ README Generated Successfully"))
@@ -146,10 +161,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
 
 program.name("dokugen").version("2.5.0").description("Automatically generate high-quality README for your application")
 
-program
-  .command("generate")
-  .description("Scan project and generate a README.md")
-  .action(async () => {
+program.command("generate").description("Scan project and generate a README.md").action(async () => {
     console.log(chalk.green("🦸 Generating README.md..."))
 
     const projectDir = process.cwd()
@@ -157,19 +169,13 @@ program
 
     if (await fs.pathExists(readmePath)) {
       const overwrite = await askYesNo("README.md already exists. Overwrite?")
-      if (!overwrite) {
-        console.log(chalk.yellow("⚠️ Skipping README generation"))
-        return
-      }
+      if (!overwrite) return
     }
 
     const projectType = await detectProjectType(projectDir)
     const projectFiles = await scanFiles(projectDir)
-
-    console.log(chalk.blue(`📂 Project Type: ${projectType}`))
-    console.log(chalk.yellow(`📂 Found: ${projectFiles.length} files`))
-
     const readmeContent = await generateReadme(projectType, projectFiles, projectDir)
+
     await fs.writeFile(readmePath, readmeContent)
     console.log(chalk.green("✅ README.md created"))
   })
