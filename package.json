@@ -2,13 +2,13 @@
   "name": "dokugen",
   "version": "2.5.0",
   "private": false,
-  "main": "./bin/dokugen.mjs",
+  "main": "./bin/dokugen.ts",
   "type": "module",
   "scripts": {
-    "postinstall": "node scripts/postinstall.mjs"
+    "postinstall": "node scripts/postinstall.ts"
   },
   "bin": {
-    "dokugen": "bin/dokugen.mjs"
+    "dokugen": "bin/dokugen.ts"
   },
   "keywords": [
     "open source",

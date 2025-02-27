@@ -1,7 +1,7 @@
-#!/usr/bin/env node
+#!/usr/bin/env ts-node
 import { chmod } from "fs/promises";
 import { platform } from "os";
-const filePath = "./bin/dokugen.mjs";
+const filePath = "./bin/dokugen.ts";
 if (platform() !== "win32") {
     chmod(filePath, 0o755)
         .then(() => console.log(`✅ Set executable permission for ${filePath}`))
