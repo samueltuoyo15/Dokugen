@@ -3,8 +3,9 @@
     "target": "es2022",
     "module": "NodeNext",
     //"rootDir": ".",
+    "allowJs": true
     "moduleResolution": "node",
-   // "outDir": ".",
+    "outDir": "dist",
     "downlevelIteration": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
