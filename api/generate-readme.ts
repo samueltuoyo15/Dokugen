@@ -1,6 +1,7 @@
 import { supabase } from "../lib/supabase.mjs"
 import type { VercelRequest, VercelResponse } from "@vercel/node"
 import crypto from "crypto"
+import os from "os"
 import { OpenAI } from 'openai'
 import dotenv from "dotenv"
 
@@ -26,7 +27,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
 
   try {
     const { projectType, projectFiles, fullCode, userInfo } = req.body
-    if (!projectType || !projectFiles || !fullCode || !userInfo && os.platform !== "linux") {
+    if (!projectType || !projectFiles || !fullCode || (!userInfo && os.platform() !== "linux")) {
       return res.status(400).json({ error: "Missing required fields in request body" })
     }
  
@@ -34,7 +35,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     if(!username || !id) return res.status(400).json({message: "missing os username and id"})
     const { data, error } = await supabase
       .from("active_users")
-      .upsert([{ username, email, id }], { onConflict: ["id"] })
+      .upsert([{ username, email, id }], { onConflict: "id" })
       .select("usage_count")
       .single()
 

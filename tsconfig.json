@@ -4,7 +4,7 @@
     "module": "NodeNext",
     //"rootDir": ".",
     "allowJs": true,
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "outDir": "dist",
     "downlevelIteration": true,
     "esModuleInterop": true,
