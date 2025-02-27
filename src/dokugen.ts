@@ -3,7 +3,7 @@ import chalk from "chalk"
 import fs from "fs-extra"
 import * as path from "path"
 import inquirer from "inquirer"
-import { AxiosResponse } from "axios"
+import axios, {type AxiosResponse } from "axios"
 import { execSync } from "child_process"
 import os from "os"
 
@@ -172,7 +172,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
         reject(err)
       })
 
-      response.data.on("error", (err) => {
+      response.data.on("error", (err: Error) => {
         console.log(chalk.red("\n❌ Error receiving stream data"))
         reject(err)
       })
