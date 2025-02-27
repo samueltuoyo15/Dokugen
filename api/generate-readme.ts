@@ -1,4 +1,4 @@
-import { supabase } from "../lib/supabase"
+import { supabase } from "../lib/supabase.ts"
 import type { VercelRequest, VercelResponse } from "@vercel/node"
 import crypto from "crypto"
 import { OpenAI } from 'openai'
