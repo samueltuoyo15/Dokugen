@@ -1,10 +1,10 @@
 {
   "name": "dokugen",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "private": false,
   "main": "./bin/dokugen.ts",
   "scripts": {
-    "postinstall": "ts-node-esm scripts/postinstall.ts"
+    "postinstall": "node scripts/postinstall.mjs"
   },
   "type": "module",
   "bin": {
