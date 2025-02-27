@@ -141,19 +141,37 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
 
     const fullCode = await extractFullCode(projectFiles, projectDir)
     const userInfo = getUserInfo()
-
-    console.log(chalk.blue("🔥 Generating README..."))
     console.log(userInfo)
+    
+    console.log(chalk.blue("🔥 Generating README..."))
+    
+    const readmePath = path.join(projectDir, "README.md")
+    const fileStream = fs.createWriteStream(readmePath)
     const { data } = await axios.post<GenerateReadmeResponse>("https://dokugen-ochre.vercel.app/api/generate-readme", {
       projectType,
       projectFiles,
       fullCode,
       userInfo,
       options: { hasDocker, hasAPI, hasDatabase, includeSetup, isOpenSource }
-    })
-
-    console.log(chalk.green("✅ README Generated Successfully"))
-    return data.readme || "Operation Failed"
+    }, {responseType: "stream"})
+    
+    return await new Promise((resolve, reject) => {
+      response.data.pipe(fileStream)
+      
+      repsponse.data.on("data", () => {
+        process.stdout.write(chalk.cyan("."))
+        
+        fileStream.on("finish", () => {
+          console.log(chalk.green("\n README.md created successfully"))
+          resolve(readmePath)
+        })
+        
+        fileStream.on("error", () => {
+          console.log(chalk.red("\n Failed to write Readme"))
+          reject("Failed")
+        })
+      })
+    })   
   } catch {
     return "Failed"
   }
@@ -175,8 +193,6 @@ program.command("generate").description("Scan project and generate a README.md")
     const projectType = await detectProjectType(projectDir)
     const projectFiles = await scanFiles(projectDir)
     const readmeContent = await generateReadme(projectType, projectFiles, projectDir)
-
-    await fs.writeFile(readmePath, readmeContent)
     console.log(chalk.green("✅ README.md created"))
   })
 
