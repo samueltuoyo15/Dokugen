@@ -13,14 +13,14 @@ interface GenerateReadmeResponse {
   readme: string
 }
 
-const getUserInfo = (): { name: string, email: string } => {
+const getUserInfo = (): { username: string, email?: string } => {
   try {
     const gitName = execSync("git config --get user.name", { encoding: "utf-8" }).trim()
     const gitEmail = execSync("git config --get user.email", { encoding: "utf-8" }).trim()
-    if (gitName && gitEmail) return { name: gitName, email: gitEmail }
+    if (gitName && gitEmail) return { username: gitName, email: gitEmail }
   } catch {}
 
-  return { name: os.userInfo().username || "Unknown", email: process.env.USER || "Unknown" }
+  return { username: os.userInfo().username || "Unknown", email: process.env.USER || "Unknown" }
 }
 
 const extractFullCode = async (projectFiles: string[], projectDir: string): Promise<string> => {

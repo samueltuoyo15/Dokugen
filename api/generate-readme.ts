@@ -26,12 +26,12 @@ export default async (req: VercelRequest, res: VercelResponse) => {
 
   try {
     const { projectType, projectFiles, fullCode, userInfo } = req.body
-    if (!projectType || !projectFiles || !fullCode || !userInfo) {
+    if (!projectType || !projectFiles || !fullCode || !userInfo && os.platform !== "linux") {
       return res.status(400).json({ error: "Missing required fields in request body" })
     }
-    
-    const { username, email, id } = userInfo
-
+ 
+    const { username, email, id } = userInfo || {}
+    if(!username || !id) return res.status(400).json({message: "missing os username and id"})
     const { data, error } = await supabase
       .from("active_users")
       .upsert([{ username, email, id }], { onConflict: ["id"] })
