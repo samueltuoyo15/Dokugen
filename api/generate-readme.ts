@@ -1,4 +1,4 @@
-import { supabase } from "../supabase.mjs"
+import { supabase } from "../lib/supabase.mjs"
 import type { VercelRequest, VercelResponse } from "@vercel/node"
 import crypto from "crypto"
 import { OpenAI } from 'openai'
