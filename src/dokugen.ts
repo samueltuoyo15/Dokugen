@@ -32,6 +32,7 @@ const extractFullCode = async (projectFiles: string[], projectDir: string): Prom
           for await (const chunk of contentStream) content += chunk
           return `## ${file}\n\`\`\`${path.extname(file).slice(1) || "txt"}\n${content}\n\`\`\`\n`
         } catch {
+          console.error(error)
           return null
         }
       })
@@ -91,7 +92,9 @@ const scanFiles = async (dir: string): Promise<string[]> => {
           files.push(fullPath.replace(`${dir}/`, ""))
         }
       }
-    } catch {}
+    } catch {
+      console.error(error)
+    }
   }
 
   return files
@@ -102,6 +105,7 @@ const checkDependency = async (filePath: string, keywords: string[]): Promise<bo
     const content = await fs.readFile(filePath, "utf-8")
     return keywords.some(keyword => content.toLowerCase().includes(keyword.toLowerCase()))
   } catch {
+    console.error(error)
     return false
   }
 }
@@ -146,7 +150,8 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
     console.log(chalk.blue("🔥 Generating README..."))
     
     const readmePath = path.join(projectDir, "README.md")
-   const response = await axios.post<GenerateReadmeResponse>("https://dokugen-ochre.vercel.app/api/generate-readme", {
+    const fileStream = fs.createWriteStream(readmePath)
+    const response = await axios.post<GenerateReadmeResponse>("https://dokugen-ochre.vercel.app/api/generate-readme", {
       projectType,
       projectFiles,
       fullCode,
@@ -154,23 +159,24 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
       options: { hasDocker, hasAPI, hasDatabase, includeSetup, isOpenSource }
     }, {responseType: "stream"})
     
-    return await new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       response.data.pipe(fileStream)
-      response.data.on("data", () => {
-     const fileStream = fs.createWriteStream(readmePath)
-        process.stdout.write(chalk.cyan("."))
-        
-        fileStream.on("finish", () => {
-          console.log(chalk.green("\n README.md created successfully"))
-          resolve(readmePath)
-        })
-        
-        fileStream.on("error", () => {
-          console.log(chalk.red("\n Failed to write Readme"))
-          reject("Failed")
-        })
+
+      fileStream.on("finish", () => {
+        console.log(chalk.green("\n✅ README.md created successfully"))
+        resolve(readmePath)
       })
-    })   
+
+      fileStream.on("error", (err) => {
+        console.log(chalk.red("\n❌ Failed to write README"))
+        reject(err)
+      })
+
+      response.data.on("error", (err) => {
+        console.log(chalk.red("\n❌ Error receiving stream data"))
+        reject(err)
+      })
+    })
   } catch {
     console.error("\n Error Generating Readme")
     return "Failed"
