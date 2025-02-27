@@ -3,7 +3,7 @@ import chalk from "chalk"
 import fs from "fs-extra"
 import * as path from "path"
 import inquirer from "inquirer"
-import axios from "axios"
+import { AxiosResponse } from "axios"
 import { execSync } from "child_process"
 import os from "os"
 
@@ -31,7 +31,7 @@ const extractFullCode = async (projectFiles: string[], projectDir: string): Prom
           let content = ""
           for await (const chunk of contentStream) content += chunk
           return `## ${file}\n\`\`\`${path.extname(file).slice(1) || "txt"}\n${content}\n\`\`\`\n`
-        } catch {
+        } catch(error){
           console.error(error)
           return null
         }
@@ -92,7 +92,7 @@ const scanFiles = async (dir: string): Promise<string[]> => {
           files.push(fullPath.replace(`${dir}/`, ""))
         }
       }
-    } catch {
+    } catch(error){
       console.error(error)
     }
   }
@@ -104,7 +104,7 @@ const checkDependency = async (filePath: string, keywords: string[]): Promise<bo
   try {
     const content = await fs.readFile(filePath, "utf-8")
     return keywords.some(keyword => content.toLowerCase().includes(keyword.toLowerCase()))
-  } catch {
+  } catch (error){
     console.error(error)
     return false
   }
@@ -151,7 +151,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
     
     const readmePath = path.join(projectDir, "README.md")
     const fileStream = fs.createWriteStream(readmePath)
-    const response = await axios.post<GenerateReadmeResponse>("https://dokugen-ochre.vercel.app/api/generate-readme", {
+    const response: AxiosResponse<GenerateReadmeResponse> = await axios.post("https://dokugen-ochre.vercel.app/api/generate-readme", {
       projectType,
       projectFiles,
       fullCode,
