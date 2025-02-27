@@ -4,8 +4,9 @@
   "private": false,
   "main": "./bin/dokugen.ts",
   "scripts": {
-    "postinstall": "node scripts/postinstall.mjs"
+    "postinstall": "ts-node-esm scripts/postinstall.ts"
   },
+  "type": "module",
   "bin": {
     "dokugen": "ts-node bin/dokugen.ts"
   },
