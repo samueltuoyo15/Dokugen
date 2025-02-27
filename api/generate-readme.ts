@@ -1,18 +1,17 @@
-//import supabase from "../lib/supabase"
+import supabase from "../lib/supabase"
 import type { VercelRequest, VercelResponse } from "@vercel/node"
 import crypto from "crypto"
-import { GoogleGenerativeAI } from "@google/generative-ai"
+import { OpenAI } from 'openai'
 import dotenv from "dotenv"
 
 dotenv.config()
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "")
-const model = genAI.getGenerativeModel({
-  model: process.env.MODEL_NAME || "",
-  systemInstruction: process.env.MODEL_INSTRUCTION || "",
-})
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY || "",
+    baseURL: process.env.OPENAI_ENDPOINT || ""
+});
 
-const generationConfig = process.env.CONFIG_PAYLOAD ? JSON.parse(process.env.CONFIG_PAYLOAD) : {}
+const MODEL_INSTRUCTION = process.env.MODEL_INSTRUCTION?.trim() || ""
 
 const generateCacheKey = (projectType: string, projectFiles: string[], fullCode: string) => {
   const hash = crypto.createHash("sha256")
@@ -32,8 +31,8 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       return res.status(400).json({ error: "Missing required fields in request body" })
     }
     
-    //const machineId = crypto.randomUUID()
-    //await supabase.from("active_users").upsert([{ machine_id: machineId}])
+    
+    await supabase.from("active_users").upsert([{ }])
 
     console.log("⚡ No cache found. Generating new README...")
 
@@ -84,9 +83,29 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     Just generate the actual **README.md content directly.**
     `
 
-    const result = await chatSession.sendMessage(prompt)
-    const readmeContent = result.response.text() || "README generation failed."
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
 
+      const stream = await openai.chat.completions.create({
+        model: process.env.MODEL_NAME!,
+        messages: [
+          { role: 'system', content: MODEL_INSTRUCTION},
+          { role: 'user', content: prompt },
+        ],
+        stream: true,
+      });
+
+      for await (const chunk of stream) {
+        const text = chunk.choices[0]?.delta?.content || '';
+        if (text) {
+          res.write(`data: ${JSON.stringify({ response: text })}\n\n`);
+        }
+      }
+
+      res.end();
+    }
+    
     console.log("✅ README Generated Successfully")
 
     return res.status(200).json({ readme: readmeContent })

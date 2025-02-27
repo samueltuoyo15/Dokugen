@@ -34,10 +34,11 @@
     "commander": "^13.1.0",
     "dotenv": "^16.4.7",
     "fs-extra": "^11.3.0",
-    "inquirer": "^12.4.2"
+    "inquirer": "^12.4.2",
+    "openai": "^4.85.4"
   },
   "devDependencies": {
-    "@google/generative-ai": "^0.21.0",
+    "@types/axios": "^0.9.36",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.13.4",
     "@vercel/node": "^5.1.7",
