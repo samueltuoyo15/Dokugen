@@ -5,10 +5,10 @@
   "main": "./bin/dokugen.ts",
   "type": "module",
   "scripts": {
-    "postinstall": "node scripts/postinstall.ts"
+    "postinstall": "ts-node scripts/postinstall.ts"
   },
   "bin": {
-    "dokugen": "bin/dokugen.ts"
+    "dokugen": "ts-node bin/dokugen.ts"
   },
   "keywords": [
     "open source",
