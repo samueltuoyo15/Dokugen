@@ -3,7 +3,7 @@
     "target": "es2022",
     "module": "NodeNext",
     //"rootDir": ".",
-    "allowJs": true
+    "allowJs": true,
     "moduleResolution": "node",
     "outDir": "dist",
     "downlevelIteration": true,
