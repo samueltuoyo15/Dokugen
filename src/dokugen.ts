@@ -146,8 +146,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
     console.log(chalk.blue("🔥 Generating README..."))
     
     const readmePath = path.join(projectDir, "README.md")
-    const fileStream = fs.createWriteStream(readmePath)
-    const { data } = await axios.post<GenerateReadmeResponse>("https://dokugen-ochre.vercel.app/api/generate-readme", {
+   const response = await axios.post<GenerateReadmeResponse>("https://dokugen-ochre.vercel.app/api/generate-readme", {
       projectType,
       projectFiles,
       fullCode,
@@ -157,8 +156,8 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
     
     return await new Promise((resolve, reject) => {
       response.data.pipe(fileStream)
-      
-      repsponse.data.on("data", () => {
+      response.data.on("data", () => {
+     const fileStream = fs.createWriteStream(readmePath)
         process.stdout.write(chalk.cyan("."))
         
         fileStream.on("finish", () => {
@@ -173,6 +172,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
       })
     })   
   } catch {
+    console.error("\n Error Generating Readme")
     return "Failed"
   }
 }
