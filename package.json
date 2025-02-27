@@ -4,7 +4,7 @@
   "private": false,
   "main": "./bin/dokugen.ts",
   "scripts": {
-    "postinstall": "ts-node scripts/postinstall.ts"
+    "postinstall": "ts-node scripts/postinstall.mjs"
   },
   "bin": {
     "dokugen": "ts-node bin/dokugen.ts"
