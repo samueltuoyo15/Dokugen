@@ -50,8 +50,8 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     console.log(`Updated Active user ${username}, (${email})`)
 
 
-    const hasAPI = projectFiles.some(file => file.includes("routes") || file.includes("api"))
-    const hasDatabase = projectFiles.some(file => file.includes("db") || file.includes("database"))
+    const hasAPI = projectFiles.some((file: string)  => file.includes("routes") || file.includes("api"))
+    const hasDatabase = projectFiles.some((file: string) => file.includes("db") || file.includes("database"))
     const useDocker = projectFiles.includes("Dockerfile")
 
     const prompt = `
