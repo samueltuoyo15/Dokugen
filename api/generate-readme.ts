@@ -19,34 +19,40 @@ const generateCacheKey = (projectType: string, projectFiles: string[], fullCode:
   return `readme:${hash.digest("hex")}`
 }
 
-
 export default async (req: VercelRequest, res: VercelResponse) => {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method not allowed" })
   }
 
   try {
-    const { projectType, projectFiles, fullCode, options } = req.body
-    if (!projectType || !projectFiles || !fullCode) {
+    const { projectType, projectFiles, fullCode, userInfo } = req.body
+    if (!projectType || !projectFiles || !fullCode || !userInfo) {
       return res.status(400).json({ error: "Missing required fields in request body" })
     }
     
-    
-    await supabase.from("active_users").upsert([{ }])
+    const { username, email, id } = userInfo
 
-    console.log("⚡ No cache found. Generating new README...")
+    const { data, error } = await supabase
+      .from("active_users")
+      .upsert([{ username, email, id }], { onConflict: ["id"] })
+      .select("usage_count")
+      .single()
 
-    const hasPackageJson = projectFiles.includes("package.json")
-    const hasDockerfile = projectFiles.includes("Dockerfile")
-    const hasDatabaseConfig = projectFiles.some(file => file.includes("db") || file.includes("database"))
-    const hasApiRoutes = projectFiles.some(file => file.includes("routes") || file.includes("api"))
+    if (error) throw error
 
-    const hasAPI = hasApiRoutes ? true : false
-    const hasDatabase = hasDatabaseConfig ? true : false
-    const useDocker = hasDockerfile ? true : false
+    const usage_count = data?.usage_count || 0
 
-    const chatSession = model.startChat({ generationConfig })
-   
+    if (data) {
+      await supabase.from("active_users").update({ usage_count: usage_count + 1 }).eq("id", id)
+    }
+
+    console.log(`Updated Active user ${username}, (${email})`)
+
+
+    const hasAPI = projectFiles.some(file => file.includes("routes") || file.includes("api"))
+    const hasDatabase = projectFiles.some(file => file.includes("db") || file.includes("database"))
+    const useDocker = projectFiles.includes("Dockerfile")
+
     const prompt = `
     Generate a **high-quality README.md** for a **${projectType}** project.
 
@@ -83,35 +89,30 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     Just generate the actual **README.md content directly.**
     `
 
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
+    res.setHeader('Content-Type', 'text/event-stream')
+    res.setHeader('Cache-Control', 'no-cache')
+    res.setHeader('Connection', 'keep-alive')
 
-      const stream = await openai.chat.completions.create({
-        model: process.env.MODEL_NAME!,
-        messages: [
-          { role: 'system', content: MODEL_INSTRUCTION},
-          { role: 'user', content: prompt },
-        ],
-        stream: true,
-      });
+    const stream = await openai.chat.completions.create({
+      model: process.env.MODEL_NAME!,
+      messages: [
+        { role: 'system', content: MODEL_INSTRUCTION },
+        { role: 'user', content: prompt },
+      ],
+      stream: true,
+    })
 
-      for await (const chunk of stream) {
-        const text = chunk.choices[0]?.delta?.content || '';
-        if (text) {
-          res.write(`data: ${JSON.stringify({ response: text })}\n\n`);
-        }
+    for await (const chunk of stream) {
+      const text = chunk.choices[0]?.delta?.content || ''
+      if (text) {
+        res.write(`data: ${JSON.stringify({ response: text })}\n\n`)
       }
-
-      res.end();
     }
-    
-    console.log("✅ README Generated Successfully")
 
-    return res.status(200).json({ readme: readmeContent })
+    res.end()
+    console.log("✅ README Generated Successfully")
   } catch (error) {
     console.error("❌ Error generating README:", error)
     return res.status(500).json({ error: "Failed to generate README" })
   }
 }
-
