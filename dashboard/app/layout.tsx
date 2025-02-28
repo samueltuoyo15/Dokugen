@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import siteMetadata from "../utils/siteMetaData";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -24,7 +25,7 @@ export const metadata = {
     description: siteMetadata.description,
     url: siteMetadata.siteUrl,
     siteName: siteMetadata.title,
-    images: [siteMetadata.socialBanner],
+    //images: [siteMetadata.socialBanner],
     locale: "en_US",
     type: "website",
   },
@@ -43,7 +44,7 @@ export const metadata = {
   twitter: {
     card: "summary_large_image",
     title: siteMetadata.title,
-    images: [siteMetadata.socialBanner],
+    //images: [siteMetadata.socialBanner],
   },
 };
 

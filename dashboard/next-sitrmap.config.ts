@@ -1,4 +1,4 @@
-import siteMetadata from "./src/utils/siteMetaData"
+import siteMetadata from "./utils/siteMetaData"
 
 export{
     siteUrl: siteMetadata.siteUrl,
