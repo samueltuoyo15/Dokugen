@@ -5,12 +5,9 @@ import fs from "fs-extra"
 import * as path from "path"
 import inquirer from "inquirer"
 import axios from "axios"
+import { Readable } from "stream"
 import { execSync } from "child_process"
 import os from "os"
-
-interface GenerateReadmeResponse {
-  readme: string
-}
 
 const getUserInfo = (): { username: string, email?: string } => {
   try {
@@ -153,7 +150,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
     
     const readmePath = path.join(projectDir, "README.md")
     const fileStream = fs.createWriteStream(readmePath)
-    const response = await axios.post<GenerateReadmeResponse>("https://dokugen-ochre.vercel.app/api/generate-readme", {
+    const response = await axios.post("https://dokugen-ochre.vercel.app/api/generate-readme", {
       projectType,
       projectFiles,
       fullCode,
@@ -161,8 +158,9 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
       options: { hasDocker, hasAPI, hasDatabase, includeSetup, isOpenSource }
     }, {responseType: "stream"})
     
+    const repsponseStream = response.data as Readable 
     return new Promise((resolve, reject) => {
-      response.data.pipe(fileStream)
+      repsponseStream.pipe(fileStream)
 
       fileStream.on("finish", () => {
         console.log(chalk.green("\n✅ README.md created successfully"))
@@ -174,7 +172,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
         reject(err)
       })
 
-      response.data.on("error", (err: Error) => {
+      repsponseStream.on("error", (err: Error) => {
         console.log(chalk.red("\n❌ Error receiving stream data"))
         reject(err)
       })
