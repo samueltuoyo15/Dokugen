@@ -6,6 +6,7 @@ import * as path from "path"
 import inquirer from "inquirer"
 import axios from "axios"
 import { Readable } from "stream"
+import { createParser, ParsedEvent, ReconnectInterval } from "eventsource-parser"
 import { execSync } from "child_process"
 import os from "os"
 
@@ -158,15 +159,34 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
       options: { hasDocker, hasAPI, hasDatabase, includeSetup, isOpenSource }
     }, {responseType: "stream"})
     
-    const repsponseStream = response.data as Readable 
+    const responseStream = response.data as Readable 
     return new Promise((resolve, reject) => {
       repsponseStream.pipe(fileStream)
 
-      fileStream.on("finish", () => {
+      const parser = createParser((event: ParsedEvent | ReconnectInterval) => {
+        if(typeof event === "string") return 
+        
+        if(event.type === "event" && event.data) {
+          try{
+            const json = JSON.parse(event.data)
+            if(json.response){
+              fileStream.write(json.response)
+            }
+          } catch(error){
+            console.error("Failed to parse chunk", error)
+          }
+        }
+      })
+      
+      repsponseStream.on("data", (chunk: Buffer) => {
+        parser.feed(chunk.toString())
+      })
+      responseStream.on("end", () => {
+        fileStream.end()
         console.log(chalk.green("\n✅ README.md created successfully"))
         resolve(readmePath)
       })
-
+      
       fileStream.on("error", (err) => {
         console.log(chalk.red("\n❌ Failed to write README"))
         reject(err)
@@ -179,14 +199,14 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
     })
   } catch {
     console.error("\n Error Generating Readme")
-    return "Failed"
+    process.exit(1)
   }
 }
 
 program.name("dokugen").version("2.9.0").description("Automatically generate high-quality README for your application")
 
 program.command("generate").description("Scan project and generate a README.md").action(async () => {
-    console.log(chalk.green("🦸 Generating README.md..."))
+    console.log(chalk.green("🦸 Preparing README.md..."))
 
     const projectDir = process.cwd()
     const readmePath = path.join(projectDir, "README.md")

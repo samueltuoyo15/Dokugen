@@ -8,7 +8,7 @@
   },
   "type": "module",
   "bin": {
-    "dokugen": "ts-node bin/dokugen.ts"
+    "dokugen": "ts-node --no-warnings bin/dokugen.ts"
   },
   "keywords": [
     "open source",
@@ -33,6 +33,7 @@
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
     "dotenv": "^16.4.7",
+    "eventsource-parser": "^3.0.0",
     "fs-extra": "^11.3.0",
     "inquirer": "^12.4.2",
     "openai": "^4.85.4",
