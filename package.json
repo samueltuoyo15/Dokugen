@@ -35,7 +35,8 @@
     "dotenv": "^16.4.7",
     "fs-extra": "^11.3.0",
     "inquirer": "^12.4.2",
-    "openai": "^4.85.4"
+    "openai": "^4.85.4",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/axios": "^0.9.36",
