@@ -1,6 +1,3 @@
 import siteMetadata from "./utils/siteMetaData"
 
-export{
-    siteUrl: siteMetadata.siteUrl,
-    generateRobotsTxt: true,
-  }
+export const config = { siteUrl: siteMetadata.siteUrl, generateRobotsTxt: true, }
