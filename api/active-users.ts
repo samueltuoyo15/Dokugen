@@ -1,4 +1,4 @@
-import supabase from "../lib/supabase.mjs"
+import { supabase } from "../lib/supabase.mjs"
 import { VercelRequest, VercelResponse } from "@vercel/node"
 
 export default async (req: VercelRequest, res: VercelResponse) => {
@@ -11,7 +11,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     if(error) throw error
     
     return res.status(200).json({activeUsers: data})
-  } catch(error: any){
+  } catch(error){
     console.error("Error Fetching Active Users", error)
     return res.status(500).json({message: "Failed to fetch active users "})
   }
