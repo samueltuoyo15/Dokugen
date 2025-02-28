@@ -31,7 +31,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     if (!projectType || !projectFiles || !fullCode || (!userInfo && os.platform() !== "linux")) {
       return res.status(400).json({ error: "Missing required fields in request body" })
     }
- 
+
     const { username, email } = userInfo || {}
     if (!username) return res.status(400).json({ message: "Missing OS username and ID" })
 
@@ -60,42 +60,34 @@ export default async (req: VercelRequest, res: VercelResponse) => {
 
     console.log(`Updated Active user ${username}, (${email})`)
 
-    const hasAPI = projectFiles.some((file: string)  => file.includes("routes") || file.includes("api"))
-    const hasDatabase = projectFiles.some((file: string) => file.includes("db") || file.includes("database"))
-    const useDocker = projectFiles.includes("Dockerfile")
-
     const prompt = `
     Generate a **high-quality README.md** for a **${projectType}** project.
 
-    ## Project Files:
-    The project contains these files:
+    ## Project Overview:
+    The project includes the following files:
     ${projectFiles.join("\n")}
     
     ## Full Code Context:
-    Below is the **actual source code** from the project:
+    Below is the actual source code:
     ${fullCode}
 
     ## README Requirements:
-    - **Clear & Professional Title**
-    - **Short & Precise Project Description**
-    - **Installation Steps**
-    - **Usage Guide**
-    ${hasAPI ? "- **API Endpoints**\n" : ""}
-    ${hasDatabase ? "- **Database Setup**\n" : ""}
-    ${useDocker ? "- **Docker Setup**\n" : ""}
-    - **Contribution Guide**
-    - **License Info (if applicable)**
-    - **Badges (if applicable)**
+    - **Analyze the project** and determine what sections are needed.
+    - If the project has APIs, databases, or Docker, include relevant details.
+    - Adjust the **tone and style** of the README based on the project's nature:
+      - If it's a **modern project**, use eye-catching elements like badges, emojis, and creative formatting.
+      - If it's a **professional project**, keep the README clean and minimal.
+    - Include **Installation Steps, Usage Guide, Contribution Guide, and License Info** (if applicable).
     
     ## Additional Requirement:
-    - At the bottom of the README, you must always include the following badge:
+    - Always include this badge at the bottom of the README:
 
     \`\`\`
     [![Built with Dokugen](https://img.shields.io/badge/Built%20with-Dokugen-brightgreen)](https://github.com/samueltuoyo15/Dokugen)
     \`\`\`
-    
-    The README must **sound like a human wrote it.**  
-    Do **not** say things like "Here is a README for you."
+
+    The README must **sound like a human wrote it**.  
+    Do **not** say things like "Here is a README for you."  
     Do **not** wrap it in markdown code blocks (e.g., \`\`\`markdown or \`\`\`).  
     Just generate the actual **README.md content directly.**
     `
