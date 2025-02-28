@@ -1,4 +1,4 @@
-export default const siteMetadata = {
+const siteMetadata = {
     title: 'Dokugen - Your README.md Generator ',
     author: 'Samuel Tuoyo',
     headerTitle: 'Dokugen',
@@ -16,4 +16,4 @@ export default const siteMetadata = {
     linkedin: 'https://www.linkedin.com/in/',
     locale: 'en-US',
   }
- 
+ export default siteMetaData
