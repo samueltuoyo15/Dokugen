@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node
 import { program } from "commander"
 import chalk from "chalk"
 import fs from "fs-extra"
@@ -204,7 +204,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
   }
 }
 
-program.name("dokugen").version("2.9.2").description("Automatically generate high-quality README for your application")
+program.name("dokugen").version("2.9.7").description("Automatically generate high-quality README for your application")
 
 program.command("generate").description("Scan project and generate a README.md").action(async () => {
     const projectDir = process.cwd()

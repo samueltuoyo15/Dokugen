@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node
 import { chmod } from "fs/promises";
 import { platform } from "os";
 const filePath = "./bin/dokugen.ts";

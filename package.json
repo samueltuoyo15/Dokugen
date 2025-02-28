@@ -1,14 +1,15 @@
 {
   "name": "dokugen",
-  "version": "2.9.2",
+  "version": "2.9.7",
   "private": false,
-  "main": "./bin/dokugen.ts",
-  "scripts": {
-    "postinstall": "node scripts/postinstall.mjs"
-  },
+  "main": "dist/bin/dokugen.mjs",
   "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "postinstall": "node dist/scripts/postinstall.mjs"
+  },
   "bin": {
-    "dokugen": "ts-node --no-warnings bin/dokugen.ts"
+    "dokugen": "dist/bin/dokugen.mjs"
   },
   "keywords": [
     "open source",

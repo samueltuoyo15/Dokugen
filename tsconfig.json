@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2022",
     "module": "NodeNext",
-    //"rootDir": ".",
+    "rootDir": ".",
     "allowJs": true,
     "moduleResolution": "NodeNext",
     "outDir": "dist",
@@ -11,5 +11,7 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true
-  }
+  },
+  "include": ["bin/**/*", "scripts/**/*"],
+  "exclude": ["dashboard", "dist", "node_modules"]
 }

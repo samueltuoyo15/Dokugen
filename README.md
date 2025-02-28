@@ -1,5 +1,5 @@
 # Dokugen: Your README.md Generator 🦸
-### current version 2.9.2 🤗
+### current version 2.9.7 🤗
 
 A CLI tool to automatically generate high-quality README files for your projects. Spend less time on documentation and more time building!
 
@@ -48,7 +48,7 @@ Contributions are welcome! Feel free to submit pull requests with improvements, 
 ## License
 
 This project is open-source and available under the MIT License. See the `LICENSE` file for more information.
-### Developers [Samuel Tuoyo](https://github.com/samueltuoyo15) & [Charming DC](https://github.com/Charmingdc)
+### Developers [Samuel Tuoyo](https://github.com/samueltuoyo15)
 ## Badges
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
