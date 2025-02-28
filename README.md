@@ -1,11 +1,11 @@
 # Dokugen: Your README.md Generator 🦸
-### current version 2.9.7 🤗
+### current version 2.9.8 🤗
 
 A CLI tool to automatically generate high-quality README files for your projects. Spend less time on documentation and more time building!
 
 ## Description
 
-Dokugen scans your project, analyzes the file structure and code, and then generates a comprehensive README.md file based on your project type and key characteristics. It supports various languages and frameworks, including JavaScript/TypeScript, Python, Go, and more. It also asks you key questions like "Does your project use Docker?" to improve the output.
+Dokugen scans your project, analyzes the file structure and codebase, and then generates a comprehensive README.md file based on your project type and key characteristics. It supports various languages and frameworks, including JavaScript/TypeScript, Python, Go, and more. It also asks you key questions like "Does your project use Docker?" to improve the output.
 
 ## Installation
 
