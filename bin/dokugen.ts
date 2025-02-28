@@ -164,19 +164,17 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
       responseStream.pipe(fileStream)
 
       const parser = createParser((event: EventSourceMessage) => {
-        if(typeof event === "string") return 
-        
-        if(event.type === "event" && event.data) {
-          try{
-            const json = JSON.parse(event.data)
-            if(json.response){
-              fileStream.write(json.response)
-            }
-          } catch(error){
-            console.error("Failed to parse chunk", error)
-          }
+       if (!event.data) return 
+
+       try {
+            const json = JSON.parse(event.data.trim()) 
+         if (json.response && typeof json.response === "string") {
+            fileStream.write(json.response)
         }
-      })
+      } catch (error) {
+            console.error("Skipping invalid event data:", event.data)
+         }
+     })
       
       responseStream.on("data", (chunk: Buffer) => {
         parser.feed(chunk.toString())
@@ -194,7 +192,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
         reject(err)
       })
 
-      repsponseStream.on("error", (err: Error) => {
+      responseStream.on("error", (err: Error) => {
         console.log(chalk.red("\n❌ Error receiving stream data"))
         reject(err)
       })
