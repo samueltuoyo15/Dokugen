@@ -17,7 +17,11 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.0.2",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "@supabase/supabase-js": "^2.48.1",
+    "@vercel/kv": "^3.0.0",
+    "openai": "^4.85.4",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

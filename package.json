@@ -28,16 +28,12 @@
   },
   "dependencies": {
     "@octokit/rest": "^21.1.1",
-    "@supabase/supabase-js": "^2.48.1",
-    "@vercel/kv": "^3.0.0",
     "axios": "^1.8.1",
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
     "dotenv": "^16.4.7",
     "fs-extra": "^11.3.0",
-    "inquirer": "^12.4.2",
-    "openai": "^4.85.4",
-    "uuid": "^11.1.0"
+    "inquirer": "^12.4.2"
   },
   "devDependencies": {
     "@types/axios": "^0.9.36",
