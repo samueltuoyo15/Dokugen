@@ -5,7 +5,6 @@ import fs from "fs-extra"
 import * as path from "path"
 import inquirer from "inquirer"
 import axios from "axios"
-import { AxiosResponse } from "axios"
 import { execSync } from "child_process"
 import os from "os"
 
@@ -154,7 +153,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
     
     const readmePath = path.join(projectDir, "README.md")
     const fileStream = fs.createWriteStream(readmePath)
-    const response: AxiosResponse<GenerateReadmeResponse> = await axios.post("https://dokugen-ochre.vercel.app/api/generate-readme", {
+    const response = await axios.post<GenerateReadmeResponse>("https://dokugen-ochre.vercel.app/api/generate-readme", {
       projectType,
       projectFiles,
       fullCode,
