@@ -1,4 +1,4 @@
-import { supabase } from "../lib/supabase"
+import { supabase } from "../lib/supabase.js"
 import { VercelRequest, VercelResponse } from "@vercel/node"
 
 export default async (req: VercelRequest, res: VercelResponse) => {
