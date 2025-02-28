@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [2.9.8] - 2025-02-28
+## [2.9.9] - 2025-02-28
 ### Added
 - **Streaming Support**: Integrated real-time streaming for README generation using OpenAI's API.
 - **Active User Tracking**: Added functionality to track active users and their usage count via Supabase.

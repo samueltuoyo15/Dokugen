@@ -1,5 +1,5 @@
 # Dokugen: Your README.md Generator 🦸
-### current version 2.9.8 🤗
+### current version 2.9.9 🤗
 
 A CLI tool to automatically generate high-quality README files for your projects. Spend less time on documentation and more time building!
 
