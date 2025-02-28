@@ -2,7 +2,7 @@ import { supabase } from "../lib/supabase.mjs"
 import type { VercelRequest, VercelResponse } from "@vercel/node"
 import crypto from "crypto"
 import os from "os"
-import { v4 as uuidv4 } as "uuid"
+import { v4 as uuidv4 } from "uuid"
 import { OpenAI } from 'openai'
 import dotenv from "dotenv"
 
@@ -38,7 +38,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     const id = userInfo?.id || uuidv4()
     const { data, error } = await supabase
       .from("active_users")
-      .upsert([{ username, email, id: }], { onConflict: "id" })
+      .upsert([{ username, email, id }], { onConflict: "id" })
       .select("usage_count")
       .single()
 
