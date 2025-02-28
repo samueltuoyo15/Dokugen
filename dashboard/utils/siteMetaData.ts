@@ -16,4 +16,4 @@ const siteMetadata = {
     linkedin: 'https://www.linkedin.com/in/',
     locale: 'en-US'
   }
- export default siteMetaData
+ export default siteMetadata
