@@ -14,6 +14,6 @@ const siteMetadata = {
     facebook: 'https://facebook.com',
     youtube: 'https://youtube.com/',
     linkedin: 'https://www.linkedin.com/in/',
-    locale: 'en-US',
+    locale: 'en-US'
   }
  export default siteMetaData
