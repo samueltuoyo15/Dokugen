@@ -33,25 +33,32 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     }
  
     const { username, email } = userInfo || {}
-    if(!username) return res.status(400).json({message: "missing os username and id"})
- 
+    if (!username) return res.status(400).json({ message: "Missing OS username and ID" })
+
     const id = userInfo?.id || uuidv4()
-    const { data, error } = await supabase
+  
+    const { data: existingUser, error: userError } = await supabase
       .from("active_users")
-      .upsert([{ username, email, id }], { onConflict: "id" })
-      .select("usage_count")
+      .select("id, usage_count")
+      .eq("email", email)
       .single()
 
-    if (error) throw error
+    if (userError && userError.code !== "PGRST116") throw userError 
 
-    const usage_count = data?.usage_count || 0
+    if (existingUser) {
+      await supabase
+        .from("active_users")
+        .update({ usage_count: existingUser.usage_count + 1 })
+        .eq("id", existingUser.id)
+    } else {
+      const { error } = await supabase
+        .from("active_users")
+        .insert([{ username, email, id, usage_count: 1 }])
 
-    if (data) {
-      await supabase.from("active_users").update({ usage_count: usage_count + 1 }).eq("id", id)
+      if (error) throw error
     }
 
     console.log(`Updated Active user ${username}, (${email})`)
-
 
     const hasAPI = projectFiles.some((file: string)  => file.includes("routes") || file.includes("api"))
     const hasDatabase = projectFiles.some((file: string) => file.includes("db") || file.includes("database"))

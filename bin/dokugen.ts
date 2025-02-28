@@ -6,7 +6,7 @@ import * as path from "path"
 import inquirer from "inquirer"
 import axios from "axios"
 import { Readable } from "stream"
-import { createParser, ParsedEvent, ReconnectInterval } from "eventsource-parser"
+import { createParser, type EventSourceMessage } from "eventsource-parser"
 import { execSync } from "child_process"
 import os from "os"
 
@@ -161,9 +161,9 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
     
     const responseStream = response.data as Readable 
     return new Promise((resolve, reject) => {
-      repsponseStream.pipe(fileStream)
+      responseStream.pipe(fileStream)
 
-      const parser = createParser((event: ParsedEvent | ReconnectInterval) => {
+      const parser = createParser((event: EventSourceMessage) => {
         if(typeof event === "string") return 
         
         if(event.type === "event" && event.data) {
@@ -178,14 +178,16 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
         }
       })
       
-      repsponseStream.on("data", (chunk: Buffer) => {
+      responseStream.on("data", (chunk: Buffer) => {
         parser.feed(chunk.toString())
       })
-      responseStream.on("end", () => {
-        fileStream.end()
-        console.log(chalk.green("\n✅ README.md created successfully"))
-        resolve(readmePath)
+      
+     responseStream.on("end", () => {
+       fileStream.end(() => {
+       console.log(chalk.green("\n✅ README.md created successfully"))
+      resolve(readmePath)
       })
+    })
       
       fileStream.on("error", (err) => {
         console.log(chalk.red("\n❌ Failed to write README"))
