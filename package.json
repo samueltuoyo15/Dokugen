@@ -14,7 +14,7 @@
     "open source",
     "readme generator",
     "cli tool",
-    "samuel Tuoyo"
+    "OritseWeyinmi samuel Tuoyo"
   ],
   "author": "OritseWeyinmi Samuel Tuoyo",
   "license": "ISC",
@@ -33,7 +33,6 @@
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
     "dotenv": "^16.4.7",
-    "eventsource-parser": "^3.0.0",
     "fs-extra": "^11.3.0",
     "inquirer": "^12.4.2",
     "openai": "^4.85.4",

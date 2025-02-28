@@ -6,7 +6,6 @@ import * as path from "path"
 import inquirer from "inquirer"
 import axios from "axios"
 import { Readable } from "stream"
-import { createParser, type EventSourceMessage } from "eventsource-parser"
 import { execSync } from "child_process"
 import os from "os"
 
@@ -160,24 +159,27 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
     
     const responseStream = response.data as Readable 
     return new Promise((resolve, reject) => {
-      responseStream.pipe(fileStream)
+      let buffer = "";
 
-      const parser = createParser((event: EventSourceMessage) => {
-       if (!event.data) return 
-
-       try {
-            const json = JSON.parse(event.data.trim()) 
-         if (json.response && typeof json.response === "string") {
-            fileStream.write(json.response)
-        }
-      } catch (error) {
-            console.error("Skipping invalid event data:", event.data)
-         }
-     })
-      
       responseStream.on("data", (chunk: Buffer) => {
-        parser.feed(chunk.toString())
+        buffer += chunk.toString()
+
+       const lines = buffer.split("\n")
+        buffer = lines.pop() || ""
+        lines.forEach((line) => {
+          if (line.startsWith("data:")) {
+            try {
+              const json = JSON.parse(line.replace("data: ", "").trim())
+              if (json.response && typeof json.response === "string") {
+                fileStream.write(json.response)
+              }
+            } catch (error) {
+              console.error("Skipping invalid event data:", line)
+            }
+          }
+        })
       })
+     
       
      responseStream.on("end", () => {
        fileStream.end(() => {
@@ -229,3 +231,5 @@ process.on("SIGINT", () => {
 process.on("unhandledRejection", () => {
   process.exit(1)
 })
+
+
