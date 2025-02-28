@@ -145,7 +145,6 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
 
     const fullCode = await extractFullCode(projectFiles, projectDir)
     const userInfo = getUserInfo()
-    console.log(userInfo)
     
     console.log(chalk.blue("🔥 Generating README..."))
     
