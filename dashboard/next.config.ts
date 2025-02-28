@@ -1,10 +1,7 @@
-import type { NextConfig } from "next"
-//import os from "os"
-
-//const isLinuxArm64 = os.platform() === "linux" && os.arch() === "arm64"
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  
-}
+  /* config options here */
+};
 
-export default nextConfig
+export default nextConfig;
