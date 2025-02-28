@@ -1,7 +1,13 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from "next"
+import os from "os"
+
+//const isLinuxArm64 = os.platform() === "linux" && os.arch() === "arm64"
 
 const nextConfig: NextConfig = {
-  /* config options here */
-};
+  experimental: {
+    //turbo: true,
+    disablePostcssPresetEnv: true,
+   },
+}
 
-export default nextConfig;
+export default nextConfig

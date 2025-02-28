@@ -149,7 +149,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
     
     const readmePath = path.join(projectDir, "README.md")
     const fileStream = fs.createWriteStream(readmePath)
-    const response = await axios.post("https://dokugen-ochre.vercel.app/api/generate-readme", {
+    const response = await axios.post("https://dokugen-readme.vercel.app/api/generate-readme", {
       projectType,
       projectFiles,
       fullCode,
@@ -204,7 +204,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
   }
 }
 
-program.name("dokugen").version("2.9.1").description("Automatically generate high-quality README for your application")
+program.name("dokugen").version("2.9.2").description("Automatically generate high-quality README for your application")
 
 program.command("generate").description("Scan project and generate a README.md").action(async () => {
     const projectDir = process.cwd()
