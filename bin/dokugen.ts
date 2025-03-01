@@ -41,32 +41,91 @@ const extractFullCode = async (projectFiles: string[], projectDir: string): Prom
 
 const detectProjectType = async (projectDir: string): Promise<string> => {
   const files = await fs.readdir(projectDir)
-  const isFullStackNext = files.includes("pages") || files.some(f => f.startsWith("app/") || f.startsWith("api/"))
 
-  const langMap: Record<string, string> = {
+ const langMap: Record<string, string> = {
+    "vite.config.ts": "React/Typescript (Vite + React)",
+    "vite.config.js": "React/JavaScript (Vite + React)",
+    "next.config.ts": "Next.js (Typescript)",
+    "next.config.js": "Next.js (JavaScript)",
+    "nuxt.config.ts": "Nuxt.js (Typescript)",
+    "nuxt.config.js": "Nuxt.js (JavaScript)",
+    "svelte.config.js": "Svelte",
+    "angular.json": "Angular",
+    "vue.config.js": "Vue.js",
+    "src/main.tsx": "React/Typescript",
+    "src/main.jsx": "React/JavaScript",
+    "src/App.vue": "Vue.js",
+    "src/main.svelte": "Svelte",
+    "src/main.ts": "Typescript",
+    "src/main.js": "JavaScript",
     "go.mod": "Golang",
+    "Cargo.toml": "Rust",
     "requirements.txt": "Python",
     "pyproject.toml": "Python",
-    "Cargo.toml": "Rust",
-    "package.json": isFullStackNext ? "Next.js (Full Stack)" : "JavaScript/TypeScript",
-    "src/App.tsx": "Frontend (React)",
-    "src/App.jsx": "Frontend (React)",
-    "pom.xml": "Java",
-    "build.gradle": "Java",
-    "next.config.ts": "Next.js",
-    "next.config.js": "Next.js",
-    "src/App.vue": "Vue.js",
+    "pom.xml": "Java (Maven)",
+    "build.gradle": "Java (Gradle)",
+    "composer.json": "PHP",
+    "Gemfile": "Ruby",
+    "package.json": "Node.js", 
     "pubspec.yaml": "Flutter/Dart",
-    "Makefile": "C/C++",
+    "android/build.gradle": "Android (Kotlin/Java)",
+    "ios/Podfile": "iOS (Swift/Objective-C)",
     "Dockerfile": "Docker",
+    "docker-compose.yml": "Docker Compose",
+    "terraform.tf": "Terraform",
+    "serverless.yml": "Serverless Framework",
+    "k8s/deployment.yaml": "Kubernetes",
+    "Makefile": "C/C++",
+    "CMakeLists.txt": "C++",
     "Program.cs": "C# / .NET",
     "Main.kt": "Kotlin",
     "App.swift": "Swift",
-    "CMakeLists.txt": "C++"
   }
 
-  const detected = Object.keys(langMap).find(file => files.includes(file))
-  return detected ? langMap[detected] : "Unknown"
+  const folderChecks: Record<string, string> = {
+    "src/components": "React/Typescript or React/JavaScript",
+    "src/views": "Vue.js",
+    "src/routes": "Svelte",
+    "src/app": "Angular",
+    "src/lib": "Svelte",
+    "src/pages": "Next.js or Nuxt.js",
+    "public": "Static Site (HTML/CSS/JS)",
+    "dist": "Built Project",
+  }
+
+
+  const checkPackageJson = async (): Promise<string | null> => {
+    const packageJsonPath = path.join(projectDir, "package.json")
+    if (await fs.pathExists(packageJsonPath)) {
+      const packageJson = await fs.readJson(packageJsonPath)
+      const dependencies = {
+        ...packageJson.dependencies,
+        ...packageJson.devDependencies,
+      }
+
+      if (dependencies["react"]) return "React/JavaScript"
+      if (dependencies["vue"]) return "Vue.js"
+      if (dependencies["svelte"]) return "Svelte"
+      if (dependencies["@angular/core"]) return "Angular"
+      if (dependencies["next"]) return "Next.js"
+      if (dependencies["nuxt"]) return "Nuxt.js"
+    }
+    return null
+  }
+
+  const detectedFile = Object.keys(langMap).find(file => files.includes(file))
+  if (detectedFile) return langMap[detectedFile]
+
+   const detectedFolder = Object.keys(folderChecks).find(folder => 
+   fs.existsSync(path.join(projectDir, folder)))
+   if (detectedFolder) return folderChecks[detectedFolder]
+  
+
+  const packageJsonDetection = await checkPackageJson()
+  if (packageJsonDetection) return packageJsonDetection
+
+
+  return "Unknown"
 }
 
 const scanFiles = async (dir: string): Promise<string[]> => {
@@ -190,6 +249,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
       
       fileStream.on("error", (err) => {
         console.log(chalk.red("\n❌ Failed to write README"))
+        fileStream.end()
         reject(err)
       })
 
@@ -198,28 +258,31 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
         reject(err)
       })
     })
-  } catch {
-    console.error("\n Error Generating Readme")
+  } catch(error){
+    console.error("\n Error Generating Readme", error)
     process.exit(1)
   }
 }
 
-program.name("dokugen").version("2.9.9").description("Automatically generate high-quality README for your application")
-
+program.name("dokugen").version("3.0.0").description("Automatically generate high-quality README for your application")
 program.command("generate").description("Scan project and generate a README.md").action(async () => {
-    const projectDir = process.cwd()
-    const readmePath = path.join(projectDir, "README.md")
+     const projectDir = process.cwd()
+     const readmePath = path.join(projectDir, "README.md")
 
-    if (await fs.pathExists(readmePath)) {
-      const overwrite = await askYesNo("README.md already exists. Overwrite?")
-      if (!overwrite) return
-    }
+     if (await fs.pathExists(readmePath)) {
+       const overwrite = await askYesNo("README.md already exists. Overwrite?")
+       if (!overwrite) return
+     }
 
-    const projectType = await detectProjectType(projectDir)
-    const projectFiles = await scanFiles(projectDir)
-    const readmeContent = await generateReadme(projectType, projectFiles, projectDir)
-    console.log(chalk.green("✅ README.md created"))
-  })
+     const projectType = await detectProjectType(projectDir)
+     const projectFiles = await scanFiles(projectDir)
+     console.log(chalk.blue(`📂 Detected project type: ${projectType}`))
+     console.log(chalk.yellow(`📂 Found: ${projectFiles.length} files in the project`))
+
+     const readmeContent = await generateReadme(projectType, projectFiles, projectDir)
+     console.log(chalk.green("✅ README.md created"))
+   })
+
 
 program.parse(process.argv)
 
