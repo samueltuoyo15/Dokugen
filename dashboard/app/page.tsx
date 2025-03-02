@@ -1,9 +1,9 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
-import { Rocket, Download, Code } from "lucide-react";
-import { motion } from "framer-motion";
-
+import { Button } from "@/components/ui/button"
+import { Rocket, Download, Code } from "lucide-react"
+import { motion } from "framer-motion"
+import MetricsSection from "@/components/metricsSection"
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
@@ -52,7 +52,17 @@ export default function Home() {
 
           </div>
         </motion.div>
+        
+        {/* User Metrics Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="mt-16"
+        >
+          <MetricsSection />
+        </motion.div>
       </div>
     </div>
-  );
+  )
 }

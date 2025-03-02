@@ -2,6 +2,12 @@ import { supabase } from "../lib/supabase.mjs"
 import { VercelRequest, VercelResponse } from "@vercel/node"
 
 export default async (req: VercelRequest, res: VercelResponse) => {
+  res.setHeader("Access-Control-Allow-Origin", "*")
+  
+  if(req.method === "OPTIONS"){
+    return res.status(200).end()
+  }
+  
   if(req.method !== "GET"){
     return res.status(405).json({message: "Method not allowed "})
   }
