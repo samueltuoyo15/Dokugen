@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev --turbo",
     "build": "next build",
+    "postbuild": "next-sitemap",
     "start": "next start",
     "lint": "next lint"
   },
@@ -21,6 +22,7 @@
     "framer-motion": "^12.4.7",
     "lucide-react": "^0.476.0",
     "next": "15.2.0",
+    "next-sitemap": "^4.2.3",
     "openai": "^4.85.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

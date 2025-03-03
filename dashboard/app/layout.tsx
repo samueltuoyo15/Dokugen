@@ -49,6 +49,9 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteMetadata.title,
   },
+  other: {
+    "google-site-verification": "pcNkCr96GgxHUdk4V5-hzhdy0OH_EcNsvVzTQERObHo",
+  },
 };
 
 export default function RootLayout({
