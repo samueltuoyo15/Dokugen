@@ -184,7 +184,7 @@ export default function Home() {
 
               {/* Testimonial 3 */}
               <div className="bg-gray-900 p-6 rounded-lg">
-                <p className="text-gray-300 italic">{`Dokugen’s templates are amazing. My projects have never looked better!`}</p>
+                <p className="text-gray-300 italic">Dokugen templates are amazing. My projects have never looked better!</p>
                 <p className="text-white font-bold mt-4">Daniel</p>
                 <p className="text-gray-400 text-sm">DevOps Engineer</p>
               </div>
@@ -221,5 +221,5 @@ export default function Home() {
         </motion.div>
       </div>
     </div>
-  );
+  )
 }
