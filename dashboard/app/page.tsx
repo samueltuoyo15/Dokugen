@@ -1,9 +1,10 @@
-"use client";
+"use client"
 
-import { Button } from "@/components/ui/button";
-import { Rocket, Download, Code, FileText, Terminal } from "lucide-react";
-import { motion } from "framer-motion";
-import MetricsSection from "@/components/metricsSection";
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Rocket, Download, Code, FileText, Terminal } from "lucide-react"
+import { motion } from "framer-motion"
+import MetricsSection from "@/components/metricsSection"
 
 export default function Home() {
   return (
@@ -21,14 +22,19 @@ export default function Home() {
             Automatically generate high-quality READMEs for your projects.
           </p>
           <div className="flex justify-center gap-4">
+            <Link href="/docs">
             <Button className="bg-blue-600 hover:bg-blue-700">
               <Download className="mr-2" />
               Download CLI
             </Button>
+            </Link>
+            
+            <Link href="/docs">
             <Button variant="outline" className="text-white border-white">
               <Code className="mr-2" />
               View Docs
             </Button>
+            </Link>
           </div>
         </motion.div>
 
@@ -50,21 +56,21 @@ export default function Home() {
               </p>
             </div>
 
-            {/* Card 2: Custom Templates */}
+            {/* Card 2: Cross-Platform & Multipurpose */}
             <div className="bg-gray-800 p-6 rounded-lg">
-              <FileText className="w-12 h-12 mb-4 text-green-500" />
-              <h3 className="text-xl font-bold mb-2">Custom Templates</h3>
+              <Terminal className="w-12 h-12 mb-4 text-green-500" />
+              <h3 className="text-xl font-bold mb-2">Cross-Platform & Multipurpose</h3>
               <p className="text-gray-300">
-                Use pre-built templates or create your own to generate READMEs tailored to your needs.
+                Works on any OS and programming language. Fast, seamless, and easy to integrate.
               </p>
             </div>
 
-            {/* Card 3: Seamless Integration */}
+            {/* Card 3: Easy to Install */}
             <div className="bg-gray-800 p-6 rounded-lg">
-              <Code className="w-12 h-12 mb-4 text-purple-500" />
-              <h3 className="text-xl font-bold mb-2">Seamless Integration</h3>
+              <FileText className="w-12 h-12 mb-4 text-purple-500" />
+              <h3 className="text-xl font-bold mb-2">Easy to Install</h3>
               <p className="text-gray-300">
-                Integrate Dokugen with your favorite tools like GitHub, GitLab, and VS Code.
+                Get started in minutes with a simple installation process and intuitive CLI.
               </p>
             </div>
           </div>
@@ -109,21 +115,21 @@ export default function Home() {
             </div>
 
             {/* Matrix-Style Mockup */}
-            <div className="mt-12">
+            <div className="mt-12 overflow-hidden">
               <div className="bg-gray-900 p-6 rounded-lg">
                 <div className="flex justify-center">
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-3 gap-4 w-full max-w-md">
                     <div className="bg-gray-700 p-4 rounded-lg">
                       <Code className="w-8 h-8 mx-auto mb-2 text-blue-500" />
-                      <p className="text-gray-300 text-sm">Code</p>
+                      <p className="text-center text-gray-300 text-sm">Code</p>
                     </div>
                     <div className="bg-gray-700 p-4 rounded-lg">
                       <Terminal className="w-8 h-8 mx-auto mb-2 text-green-500" />
-                      <p className="text-gray-300 text-sm">CLI</p>
+                      <p className="text-center text-gray-300 text-sm">CLI</p>
                     </div>
                     <div className="bg-gray-700 p-4 rounded-lg">
                       <FileText className="w-8 h-8 mx-auto mb-2 text-purple-500" />
-                      <p className="text-gray-300 text-sm">README</p>
+                      <p className="text-center text-gray-300 text-sm">README</p>
                     </div>
                   </div>
                 </div>
@@ -132,11 +138,31 @@ export default function Home() {
           </div>
         </motion.div>
 
-        {/* Testimonials Section */}
+        {/* Image Mockup Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
+          className="mt-16"
+        >
+          <div className="bg-gray-800 p-12 rounded-lg">
+            <h2 className="text-4xl font-bold mb-8 text-center">See Dokugen in Action</h2>
+            <div className="relative w-full h-96 overflow-hidden">
+              <div
+                className="absolute inset-0 bg-cover bg-center transform scale-110 rotate-3"
+                style={{
+                  backgroundImage: "url('/Screenshot_20250303-090722.png')", 
+                }}
+              ></div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Testimonials Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
           className="mt-16"
         >
           <div className="bg-gray-800 p-12 rounded-lg">
@@ -170,7 +196,7 @@ export default function Home() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
+          transition={{ duration: 0.8, delay: 1 }}
           className="mt-16"
         >
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-12 rounded-lg text-center">
@@ -188,7 +214,7 @@ export default function Home() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1 }}
+          transition={{ duration: 0.8, delay: 1.2 }}
           className="mt-16"
         >
           <MetricsSection />
