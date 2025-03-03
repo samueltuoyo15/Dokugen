@@ -31,7 +31,7 @@ export default function Home() {
               </Button>
             </Link>
             <Link href="/docs">
-              <Button variant="outline" className="text-white border-white">
+              <Button className="text-white border-white">
                 <FileText className="mr-2" />
                 View Docs
               </Button>

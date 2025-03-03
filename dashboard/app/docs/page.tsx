@@ -72,7 +72,7 @@ export default function DocsPage() {
               </Button>
             </Link>
             <Link href="https://github.com/samueltuoyo15/Dokugen/" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" className="text-white border-white">
+              <Button className="text-white border-white">
                 <Github className="mr-2" />
                 Contribute
               </Button>
