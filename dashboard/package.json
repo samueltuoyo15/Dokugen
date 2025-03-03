@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postbuild": "ts-node node_modules/next-sitemap/bin/cli.js --config next-sitemap.config.ts"
+    "postbuild": "next-sitemap --config next-sitemap.config.ts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.2",
