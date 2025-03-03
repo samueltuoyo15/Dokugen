@@ -1,17 +1,21 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Sora, IBM_Plex_Mono } from "next/font/google";
 import siteMetadata from "../utils/siteMetaData";
-import Providers from "./Providers"
-import "./globals.css"
+import Providers from "./Providers";
+import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const sora = Sora({
+  variable: "--font-sora",
   subsets: ["latin"],
+  weight: ["400", "600", "700"], // Adjust weights if needed
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const plexMono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
   subsets: ["latin"],
+  weight: ["400", "500", "700"], // Adjust weights if needed
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -26,7 +30,6 @@ export const metadata: Metadata = {
     description: siteMetadata.description,
     url: siteMetadata.siteUrl,
     siteName: siteMetadata.title,
-    //images: [siteMetadata.socialBanner],
     locale: "en_US",
     type: "website",
   },
@@ -45,10 +48,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: siteMetadata.title,
-    //images: [siteMetadata.socialBanner],
   },
 };
-
 
 export default function RootLayout({
   children,
@@ -58,9 +59,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${sora.variable} ${plexMono.variable} select-none antialiased`}
       >
-      <Providers>{children}</Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
