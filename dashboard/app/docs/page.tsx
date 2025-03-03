@@ -1,7 +1,8 @@
 "use client"
 
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Terminal, Code, FileText, Search } from "lucide-react"
+import { Terminal, Code, FileText, Search, Github} from "lucide-react"
 import { motion } from "framer-motion"
 
 export default function DocsPage() {
@@ -20,14 +21,19 @@ export default function DocsPage() {
             Everything you need to know about Dokugen, from installation to advanced usage.
           </p>
           <div className="flex justify-center gap-4">
+            <Link href="/" target="_blank">
             <Button className="bg-blue-600 hover:bg-blue-700">
               <Terminal className="mr-2" />
-              Get Started
+              Go to Home
             </Button>
+             </Link>
+             
+            <Link href="https://github.com/samueltuoyo15/Dokugen/" target="_blank">
             <Button variant="outline" className="text-white border-white">
-              <Code className="mr-2" />
-              API Reference
+              <Github className="mr-2" />
+              Contribute 
             </Button>
+            </Link>
           </div>
           <div className="mt-8 max-w-md mx-auto">
             <div className="relative">
@@ -50,7 +56,19 @@ export default function DocsPage() {
         >
           <h2 className="text-4xl font-bold mb-8">Getting Started</h2>
           <div className="space-y-8">
-            {/* Step 1: Installation */}
+            {/* Step 1: Prerequisites */}
+            <div className="bg-gray-800 p-6 rounded-lg">
+              <h3 className="text-2xl font-bold mb-4">1. Installation</h3>
+              <p className="text-gray-300 mb-4">
+                Go your your current project through your terminal:
+              </p>
+              <pre className="bg-gray-900 p-4 rounded-lg">
+                <code className="text-green-400">cd your-project</code>
+              </pre>
+            </div>
+            
+          <div className="space-y-8">
+            {/* Step 2: Installation */}
             <div className="bg-gray-800 p-6 rounded-lg">
               <h3 className="text-2xl font-bold mb-4">1. Installation</h3>
               <p className="text-gray-300 mb-4">
@@ -61,7 +79,7 @@ export default function DocsPage() {
               </pre>
             </div>
 
-            {/* Step 2: Generate README */}
+            {/* Step 3: Generate README */}
             <div className="bg-gray-800 p-6 rounded-lg">
               <h3 className="text-2xl font-bold mb-4">2. Generate README</h3>
               <p className="text-gray-300 mb-4">
@@ -72,7 +90,7 @@ export default function DocsPage() {
               </pre>
             </div>
 
-            {/* Step 3: Customize */}
+            {/* Step 4: Customize */}
             <div className="bg-gray-800 p-6 rounded-lg">
               <h3 className="text-2xl font-bold mb-4">3. Customize</h3>
               <p className="text-gray-300 mb-4">
@@ -139,7 +157,7 @@ export default function DocsPage() {
               <div>
                 <h3 className="text-xl font-bold mb-2">Can I use custom templates?</h3>
                 <p className="text-gray-300">
-                  Yes, you can use the <code className="text-green-400">--template</code> flag to specify a custom template.
+                  Coming Soon, you will be able to use the <code className="text-green-400">--template</code> flag to specify a custom template in upcoming Dokugen version  3.2.0.
                 </p>
               </div>
             </div>
@@ -153,7 +171,7 @@ export default function DocsPage() {
           transition={{ duration: 0.8, delay: 1 }}
           className="mt-16 text-center"
         >
-          <p className="text-gray-300">Need help? Check out our <a href="#" className="text-blue-500 hover:underline">GitHub</a> or <a href="#" className="text-blue-500 hover:underline">support page</a>.</p>
+          <p className="text-gray-300">Need help? Check out our <a href="https://github.com/samueltuoyo15/Dokugen" className="text-blue-500 hover:underline">GitHub</a> or <a href="https://github.com/samueltuoyo15/Dokugen" className="text-blue-500 hover:underline">support page</a>.</p>
         </motion.div>
       </div>
     </div>

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Rocket, Download, Code, FileText, Terminal, Github} from "lucide-react"
+import { Rocket, Code, FileText, Terminal, Github} from "lucide-react"
 import { motion } from "framer-motion"
 import MetricsSection from "@/components/metricsSection"
 
