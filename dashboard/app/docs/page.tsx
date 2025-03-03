@@ -59,7 +59,7 @@ export default function DocsPage() {
           transition={{ duration: 0.8 }}
           className="text-center"
         >
-         <Image src="/smile_logo.svg" className="text-center mx-auto" height={50} width={50} alt="Smile Logo"/>
+         <Image src="/smile_logo.svg" className="block text-center mx-auto" height={50} width={50} alt="Smile Logo"/>
           <h1 className="text-6xl font-bold mb-4">Dokugen Docs</h1>
           <p className="text-xl text-gray-300 mb-8">
             Everything you need to know about Dokugen, from installation to advanced usage.
