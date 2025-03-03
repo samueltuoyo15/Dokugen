@@ -120,33 +120,6 @@ export default function DocsPage() {
           </div>
         </motion.div>
 
-        {/* API Reference Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="mt-16"
-        >
-          <h2 className="text-4xl font-bold mb-8">API Reference</h2>
-          <div className="bg-gray-800 p-6 rounded-lg">
-            <h3 className="text-2xl font-bold mb-4">CLI Commands</h3>
-            <div className="space-y-4">
-              <div>
-                <h4 className="text-xl font-bold mb-2">Generate README</h4>
-                <pre className="bg-gray-900 p-4 rounded-lg">
-                  <code className="text-green-400">dokugen generate</code>
-                </pre>
-              </div>
-              <div>
-                <h4 className="text-xl font-bold mb-2">Custom Template</h4>
-                <pre className="bg-gray-900 p-4 rounded-lg">
-                  <code className="text-green-400">dokugen generate --template custom.md</code>
-                </pre>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
         {/* FAQs Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
