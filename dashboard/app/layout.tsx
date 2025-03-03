@@ -7,14 +7,14 @@ import "./globals.css";
 const sora = Sora({
   variable: "--font-sora",
   subsets: ["latin"],
-  weight: ["400", "600", "700"], // Adjust weights if needed
+  weight: ["400", "600", "700"], 
   display: "swap",
 });
 
 const plexMono = IBM_Plex_Mono({
   variable: "--font-plex-mono",
   subsets: ["latin"],
-  weight: ["400", "500", "700"], // Adjust weights if needed
+  weight: ["400", "500", "700"], 
   display: "swap",
 });
 
