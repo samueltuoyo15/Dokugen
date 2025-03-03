@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Rocket, Code, FileText, Terminal, Github} from "lucide-react"
 import { motion } from "framer-motion"
@@ -115,8 +116,8 @@ export default function Home() {
             </div>
 
             {/* Matrix-Style Mockup */}
-            <div className="mt-12 overflow-hidden">
-              <div className="bg-gray-900 p-6 rounded-lg">
+            <div className="mt-12">
+              <div className="bg-gray-900 p-3 md:p-6 rounded-lg">
                 <div className="flex justify-center">
                   <div className="grid grid-cols-3 gap-4 w-full max-w-md">
                     <div className="bg-gray-700 p-4 rounded-lg">
@@ -148,12 +149,11 @@ export default function Home() {
           <div className="bg-gray-800 p-12 rounded-lg">
             <h2 className="text-4xl font-bold mb-8 text-center">See Dokugen in Action</h2>
             <div className="relative w-full h-96 overflow-hidden">
-              <div
+              <Image
+                src='/Screenshot_20250303-090722.png'
+                height={300} width={600} alt="Mockup"
                 className="absolute inset-0 bg-cover bg-center transform scale-110 rotate-3"
-                style={{
-                  backgroundImage: "url('/Screenshot_20250303-090722.png')", 
-                }}
-              ></div>
+             />
             </div>
           </div>
         </motion.div>
