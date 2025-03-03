@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Rocket, Download, Code, FileText, Terminal } from "lucide-react"
+import { Rocket, Download, Code, FileText, Terminal, Github} from "lucide-react"
 import { motion } from "framer-motion"
 import MetricsSection from "@/components/metricsSection"
 
@@ -22,16 +22,16 @@ export default function Home() {
             Automatically generate high-quality READMEs for your projects.
           </p>
           <div className="flex justify-center gap-4">
-            <Link href="/docs">
+            <Link href="https://github.com/samueltuoyo15/Dokugen/" target="_blank">
             <Button className="bg-blue-600 hover:bg-blue-700">
-              <Download className="mr-2" />
-              Download CLI
+              <Github className="mr-2" />
+              Fork Repo
             </Button>
             </Link>
             
             <Link href="/docs">
             <Button variant="outline" className="text-white border-white">
-              <Code className="mr-2" />
+              <FileText className="mr-2" />
               View Docs
             </Button>
             </Link>
