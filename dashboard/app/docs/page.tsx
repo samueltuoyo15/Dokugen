@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Terminal, Code, FileText, Search, Github } from "lucide-react"
 import { motion } from "framer-motion"
-import { useState } from "react
+import { useState } from "react"
 
 const searchableContent = [
   {
@@ -40,7 +40,7 @@ const searchableContent = [
 ]
 
 export default function DocsPage() {
-  const [searchQuery, setSearchQuery] = useState("") // State for search query
+  const [searchQuery, setSearchQuery] = useState("") 
 
   const filteredContent = searchableContent.filter(
     (item) =>
