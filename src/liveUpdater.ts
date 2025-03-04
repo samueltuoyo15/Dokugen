@@ -3,10 +3,15 @@ import path from "path";
 import fs from "fs";
 import { promisify } from "util";
 import { exec as execCallback } from "child_process";
-import debounce from 'lodash.debounce';
+import debounce from "lodash.debounce";
 import { simpleGit, SimpleGit } from 'simple-git'; 
 import chalk from "chalk";
 import inquirer from "inquirer";
+
+type DebouncedFunc<T extends (...args: any) => any> = T & {
+  cancel: () => void;
+  flush: () => ReturnType<T>;
+};
 
 
 const exec = promisify(execCallback);
@@ -21,23 +26,22 @@ class LiveDocumentationUpdater {
   };
   watcher: any;
   isGenerating: boolean;
-  debouncedGenerate: Function;
+  debouncedGenerate: DebouncedFunc<() => Promise<void>>;
   startTime: number | null;
 
   constructor(options = {}) {
     this.options = {
-      watchPaths: ["."], 
-      ignore: ["node_modules/**", ".git/**", "README.md"], 
-      debounceTime: 2000, 
+      watchPaths: ["."],
+      ignore: ["node_modules/**", ".git/**", "README.md"],
+      debounceTime: 2000,
       ...options,
     };
 
     this.watcher = null;
     this.isGenerating = false;
-    this.debouncedGenerate = debounce(
-      this.generateDocumentation.bind(this),
-      this.options.debounceTime
-    );
+    this.debouncedGenerate = debounce(() => {
+      return this.generateDocumentation();
+    }, this.options.debounceTime) as DebouncedFunc<() => Promise<void>>;
     this.startTime = null;
   }
 
@@ -94,23 +98,25 @@ class LiveDocumentationUpdater {
       this.isGenerating = true;
       console.log("📊 Analyzing project structure...");
 
-      // Prompt before updating the README
+
       const { confirmUpdate } = await inquirer.prompt([
         {
           type: "confirm",
           name: "confirmUpdate",
           message:
             "Detected changes in your project. Do you want to update your README?",
-          default: true,
+          default: false,
         },
       ]);
 
+      console.log("User confirmed update:", confirmUpdate);
+
       if (!confirmUpdate) {
         console.log(chalk.blue("Update cancelled by user."));
+        this.debouncedGenerate.cancel();
         return;
       }
 
-      // Check if README.md exists and prompt for overwrite
       const readmePath = path.join(process.cwd(), "README.md");
       let overwrite = true;
       if (fs.existsSync(readmePath)) {
@@ -130,16 +136,18 @@ class LiveDocumentationUpdater {
         return;
       }
 
-      
-      const { stdout, stderr } = await exec("node dist/bin/dokugen.js generate --auto");
+
+      const { stdout, stderr } = await exec(
+        "node dist/bin/dokugen.js generate --auto"
+      );
 
       if (stderr) {
         console.error(`⚠️ Error generating documentation: ${stderr}`);
       } else {
         console.log("✅ Documentation updated successfully!");
 
-        // Check for Git repository and offer commit prompt
-          const git: SimpleGit = simpleGit();
+ 
+        const git: SimpleGit = simpleGit();
         if (await git.checkIsRepo()) {
           const { confirmCommit } = await inquirer.prompt([
             {
@@ -158,7 +166,6 @@ class LiveDocumentationUpdater {
           }
         }
 
-       
         if (this.options.showNotifications) {
           this.showNotification(
             "Documentation Updated",
