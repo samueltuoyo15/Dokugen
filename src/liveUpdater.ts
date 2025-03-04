@@ -169,7 +169,7 @@ class LiveDocumentationUpdater {
         if (this.options.showNotifications) {
           this.showNotification(
             "Documentation Updated",
-            "Your README.md has been updated."
+            chalk.green("Your README.md has been updated.")
           );
         }
       }

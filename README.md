@@ -1,40 +1,62 @@
-# Dokugen
+# Dokugen: Effortless README Generation 🚀
 
 ## Description
-Dokugen is an open-source command-line tool designed to automatically generate high-quality README.md files for your projects. It analyzes your project structure and code to create a detailed and professional README, saving you time and ensuring clarity and consistency.
 
-## Features
-- **Automated README Generation**: Automatically creates a comprehensive README file by analyzing your project.
-- **Customizable Templates**: Supports customizable templates to match your project's style.
-- **Live Updates**: Watches for changes in your project and automatically updates the README.
-- **Cross-Platform Compatibility**: Works seamlessly on various operating systems.
-- **CLI Tool**: Easy-to-use command-line interface for generating and managing README files.
-- **Dashboard**: A Next.js dashboard to visualize user metrics and manage the tool.
+Dokugen is an open-source command-line tool designed to simplify the creation of high-quality README.md files for your projects. By intelligently analyzing your project structure and code, Dokugen generates detailed and professional documentation, saving you time and ensuring consistency.
 
-## Installation
-To install Dokugen, make sure you have Node.js and npm installed. Then, run:
+## Features ✨
 
-```bash
-npm install -g dokugen
-```
+-   **Automated Analysis:** Dokugen analyzes your project files to understand its structure and purpose.
+-   **Customizable Templates:** Choose from a variety of templates to match your project's style and requirements.
+-   **Live Updates:** Automatically update your README when changes are detected in your project.
+-   **CLI Tool:** Easy-to-use command-line interface for quick and efficient documentation generation.
+-   **Dashboard:** A user-friendly dashboard to monitor active users and metrics.
 
-## Usage
-To generate a README for your project, navigate to your project's root directory in the terminal and run:
+## Installation 🔧
 
-```bash
-dokugen generate
-```
+To install Dokugen, you need to have Node.js and npm installed on your system.
 
-To enable live updates and automatically regenerate the README when changes are detected:
+1.  **Install Dokugen globally:**
 
-```bash
-dokugen live
-```
+    ```bash
+    npm install -g dokugen
+    ```
 
-You can also customize the behavior of Dokugen by creating a `.dokugenrc.json` file in your project's root directory.
+2.  **Verify the installation:**
 
-## Configuration
-Here's an example of a `.dokugenrc.json` configuration file:
+    ```bash
+    dokugen --version
+    ```
+
+## Usage 📦
+
+### Generating a README
+
+1.  Navigate to your project directory:
+
+    ```bash
+    cd your-project
+    ```
+
+2.  Generate a README file:
+
+    ```bash
+    dokugen generate
+    ```
+
+### Live Documentation Updates
+
+1.  Start live documentation updates:
+
+    ```bash
+    dokugen live
+    ```
+
+    This command watches your project for changes and automatically updates the README.md file.
+
+### Configuration
+
+You can configure Dokugen using the `.dokugenrc.json` file in your project directory. Here's an example configuration:
 
 ```json
 {
@@ -43,79 +65,68 @@ Here's an example of a `.dokugenrc.json` configuration file:
   "ignore": ["node_modules/**", ".git/**", "README.md"],
   "debounceTime": 2000,
   "autoCommit": true,
-  "notification": false
+  "notification": true
 }
 ```
 
-### Configuration Options
-- `templates`: An array of template names to use for generating the README.
-- `watchPaths`: An array of paths to watch for changes.
-- `ignore`: An array of patterns to ignore when watching for changes.
-- `debounceTime`: The debounce time in milliseconds for generating the README.
-- `autoCommit`: Whether to automatically commit changes to the README to Git.
-- `notification`: Whether to show desktop notifications on updates.
+### CLI Options
+
+| Option          | Description                                                                       | Default Value           |
+| --------------- | --------------------------------------------------------------------------------- | ----------------------- |
+| `-p, --paths`   | Comma-separated paths to watch                                                    | `.`                     |
+| `-i, --ignore`  | Comma-separated patterns to ignore                                                | `node_modules/**,.git/**,README.md` |
+| `-d, --debounce`| Debounce time in milliseconds                                                     | `2000`                  |
+| `-n, --notifications` | Show desktop notifications on updates                                           | `true`                  |
+| `-g, --generate`| Generate documentation on start                                                   | `false`                 |
 
 ## Technologies Used
 
-| Technology    | Description                                      |
-| ------------- | ------------------------------------------------ |
-| Node.js       | JavaScript runtime environment                   |
-| TypeScript    | Typed superset of JavaScript                     |
-| Commander.js  | Library for building command-line interfaces     |
-| Chokidar      | Library for watching file system changes        |
-| SimpleGit     | Lightweight interface for running git commands  |
-| Inquirer.js   | Library for interactive command line prompts     |
-| Next.js       | React framework for building web applications   |
-| Tailwind CSS  | Utility-first CSS framework                      |
-| OpenAI API    | For generating README content                   |
-| Supabase      | Backend-as-a-Service for data storage           |
+| Technology     | Description                                              |
+| -------------- | -------------------------------------------------------- |
+| Node.js        | JavaScript runtime environment                           |
+| TypeScript     | Typed superset of JavaScript                             |
+| Commander.js   | Node.js command-line interface toolkit                  |
+| Chokidar       | File system watcher                                      |
+| Inquirer.js    | Interactive command-line user interface                 |
+| Octokit        | GitHub API client                                        |
+| Axios          | Promise based HTTP client                                |
+| Chalk          | Terminal string styling                                 |
+| Next.js        | React framework for building web applications           |
+| Tailwind CSS   | Utility-first CSS framework                              |
+| Supabase       | Open source Firebase alternative                         |
+| OpenAI         | Artificial intelligence research and deployment company |
 
-## Project Structure
-- `package.json`: Contains project metadata and dependencies.
-- `config/default-dokugenrc.json`: Default configuration file for Dokugen.
-- `dashboard/`: Contains the source code for the Next.js dashboard.
-    - `components.json`: Configuration file for UI components.
-    - `eslint.config.mjs`: ESLint configuration file.
-    - `next-sitemap.config.js`: Next.js sitemap configuration.
-    - `next.config.ts`: Next.js configuration file.
-    - `package.json`: Dashboard dependencies and scripts.
-    - `postcss.config.mjs`: PostCSS configuration file.
-    - `tailwind.config.ts`: Tailwind CSS configuration file.
-    - `api/`: API routes for the dashboard.
-        - `active-users.ts`: API to fetch active users.
-        - `generate-readme.ts`: API to generate README content.
-    - `app/`: Main application directory for Next.js.
-        - `page.tsx`: Home page.
-        - `layout.tsx`: Root layout for the application.
-        - `Providers.tsx`: React Query provider.
-    - `components/`: Reusable React components.
-        - `metricsSection.tsx`: Component for displaying user metrics.
-        - `ui/`: UI primitives.
-            - `button.tsx`: Button component.
-    - `utils/`: Utility functions.
-        - `siteMetaData.ts`: Site metadata.
-- `scripts/`: Scripts for automating tasks.
-    - `postinstall.mjs`: Script to run after installing the package.
-    - `postinstall.ts`: Script to set executable permissions.
-- `src/`: Main source code for Dokugen.
-    - `liveUpdater.ts`: Implementation for live documentation updates.
+## Contributing 🤝
 
-## Contributing
-Contributions are welcome! Here’s how you can contribute:
+We welcome contributions to Dokugen! Here's how you can contribute:
 
 1.  Fork the repository.
 2.  Create a new branch for your feature or bug fix.
-3.  Make your changes and commit them with descriptive commit messages.
+3.  Make your changes and commit them with descriptive messages.
 4.  Submit a pull request.
 
 ### Development Setup
+
 1.  Clone the repository:
 
     ```bash
     git clone https://github.com/samueltuoyo15/Dokugen.git
     ```
-2.  Navigate to the project directory:
+
+2.  Install dependencies:
 
     ```bash
-    cd Dokugen
+    npm install
     ```
+
+3.  Build the project:
+
+    ```bash
+    npm run build
+    ```
+
+## License 📜
+
+This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
+
+[![Built with Dokugen](https://img.shields.io/badge/Built%20with-Dokugen-brightgreen)](https://github.com/samueltuoyo15/Dokugen)
