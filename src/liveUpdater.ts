@@ -80,8 +80,8 @@ class LiveDocumentationUpdater {
 
     if (this.options.generateOnStart) {
       this.generateDocumentation();
-    }
-
+      }
+      
     return this;
   }
 
@@ -105,7 +105,7 @@ class LiveDocumentationUpdater {
           name: "confirmUpdate",
           message:
             "Detected changes in your project. Do you want to update your README?",
-          default: false,
+          default: true,
         },
       ]);
 
@@ -125,7 +125,7 @@ class LiveDocumentationUpdater {
             type: "confirm",
             name: "confirmOverwrite",
             message: "A README.md already exists. Do you want to overwrite it?",
-            default: false,
+            default: true,
           },
         ]);
         overwrite = confirmOverwrite;
