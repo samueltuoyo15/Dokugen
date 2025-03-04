@@ -1,93 +1,175 @@
-# Dokugen: Effortless README Generation for Your Projects 🚀
+# Dokugen: Effortless README Generation Tool 🚀
 
 ## Description
 
-Dokugen is an open-source command-line tool designed to automatically generate high-quality, professional README.md files for your projects. It intelligently analyzes your project structure and code to create a detailed and engaging README, saving you time while ensuring clarity and consistency. Whether you're showcasing a personal project or contributing to open source, Dokugen makes documentation a breeze.
+Dokugen is an open-source command-line tool designed to streamline the creation of high-quality README.md files for your projects. By intelligently analyzing your project structure and code, Dokugen generates a comprehensive and professional README, saving you time and ensuring clarity and consistency. Whether you're working on a small personal project or a large enterprise application, Dokugen has you covered.
 
-## Key Features 🌟
+## Features
 
--   **Automated Analysis**: Analyzes your project's file structure and code to understand its purpose and functionality.
--   **Customizable Templates**: Offers a range of templates to suit different project types and styles.
--   **Live Updates**: Automatically detects changes in your project and updates the README accordingly.
--   **Easy Installation**: Get started quickly with a simple installation process.
--   **Cross-Platform Compatibility**: Works seamlessly on macOS, Windows, and Linux.
--   **Git Integration**: Offers to commit the updated README to version control.
+-   **Automated README Generation**: Automatically analyzes your project and generates a detailed README.md file.
+-   **Customizable Templates**: Supports customizable templates to match your project's style and requirements.
+-   **Live Updates**: Watches your project for changes and automatically updates the README.
+-   **CLI Tool**: Easy-to-use command-line interface for generating and managing README files.
+-   **Cross-Platform**: Works seamlessly on macOS, Windows, and Linux.
+-   **Integration**: Integrates smoothly with Git for version control.
+-   **Dashboard**: Provides a user-friendly dashboard to view active users and project metrics.
 
-## Installation 🔧
+## Installation
 
-To install Dokugen, make sure you have Node.js and npm (Node Package Manager) installed on your system. Then, run the following command:
+To install Dokugen, you'll need Node.js and npm (Node Package Manager) installed on your system. Follow these steps:
 
-```bash
-npm install -g dokugen
-```
+1.  Install Dokugen globally using npm:
 
-## Usage 📦
+    ```bash
+    npm install -g dokugen
+    ```
 
-To generate a README for your project, navigate to your project's root directory in the terminal and run:
+2.  Verify the installation by checking the Dokugen version:
+
+    ```bash
+    dokugen --version
+    ```
+
+## Usage
+
+### Generating a README
+
+To generate a README for your project, navigate to your project's root directory in the command line and run:
 
 ```bash
 dokugen generate
 ```
 
-To watch your project for changes and automatically update the README, use the `live` command:
+This command analyzes your project and generates a `README.md` file in the root directory.
+
+### Watching for Changes
+
+To automatically update the README when your project changes, use the `live` command:
 
 ```bash
 dokugen live
 ```
 
-You can also customize the behavior of the `live` command with the following options:
+This command watches your project files and updates the README whenever a change is detected.
 
--   `-p, --paths <paths>`: Comma-separated paths to watch (default: `.`)
+#### Options for `live` command:
+
+-   `-p, --paths <paths>`: Comma-separated paths to watch (default: `.` - current directory)
 -   `-i, --ignore <patterns>`: Comma-separated patterns to ignore (default: `node_modules/**,.git/**,README.md`)
--   `-d, --debounce <ms>`: Debounce time in milliseconds (default: 2000)
--   `-n, --notifications`: Show desktop notifications on updates (default: false)
--   `-g, --generate`: Generate documentation on start (default: false)
+-   `-d, --debounce <ms>`: Debounce time in milliseconds (default: `2000`)
+-   `-n, --notifications`: Show desktop notifications on updates (default: `true`)
+-   `-g, --generate`: Generate documentation on start (default: `false`)
 
-For example:
+### Configuration
 
-```bash
-dokugen live -p src,lib -i dist,docs -d 3000 -n
+Dokugen can be configured using a `.dokugenrc.json` file in your project's root directory. Here’s an example configuration:
+
+```json
+{
+  "templates": ["default"],
+  "watchPaths": ["."],
+  "ignore": ["node_modules/**", ".git/**", "README.md"],
+  "debounceTime": 2000,
+  "autoCommit": true,
+  "notification": false
+}
 ```
 
-## Project Structure
+#### Configuration Options:
 
-The project includes the following key files and directories:
-
-| File/Directory          | Description                                                              |
-| :---------------------- | :----------------------------------------------------------------------- |
-| `package.json`          | Contains metadata about the project and its dependencies.              |
-| `dashboard/`            | Contains the Next.js dashboard code.                                   |
-| `src/liveUpdater.ts`    | Implements the live documentation update functionality.                 |
-| `scripts/postinstall.ts`| Sets executable permissions for the Dokugen CLI after installation.     |
-| `api/active-users.ts`   | API endpoint to fetch active user metrics.                             |
-| `api/generate-readme.ts`| API endpoint to generate the README content using OpenAI.              |
-| `dashboard/app/`        | Contains the Next.js application components and layout.               |
-| `dashboard/components/` | Contains React components used in the dashboard.                       |
-| `dashboard/utils/`      | Utility functions and site metadata for the dashboard.                |
+-   `templates`: Array of template names to use.
+-   `watchPaths`: Array of paths to watch for changes.
+-   `ignore`: Array of patterns to ignore.
+-   `debounceTime`: Time in milliseconds to debounce updates.
+-   `autoCommit`: Automatically commit changes to Git.
+-   `notification`: Show desktop notifications.
 
 ## Technologies Used
 
 -   Node.js
 -   TypeScript
--   Commander.js
 -   Chokidar
+-   Commander.js
+-   Inquirer.js
 -   Axios
--   Next.js
--   Tailwind CSS
--   OpenAI API
--   Supabase
+-   Octokit REST
 
-## Contributing 🤝
+## Contributing
 
-Contributions are welcome! Here's how you can contribute:
+Contributions are welcome! Here’s how you can contribute:
 
 1.  Fork the repository.
 2.  Create a new branch for your feature or bug fix.
-3.  Implement your changes.
-4.  Submit a pull request with a clear description of your changes.
+3.  Make your changes and commit them with descriptive commit messages.
+4.  Push your changes to your fork.
+5.  Submit a pull request to the main repository.
 
-## License
+### Setting up the Development Environment
 
-This project is licensed under the [ISC License](LICENSE).
+1.  Clone the repository:
 
-[![Built with Dokugen](https://img.shields.io/badge/Built%20with-Dokugen-brightgreen)](https://github.com/samueltuoyo15/Dokugen)
+    ```bash
+    git clone https://github.com/samueltuoyo15/Dokugen.git
+    ```
+
+2.  Navigate to the project directory:
+
+    ```bash
+    cd Dokugen
+    ```
+
+3.  Install the dependencies:
+
+    ```bash
+    npm install
+    ```
+
+4.  Build the project:
+
+    ```bash
+    npm run build
+    ```
+
+### Project Structure
+
+The project includes the following files:
+
+-   `package.json`: Project dependencies and scripts.
+-   `config/default-dokugenrc.json`: Default configuration file.
+-   `dashboard/`: Contains the Next.js dashboard application.
+-   `scripts/`: Contains scripts for post-install tasks.
+-   `src/liveUpdater.ts`: Manages live documentation updates.
+-   `dashboard/api/`: API routes for the dashboard.
+-   `dashboard/app/`: Next.js application components and pages.
+-   `dashboard/components/`: React components for the dashboard.
+-   `dashboard/utils/siteMetaData.ts`: Site metadata for the dashboard.
+
+## Dashboard
+
+The Dokugen dashboard provides a user-friendly interface to view active users and project metrics. The dashboard is built with Next.js and includes the following components:
+
+-   `active-users.ts`: API route to fetch active users.
+-   `generate-readme.ts`: API route to generate README files.
+-   `MetricsSection.tsx`: React component to display user metrics.
+
+To set up and run the dashboard:
+
+1.  Navigate to the `dashboard` directory:
+
+    ```bash
+    cd dashboard
+    ```
+
+2.  Install the dependencies:
+
+    ```bash
+    npm install
+    ```
+
+3.  Run the development server:
+
+    ```bash
+    npm run dev
+    ```
+
+The dashboard will be

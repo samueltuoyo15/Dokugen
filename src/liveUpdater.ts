@@ -222,7 +222,7 @@ function addLiveCommand(program: any) {
     .option(
       "-n, --notifications",
       "Show desktop notifications on updates",
-      false
+      true
     )
     .option("-g, --generate", "Generate documentation on start", false)
     .action((options: any) => {
