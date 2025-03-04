@@ -292,6 +292,7 @@ async function generateReadme(
     projectFiles,
     projectDir
   );
+
   let includeSetup = false;
   let isOpenSource = false;
   if (!skipPrompts) {
@@ -300,58 +301,84 @@ async function generateReadme(
     );
     isOpenSource = await askYesNo("Include contribution guidelines in README?");
   }
+
+  console.log(chalk.blue("📝 Extracting full code..."));
+
   const fullCode = await extractFullCode(projectFiles, projectDir);
   const userInfo = getUserInfo();
   console.log(chalk.blue("🔥 Generating README..."));
+
   const readmePath = path.join(projectDir, "README.md");
   const fileStream = fs.createWriteStream(readmePath);
-  const response = await axios.post(
-    "https://dokugen-readme.vercel.app/api/generate-readme",
-    {
-      projectType,
-      projectFiles,
-      fullCode,
-      userInfo,
-      options: { hasDocker, hasAPI, hasDatabase, includeSetup, isOpenSource },
-    },
-    { responseType: "stream" }
-  );
-  const responseStream = response.data as Readable;
-  return new Promise((resolve, reject) => {
-    let buffer = "";
-    responseStream.on("data", (chunk: Buffer) => {
-      buffer += chunk.toString();
-      const lines = buffer.split("\n");
-      buffer = lines.pop() || "";
-      lines.forEach((line) => {
-        if (line.startsWith("data:")) {
-          try {
-            const json = JSON.parse(line.replace("data: ", "").trim());
-            if (json.response && typeof json.response === "string") {
-              fileStream.write(json.response);
+
+  try {
+    const response = await axios.post(
+      "https://dokugen-readme.vercel.app/api/generate-readme",
+      {
+        projectType,
+        projectFiles,
+        fullCode,
+        userInfo,
+        options: { hasDocker, hasAPI, hasDatabase, includeSetup, isOpenSource },
+      },
+      { responseType: "stream", timeout: 10000 }
+    );
+
+    const responseStream = response.data as Readable;
+
+    return new Promise((resolve, reject) => {
+      let buffer = "";
+      responseStream.on("data", (chunk: Buffer) => {
+        buffer += chunk.toString();
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+        lines.forEach((line) => {
+          if (line.startsWith("data:")) {
+            try {
+              const json = JSON.parse(line.replace("data: ", "").trim());
+              if (json.response && typeof json.response === "string") {
+                fileStream.write(json.response);
+              }
+            } catch (error) {
+              console.error("Skipping invalid event data:", line);
             }
-          } catch (error) {
-            console.error("Skipping invalid event data:", line);
           }
-        }
+        });
+      });
+
+      responseStream.on("end", () => {
+        fileStream.end(() => {
+          console.log(chalk.green("\n✅ README.md created successfully"));
+          resolve(readmePath);
+        });
+      });
+
+      fileStream.on("error", (err) => {
+        console.log(chalk.red("\n❌ Failed to write README"));
+        fileStream.end();
+        reject(err);
+      });
+      responseStream.on("error", (err: Error) => {
+        console.log(chalk.red("\n❌ Error receiving stream data"));
+        reject(err);
       });
     });
-    responseStream.on("end", () => {
-      fileStream.end(() => {
-        console.log(chalk.green("\n✅ README.md created successfully"));
-        resolve(readmePath);
-      });
-    });
-    fileStream.on("error", (err) => {
-      console.log(chalk.red("\n❌ Failed to write README"));
-      fileStream.end();
-      reject(err);
-    });
-    responseStream.on("error", (err: Error) => {
-      console.log(chalk.red("\n❌ Error receiving stream data"));
-      reject(err);
-    });
-  });
+  } catch (error: any) {
+    console.log(chalk.red("\n❌ Error generating README"));
+
+    if (error.code === "ENOTFOUND" || error.code === "ECONNREFUSED") {
+      console.error(chalk.red(
+        "Network error. Are you offline or is the server unreachable?"
+      ));
+    } else if (error.code === "ECONNABORTED") {
+      console.error( chalk.red(
+        "The request timed out. Please check your connection and try again."
+      ));
+    } else {
+      console.error(error.message || error);
+    }
+    process.exit(1);
+  }
 }
 
 async function generateAutoReadme(
@@ -371,53 +398,69 @@ async function generateAutoReadme(
   console.log(chalk.blue("🔥 Generating README..."));
   const readmePath = path.join(projectDir, "README.md");
   const fileStream = fs.createWriteStream(readmePath);
-  const response = await axios.post(
-    "https://dokugen-readme.vercel.app/api/generate-readme",
-    {
-      projectType,
-      projectFiles,
-      fullCode,
-      userInfo,
-      options: { hasDocker, hasAPI, hasDatabase, includeSetup, isOpenSource },
-    },
-    { responseType: "stream" }
-  );
-  const responseStream = response.data as Readable;
-  return new Promise((resolve, reject) => {
-    let buffer = "";
-    responseStream.on("data", (chunk: Buffer) => {
-      buffer += chunk.toString();
-      const lines = buffer.split("\n");
-      buffer = lines.pop() || "";
-      lines.forEach((line) => {
-        if (line.startsWith("data:")) {
-          try {
-            const json = JSON.parse(line.replace("data: ", "").trim());
-            if (json.response && typeof json.response === "string") {
-              fileStream.write(json.response);
+
+  try {
+    const response = await axios.post(
+      "https://dokugen-readme.vercel.app/api/generate-readme",
+      {
+        projectType,
+        projectFiles,
+        fullCode,
+        userInfo,
+        options: { hasDocker, hasAPI, hasDatabase, includeSetup, isOpenSource },
+      },
+      { responseType: "stream", timeout: 10000 }
+    );
+    
+    const responseStream = response.data as Readable;
+    return new Promise((resolve, reject) => {
+      let buffer = "";
+      responseStream.on("data", (chunk: Buffer) => {
+        buffer += chunk.toString();
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+        lines.forEach((line) => {
+          if (line.startsWith("data:")) {
+            try {
+              const json = JSON.parse(line.replace("data: ", "").trim());
+              if (json.response && typeof json.response === "string") {
+                fileStream.write(json.response);
+              }
+            } catch (error) {
+              console.error("Skipping invalid event data:", line);
             }
-          } catch (error) {
-            console.error("Skipping invalid event data:", line);
           }
-        }
+        });
+      });
+
+      responseStream.on("end", () => {
+        fileStream.end(() => {
+          console.log(chalk.green("\n✅ README.md created successfully"));
+          resolve(readmePath);
+        });
+      });
+      fileStream.on("error", (err) => {
+        console.log(chalk.red("\n❌ Failed to write README"));
+        fileStream.end();
+        reject(err);
+      });
+      responseStream.on("error", (err: Error) => {
+        console.log(chalk.red("\n❌ Error receiving stream data"));
+        reject(err);
       });
     });
-    responseStream.on("end", () => {
-      fileStream.end(() => {
-        console.log(chalk.green("\n✅ README.md created successfully"));
-        resolve(readmePath);
-      });
-    });
-    fileStream.on("error", (err) => {
-      console.log(chalk.red("\n❌ Failed to write README"));
-      fileStream.end();
-      reject(err);
-    });
-    responseStream.on("error", (err: Error) => {
-      console.log(chalk.red("\n❌ Error receiving stream data"));
-      reject(err);
-    });
-  });
+  } catch (error: any) {
+    console.log(chalk.red("\n❌ Error generating README"));
+
+    if (error.code === "ENOTFOUND" || error.code === "ECONNREFUSED") {
+      console.error(chalk.red("Network error. Are you offline or is the server unreachable?"));
+    } else if (error.code === "ECONNABORTED") {
+      console.error(chalk.red("The request timed out. Please check your connection and try again."));
+    } else {
+      console.error(error.message || error);
+    }
+    process.exit(1);
+  }
 }
 
 program
