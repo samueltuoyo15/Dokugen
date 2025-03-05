@@ -146,15 +146,7 @@ export default function Home() {
         >
           <div className="bg-gray-800 p-6 md:p-12 rounded-lg">
             <h2 className="text-4xl font-bold mb-8 text-center">See Dokugen in Action</h2>
-            <div className="relative w-full h-64 md:h-96 overflow-hidden">
-            {/*  <Image
-                src="/Screenshot_20250303-090722.png"
-                alt="Mockup"
-                fill
-                className="object-cover rounded-lg"
-              />*/}
-              <video src="/Demo.mp4" muted autoPlay className="w-full h-full object-cover rounded-lg">Your browser does not support the video tag.</video>
-            </div>
+           <video src="/Demo.mp4" muted autoPlay className="w-full h-full object-cover rounded-lg">Your browser does not support the video tag.</video>
           </div>
         </motion.div>
 
