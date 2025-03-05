@@ -1,11 +1,11 @@
-import chokidar from "chokidar";
+import chokidar from "chokidar"; 
 import path from "path";
 import fs from "fs";
 import { promisify } from "util";
 import { exec as execCallback } from "child_process";
-import debounce from "lodash.debounce";
+import debounce from "lodash.debounce"; 
 import { simpleGit, SimpleGit } from 'simple-git'; 
-import chalk from "chalk";
+import chalk from "chalk"; 
 import inquirer from "inquirer";
 
 type DebouncedFunc<T extends (...args: any) => any> = T & {
@@ -105,7 +105,7 @@ class LiveDocumentationUpdater {
           name: "confirmUpdate",
           message:
             "Detected changes in your project. Do you want to update your README?",
-          default: true,
+          default: false,
         },
       ]);
 
