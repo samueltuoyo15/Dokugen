@@ -138,7 +138,7 @@ class LiveDocumentationUpdater {
 
 
       const { stdout, stderr } = await exec(
-        "node dist/bin/dokugen.js generate --auto"
+        "dokugen generate --auto"
       );
 
       if (stderr) {
