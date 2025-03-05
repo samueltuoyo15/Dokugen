@@ -1,46 +1,46 @@
-# Dokugen: Effortless README Generation Tool 🚀
+# Dokugen: Your README.md Generator 🦸
+### current version 3.0.0 🤗
 
-[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
-[![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://opensource.org/)
+A CLI tool to automatically generate high-quality README files for your projects. Spend less time on documentation and more time building!
 
-Dokugen is an open-source command-line tool designed to simplify the process of creating high-quality README.md files for your projects. It automatically analyzes your project structure and code to generate a detailed and professional README, saving you time and ensuring consistency.
+## Description
 
-## ✨ Key Features
+Dokugen scans your project, analyzes the file structure and codebase, and then generates a comprehensive README.md file based on your project type and key characteristics. It supports various languages and frameworks, including JavaScript/TypeScript, Python, Go, and more. It also asks you key questions like "Does your project use Docker?" to improve the output.
 
--   **Automated README Generation**: Quickly generate comprehensive README files with minimal effort.
--   **Project Analysis**: Intelligent analysis of your project structure to create relevant and informative documentation.
--   **Customizable Templates**: Use pre-built templates or create your own to match your project's style.
--   **Live Updates**: Watch your project for changes and automatically update the README.
--   **CLI Interface**: Easy-to-use command-line interface for seamless integration into your development workflow.
--   **Dashboard**: Interactive dashboard to track usage metrics and manage configurations.
+## Installation
 
-## 📦 Installation
-
-Get started with Dokugen in just a few simple steps:
-
-1.  **Install Dokugen globally using npm:**
+To install Dokugen globally and make it accessible from any project directory, run:
 
 ```bash
 npm install -g dokugen
 ```
 
-2.  **Verify the installation:**
+## Verify the installation
 
 ```bash
 dokugen --version
 ```
 
-## 🔧 Usage
+## Usage
 
-### Generating a README
-
-To generate a README for your project, navigate to your project's root directory and run:
+Navigate to your project's root directory in the terminal and run the following command:
 
 ```bash
-dokugen generate
+npx dokugen generate
 ```
 
-This command analyzes your project and generates a `README.md` file with relevant information.
+The tool will guide you through a few questions to customize the README generation process.  If a README.md already exists, you will be prompted to overwrite it.
+
+## Example
+
+Here's an example of running Dokugen in a project directory:
+
+```bash
+cd my-awesome-project
+npx dokugen generate
+```
+
+The tool will then generate a `README.md` file in your project's root.
 
 ### Watching for Live Updates
 
@@ -75,19 +75,43 @@ Dokugen can be configured using a `.dokugenrc.json` file in your project's root 
 }
 ```
 
+## Contributing
+
+Contributions are welcome! Feel free to submit pull requests with improvements, bug fixes, or new features.
+
+1.  Fork the repository.
+2.  Create a new branch for your feature or bug fix.
+3.  Make your changes.
+4.  Submit a pull request.
+
+## Acknowledgements
+
+This project uses the following open-source libraries:
+
+*   [commander](https://github.com/tj/commander.js)
+*   [chalk](https://github.com/chalk/chalk)
+*   [fs-extra](https://github.com/jprichardson/node-fs-extra)
+*   [path](https://nodejs.org/api/path.html)
+*   [inquirer](https://github.com/SBoudrias/Inquirer.js)
+*   [axios](https://github.com/axios/axios)
+
 ## ⚙️ Technologies Used
 
--   **Node.js**: The runtime environment for the CLI tool.
 -   **TypeScript**: Used for developing a scalable and maintainable codebase.
 -   **Chokidar**: File system watcher for live updates.
 -   **Commander.js**: Library for building command-line interfaces.
 -   **Inquirer.js**: Library for interactive command-line prompts.
--   **Axios**: Promise based HTTP client for the browser and node.js
--   **React**: Used for building the dashboard interface.
--   **Next.js**: Used for building the dashboard interface.
--   **Supabase**: Used for user authentication and data storage.
+-   **Next.js**: Used for building SEO and the dashboard interface.
+-   **Supabase Postgre Db**: Used for monitoring active users in real time.
 -   **OpenAI**: Used for generating the README.md content.
 
-## 📂 Project Structure
 
-Here's a brief
+## License
+
+This project is open-source and available under the MIT License. See the `LICENSE` file for more information.
+### Contributors: [OritseWeyinmi Samuel Tuoyo](https://github.com/samueltuoyo15), [CharmingDc Adebayo](https://github.com/Charmingdc), [Ogunwele](https://github.com/ogunlewe)
+## Badges
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://opensource.org/)
+[![Built with Dokugen](https://img.shields.io/badge/Built%20with-Dokugen-brightgreen)](https://github.com/samueltuoyo15/Dokugen)
