@@ -1,67 +1,93 @@
-# Dokugen: Your README.md Generator 🦸
-### current version 3.0.0 🤗
+# Dokugen: Effortless README Generation Tool 🚀
 
-A CLI tool to automatically generate high-quality README files for your projects. Spend less time on documentation and more time building!
+[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
+[![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://opensource.org/)
 
-## Description
+Dokugen is an open-source command-line tool designed to simplify the process of creating high-quality README.md files for your projects. It automatically analyzes your project structure and code to generate a detailed and professional README, saving you time and ensuring consistency.
 
-Dokugen scans your project, analyzes the file structure and codebase, and then generates a comprehensive README.md file based on your project type and key characteristics. It supports various languages and frameworks, including JavaScript/TypeScript, Python, Go, and more. It also asks you key questions like "Does your project use Docker?" to improve the output.
+## ✨ Key Features
 
-## Installation
+-   **Automated README Generation**: Quickly generate comprehensive README files with minimal effort.
+-   **Project Analysis**: Intelligent analysis of your project structure to create relevant and informative documentation.
+-   **Customizable Templates**: Use pre-built templates or create your own to match your project's style.
+-   **Live Updates**: Watch your project for changes and automatically update the README.
+-   **CLI Interface**: Easy-to-use command-line interface for seamless integration into your development workflow.
+-   **Dashboard**: Interactive dashboard to track usage metrics and manage configurations.
 
-To install Dokugen globally and make it accessible from any project directory, run:
+## 📦 Installation
+
+Get started with Dokugen in just a few simple steps:
+
+1.  **Install Dokugen globally using npm:**
 
 ```bash
 npm install -g dokugen
 ```
 
-## Usage
-
-Navigate to your project's root directory in the terminal and run the following command:
+2.  **Verify the installation:**
 
 ```bash
-npx dokugen generate
+dokugen --version
 ```
 
-The tool will guide you through a few questions to customize the README generation process.  If a README.md already exists, you will be prompted to overwrite it.
+## 🔧 Usage
 
-## Example
+### Generating a README
 
-Here's an example of running Dokugen in a project directory:
+To generate a README for your project, navigate to your project's root directory and run:
 
 ```bash
-cd my-awesome-project
-npx dokugen generate
+dokugen generate
 ```
 
-The tool will then generate a `README.md` file in your project's root.
+This command analyzes your project and generates a `README.md` file with relevant information.
 
-## Contributing
+### Watching for Live Updates
 
-Contributions are welcome! Feel free to submit pull requests with improvements, bug fixes, or new features.
+To automatically update your README as you make changes to your project, use the `live` command:
 
-1.  Fork the repository.
-2.  Create a new branch for your feature or bug fix.
-3.  Make your changes.
-4.  Submit a pull request.
+```bash
+dokugen live
+```
 
-## License
+This command watches your project files and updates the `README.md` whenever changes are detected.
 
-This project is open-source and available under the MIT License. See the `LICENSE` file for more information.
-### Developers [Samuel Tuoyo](https://github.com/samueltuoyo15)
-## Badges
+#### Options for the `live` command:
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Built with Dokugen](https://img.shields.io/badge/Built%20with-Dokugen-brightgreen)](https://github.com/samueltuoyo15/Dokugen)
+-   `-p, --paths <paths>`: Comma-separated paths to watch (default: `.` ).
+-   `-i, --ignore <patterns>`: Comma-separated patterns to ignore (default: `node_modules/**,.git/**,README.md`).
+-   `-d, --debounce <ms>`: Debounce time in milliseconds (default: `2000`).
+-   `-n, --notifications`: Show desktop notifications on updates (default: `true`).
+-   `-g, --generate`: Generate documentation on start (default: `false`).
 
-## Acknowledgements
+### Configuration
 
+Dokugen can be configured using a `.dokugenrc.json` file in your project's root directory. Here's an example configuration:
 
-This project uses the following open-source libraries:
+```json
+{
+  "templates": ["default"],
+  "watchPaths": ["."],
+  "ignore": ["node_modules/**", ".git/**", "README.md"],
+  "debounceTime": 2000,
+  "autoCommit": true,
+  "notification": true
+}
+```
 
-*   [commander](https://github.com/tj/commander.js)
-*   [chalk](https://github.com/chalk/chalk)
-*   [fs-extra](https://github.com/jprichardson/node-fs-extra)
-*   [path](https://nodejs.org/api/path.html)
-*   [inquirer](https://github.com/SBoudrias/Inquirer.js)
-*   [axios](https://github.com/axios/axios)
+## ⚙️ Technologies Used
+
+-   **Node.js**: The runtime environment for the CLI tool.
+-   **TypeScript**: Used for developing a scalable and maintainable codebase.
+-   **Chokidar**: File system watcher for live updates.
+-   **Commander.js**: Library for building command-line interfaces.
+-   **Inquirer.js**: Library for interactive command-line prompts.
+-   **Axios**: Promise based HTTP client for the browser and node.js
+-   **React**: Used for building the dashboard interface.
+-   **Next.js**: Used for building the dashboard interface.
+-   **Supabase**: Used for user authentication and data storage.
+-   **OpenAI**: Used for generating the README.md content.
+
+## 📂 Project Structure
+
+Here's a brief
