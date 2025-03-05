@@ -139,28 +139,8 @@ async function detectProjectType(projectDir: string): Promise<string> {
 }
 
 async function scanFiles(dir: string): Promise<string[]> {
-  const ignoreDirs = new Set([
-    "node_modules",
-    "dist",
-    ".git",
-    ".next",
-    "coverage",
-    "out",
-    "test",
-    "uploads",
-    "docs",
-    "build",
-    ".vscode",
-    ".idea",
-    "logs",
-    "public",
-    "storage",
-    "bin",
-    "obj",
-    "lib",
-    "venv",
-    "cmake-build-debug",
-  ]);
+  const ignoreDirs = new Set([ "node_modules", "dist", ".git", ".next", "coverage", "out", "test",  "uploads",  "docs",  "build", ".vscode", ".idea",  "logs",  "public",  "storage",  "bin", "obj",  "lib",  "venv", "cmake-build-debug",
+ ]);
   const ignoreFiles = new Set([
     "CHANGELOG.md",
     "style.css",
