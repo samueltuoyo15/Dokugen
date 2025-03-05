@@ -22,18 +22,24 @@ const searchableContent = [
   },
   {
     id: 3,
+    title: "Can I auto generate my readme using the --live flag?",
+    content: "Coming Soon, you will be able to use the flag to watch ad auto generate your readme in upcoming Dokugen version 3.1.0.",
+    type: "faq",
+  },
+  {
+    id: 4,
     title: "Modern READMEs",
     content: "Generate READMEs with emojis, badges, and modern formatting.",
     type: "feature",
   },
   {
-    id: 4,
+    id: 5,
     title: "Cross-Platform",
     content: "Works on any OS and programming language.",
     type: "feature",
   },
   {
-    id: 5,
+    id: 6,
     title: "Easy Integration",
     content: "Integrate with GitHub, GitLab, and VS Code.",
     type: "feature",
@@ -247,7 +253,13 @@ export default function DocsPage() {
                 <div>
                   <h3 className="text-xl font-bold mb-2">Can I use custom templates?</h3>
                   <p className="text-gray-300">
-                    Coming Soon, you will be able to use the <code className="text-green-400">--template</code> flag to specify a custom template in upcoming Dokugen version 3.2.0.
+                    Coming Soon, you will be able to use the <code className="text-green-400">--template flag</code> flag to specify a custom template in upcoming Dokugen version 3.1.0.
+                  </p>
+                </div>
+                   <div>
+                  <h3 className="text-xl font-bold mb-2">Can I auto generate my readme using the --live flag?</h3>
+                  <p className="text-gray-300">
+                    Coming Soon, you will be able to use the <code className="text-green-400">--live flag</code> flag to watch ad auto generate your readme in upcoming Dokugen version 3.1.0.
                   </p>
                 </div>
               </div>
