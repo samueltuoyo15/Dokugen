@@ -153,6 +153,7 @@ export default function Home() {
                 fill
                 className="object-cover rounded-lg"
               />
+              <video src="/Demo.mp4" muted autoplay></video>
             </div>
           </div>
         </motion.div>

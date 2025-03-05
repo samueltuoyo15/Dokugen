@@ -48,7 +48,7 @@ npx dokugen generate
 
 The tool will then generate a `README.md` file in your project's root.
 
-### Watching for Live Updates
+### Watching for Live Updates (Coming Soon!!!!!!)  version 3.1.0
 
 To automatically update your README as you make changes to your project, use the `live` command:
 
