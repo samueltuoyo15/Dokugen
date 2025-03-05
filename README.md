@@ -7,6 +7,12 @@ A CLI tool to automatically generate high-quality README files for your projects
 
 Dokugen scans your project, analyzes the file structure and codebase, and then generates a comprehensive README.md file based on your project type and key characteristics. It supports various languages and frameworks, including JavaScript/TypeScript, Python, Go, and more. It also asks you key questions like "Does your project use Docker?" to improve the output.
 
+first of all go to your particular Project you want to make use of Dokugen:
+
+```bash
+cd your-current-project
+```
+
 ## Installation
 
 To install Dokugen globally and make it accessible from any project directory, run:
@@ -33,7 +39,7 @@ The tool will guide you through a few questions to customize the README generati
 
 ## Example
 
-Here's an example of running Dokugen in a project directory:
+Here's an example of running Dokugen in a project directory after successful installation:
 
 ```bash
 cd my-awesome-project
@@ -75,15 +81,6 @@ Dokugen can be configured using a `.dokugenrc.json` file in your project's root 
 }
 ```
 
-## Contributing
-
-Contributions are welcome! Feel free to submit pull requests with improvements, bug fixes, or new features.
-
-1.  Fork the repository.
-2.  Create a new branch for your feature or bug fix.
-3.  Make your changes.
-4.  Submit a pull request.
-
 ## Acknowledgements
 
 This project uses the following open-source libraries:
@@ -105,6 +102,14 @@ This project uses the following open-source libraries:
 -   **Supabase Postgre Db**: Used for monitoring active users in real time.
 -   **OpenAI**: Used for generating the README.md content.
 
+## Contributing
+
+Contributions are welcome! Feel free to submit pull requests with improvements, bug fixes, or new features.
+
+1.  Fork the repository.
+2.  Create a new branch for your feature or bug fix.
+3.  Make your changes.
+4.  Submit a pull request.
 
 ## License
 
