@@ -153,7 +153,7 @@ export default function Home() {
                 fill
                 className="object-cover rounded-lg"
               />
-              <video src="/Demo.mp4" muted autoplay className="w-full h-full object-cover rounded-lg">Your browser does not support the video tag.</video>
+              <video src="/Demo.mp4" muted autoPlay className="w-full h-full object-cover rounded-lg">Your browser does not support the video tag.</video>
             </div>
           </div>
         </motion.div>
