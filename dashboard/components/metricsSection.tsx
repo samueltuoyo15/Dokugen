@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
 
 
 interface UserMetrics {
@@ -78,11 +78,11 @@ export default function MetricsSection() {
         </div>
       </div>
 
-      {/* Usage Count Bar Chart */}
+      {/* Usage Count Line Chart */}
       <div className="bg-gray-800 p-6 rounded-lg">
         <h3 className="text-2xl font-bold mb-4">Usage Count by User</h3>
         <ResponsiveContainer width="100%" height={400}>
-          <BarChart
+          <LineChart
             data={chartData}
             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
           >
@@ -91,8 +91,8 @@ export default function MetricsSection() {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey="usage_count" fill="#8884d8" name="Usage Count" />
-          </BarChart>
+            <Line dataKey="usage_count" fill="#8884d8" name="Usage Count" />
+          </LineChart>
         </ResponsiveContainer>
       </div>
     </div>
