@@ -1,22 +1,8 @@
 import type { Metadata } from "next";
-import { Sora, IBM_Plex_Mono } from "next/font/google";
+import { GeistSans, GeistMono } from "geist/font";
 import siteMetadata from "../utils/siteMetaData";
 import Providers from "./Providers";
 import "./globals.css";
-
-const sora = Sora({
-  variable: "--font-sora",
-  subsets: ["latin"],
-  weight: ["400", "600", "700"], 
-  display: "swap",
-});
-
-const plexMono = IBM_Plex_Mono({
-  variable: "--font-plex-mono",
-  subsets: ["latin"],
-  weight: ["400", "500", "700"], 
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteMetadata.siteUrl),
@@ -62,7 +48,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${sora.variable} ${plexMono.variable} select-none antialiased`}
+        className={`${GeistSans.variable} ${GeistMono.variable} select-none antialiased`}
       >
         <Providers>{children}</Providers>
       </body>

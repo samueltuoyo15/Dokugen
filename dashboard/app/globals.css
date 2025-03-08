@@ -11,11 +11,13 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --font-geist: 'Geist', sans-serif;
   }
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: var(--font-sora), Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist);
 }
+
