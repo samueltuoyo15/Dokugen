@@ -1,8 +1,0 @@
-{
-  "templates": ["default"],
-  "watchPaths": ["."],
-  "ignore": ["node_modules/**", ".git/**", "README.md"],
-  "debounceTime": 20000,
-  "autoCommit": true,
-  "notification": true
-}
