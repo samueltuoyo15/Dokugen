@@ -150,39 +150,6 @@ export default function Home() {
           </div>
         </motion.div>
 
-        {/* Testimonials Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="mt-16"
-        >
-          <div className="bg-gray-800 p-6 md:p-12 rounded-lg">
-            <h2 className="text-4xl font-bold mb-8 text-center">What Our Users Say</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Testimonial 1 */}
-              <div className="bg-gray-900 p-6 rounded-lg">
-                <p className="text-gray-300 italic">{`Dokugen saved me hours of writing READMEs. It’s a game-changer for developers!`}</p>
-                <p className="text-white font-bold mt-4">Samuel Tuoyo</p>
-                <p className="text-gray-400 text-sm">Full-Stack Developer</p>
-              </div>
-
-              {/* Testimonial 2 */}
-              <div className="bg-gray-900 p-6 rounded-lg">
-                <p className="text-gray-300 italic">"I love how easy it is to generate professional READMEs with Dokugen."</p>
-                <p className="text-white font-bold mt-4">Treasure Uzoma</p>
-                <p className="text-gray-400 text-sm">Open Source Contributor</p>
-              </div>
-
-              {/* Testimonial 3 */}
-              <div className="bg-gray-900 p-6 rounded-lg">
-                <p className="text-gray-300 italic">Dokugen templates are amazing. My projects have never looked better!</p>
-                <p className="text-white font-bold mt-4">Daniel</p>
-                <p className="text-gray-400 text-sm">DevOps Engineer</p>
-              </div>
-            </div>
-          </div>
-        </motion.div>
 
         {/* CTA Section */}
         <motion.div
