@@ -13,5 +13,5 @@
     "skipLibCheck": true
   },
   "include": ["bin/**/*", "scripts/**/*"],
-  "exclude": ["documentation", "dist", "node_modules"]
+  "exclude": ["dashboard", "dist", "node_modules"]
 }
