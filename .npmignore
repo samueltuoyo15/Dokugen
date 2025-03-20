@@ -1,3 +1,4 @@
 .env
 dashboard/
+lib/
 node_modules/
