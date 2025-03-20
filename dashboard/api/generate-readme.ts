@@ -13,11 +13,13 @@ const openai = new OpenAI({
   baseURL: process.env.OPENAI_ENDPOINT || ""
 })
 
+/*TODO 
 const generateCacheKey = (projectType, projectFiles, fullCode) => {
   const hash = crypto.createHash("sha256")
   hash.update(projectType + projectFiles.join("") + fullCode)
   return `readme:${hash.digest("hex")}`
 }
+*/
 
 export default async (req, res) => {
   if (req.method !== "POST") {
