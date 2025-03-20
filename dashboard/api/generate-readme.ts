@@ -13,8 +13,8 @@ const openai = new OpenAI({
   baseURL: process.env.OPENAI_ENDPOINT || ""
 })
 
-/*TODO 
-const generateCacheKey = (projectType, projectFiles, fullCode) => {
+/* TODO
+const generateCacheKey = (projectType: string, projectFiles: string[], fullCode: string): string => {
   const hash = crypto.createHash("sha256")
   hash.update(projectType + projectFiles.join("") + fullCode)
   return `readme:${hash.digest("hex")}`
@@ -28,6 +28,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
 
   try {
     const { projectType, projectFiles, fullCode, userInfo, options, existingReadme } = req.body
+
     if (!projectType || !projectFiles || !fullCode || (!userInfo && os.platform() !== "linux")) {
       return res.status(400).json({ error: "Missing required fields in request body" })
     }
@@ -44,7 +45,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       .single()
 
     if (userError && userError.code !== "PGRST116") throw userError
-
+    
     if (existingUser) {
       await supabase
         .from("active_users")
@@ -83,31 +84,31 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     - **License**: Information about the project's license (if applicable).
     `
 
-    if (options.hasDocker) {
+    if (options?.hasDocker) {
       prompt += `
       - **Docker Setup**: Include instructions for setting up and running the project using Docker.
       `
     }
 
-    if (options.hasAPI) {
+    if (options?.hasAPI) {
       prompt += `
       - **API Documentation**: Include details about the API endpoints, request/response examples, and how to use them.
       `
     }
 
-    if (options.hasDatabase) {
+    if (options?.hasDatabase) {
       prompt += `
       - **Database Configuration**: Include instructions for setting up and configuring the database.
       `
     }
 
-    if (options.includeSetup) {
+    if (options?.includeSetup) {
       prompt += `
       - **Setup Instructions**: Include detailed setup instructions for the project.
       `
     }
 
-    if (options.isOpenSource) {
+    if (options?.isOpenSource) {
       prompt += `
       - **Contributing Guidelines**: Include guidelines for contributing to the project.
       `
@@ -155,13 +156,13 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       ${existingReadme}
       `
     }
-
+    
     res.setHeader("Content-Type", "text/event-stream")
     res.setHeader("Cache-Control", "no-cache")
     res.setHeader("Connection", "keep-alive")
 
     const stream = await openai.chat.completions.create({
-      model: process.env.MODEL_NAME,
+      model: process.env.MODEL_NAME || "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
@@ -178,7 +179,6 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       ],
       stream: true
     })
-
     for await (const chunk of stream) {
       const text = chunk.choices[0]?.delta?.content || ""
       if (text) {
@@ -188,8 +188,8 @@ export default async (req: VercelRequest, res: VercelResponse) => {
 
     res.end()
     console.log("✅ README Generated Successfully")
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ Error generating README:", error)
-    return res.status(500).json({ error: "Failed to generate README" })
+    return res.status(500).json({ error: error.message || "Failed to generate README" })
   }
 }
