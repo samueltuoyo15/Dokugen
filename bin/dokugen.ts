@@ -266,22 +266,40 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
 }
 
 program.name("dokugen").version("3.1.0").description("Automatically generate high-quality README for your application")
-program.command("generate").description("Scan project and generate a README.md").option("--no-overwrite", "Do not overwrite existing README.md, append new features instead").action(async () => {
+program.command("generate").description("Scan project and generate a README.md").option("--no-overwrite", "Do not overwrite existing README.md, append new features instead").action(async (options) => {
      const projectDir = process.cwd()
      const readmePath = path.join(projectDir, "README.md")
-
-     if (await fs.pathExists(readmePath)) {
-       const overwrite = await askYesNo("README.md already exists. Overwrite?")
-       if (!overwrite) return
-     }
-
+     const readmeExists = await fs.pathExists(readmePath)
+   
+     if (readmeExists && !options.overwrite) {
+     const existingReadme = await fs.readFiile(readmePath, "utf-8")
+     
      const projectType = await detectProjectType(projectDir)
      const projectFiles = await scanFiles(projectDir)
      console.log(chalk.blue(`📂 Detected project type: ${projectType}`))
      console.log(chalk.yellow(`📂 Found: ${projectFiles.length} files in the project`))
-
+   
+     const readmeContent = await generateReadme(projectType, projectFiles, projectDir, existingReadme)
+     console.log(chalk.green("✅ README.md created"))
+     } else if(readmeExists && options.overwrite) {
+       const overwrite = await askYesNo("README.md already exists. Overwrite?")
+      if (!overwrite) return
+      const projectType = await detectProjectType(projectDir)
+      const projectFiles = await scanFiles(projectDir)
+      console.log(chalk.blue(`📂 Detected project type: ${projectType}`))
+      console.log(chalk.yellow(`📂 Found: ${projectFiles.length} files in the project`))
+    
      const readmeContent = await generateReadme(projectType, projectFiles, projectDir)
      console.log(chalk.green("✅ README.md created"))
+     } else{
+      const projectType = await detectProjectType(projectDir)
+     const projectFiles = await scanFiles(projectDir)
+     console.log(chalk.blue(`📂 Detected project type: ${projectType}`))
+     console.log(chalk.yellow(`📂 Found: ${projectFiles.length} files in the project`))
+   
+     const readmeContent = await generateReadme(projectType, projectFiles, projectDir)
+     console.log(chalk.green("✅ README.md created"))
+     }
    })
 
 
