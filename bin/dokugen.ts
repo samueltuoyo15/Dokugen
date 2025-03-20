@@ -214,7 +214,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
       projectFiles,
       fullCode,
       userInfo,
-      options: { hasDocker, hasAPI, hasDatabase, includeSetup, isOpenSource }
+      options: { hasDocker, hasAPI, hasDatabase, includeSetup, isOpenSource },
       existingReadme,
     }, {responseType: "stream"})
     

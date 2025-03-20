@@ -1,17 +1,12 @@
-# Dokugen: Your README.md Generator 🦸
-### current version 3.0.0 🤗
+# Dokugen: Your README.md Generator 🦸‍♀️
+
+### Current Version: 3.0.0 🤗
 
 A CLI tool to automatically generate high-quality README files for your projects. Spend less time on documentation and more time building!
 
 ## Description
 
-Dokugen scans your project, analyzes the file structure and codebase, and then generates a comprehensive README.md file based on your project type and key characteristics. It supports various languages and frameworks, including JavaScript/TypeScript, Python, Go, and more. It also asks you key questions like "Does your project use Docker?" to improve the output.
-
-first of all go to your particular Project you want to make use of Dokugen:
-
-```bash
-cd your-current-project
-```
+Dokugen scans your project, analyzes the file structure and codebase, and then generates a comprehensive `README.md` file based on your project type and key characteristics. It supports various languages and frameworks, including JavaScript/TypeScript, Python, Go, and more. It also asks you key questions like "Does your project use Docker?" to improve the output.
 
 ## Installation
 
@@ -21,7 +16,9 @@ To install Dokugen globally and make it accessible from any project directory, r
 npm install -g dokugen
 ```
 
-## Verify the installation
+### Verify Installation
+
+Ensure Dokugen is installed by checking its version:
 
 ```bash
 dokugen --version
@@ -29,92 +26,116 @@ dokugen --version
 
 ## Usage
 
-Navigate to your project's root directory in the terminal and run the following command:
+Navigate to your project's root directory in the terminal and run:
 
 ```bash
 npx dokugen generate
 ```
 
-The tool will guide you through a few questions to customize the README generation process.  If a README.md already exists, you will be prompted to overwrite it.
+The tool will guide you through a few questions to customize the README generation process. If a `README.md` already exists, you will be prompted to overwrite it.
 
-## Example
-
-Here's an example of running Dokugen in a project directory after successful installation:
+### Example
 
 ```bash
 cd my-awesome-project
 npx dokugen generate
 ```
 
-The tool will then generate a `README.md` file in your project's root.
+The tool will then generate a `README.md` file in your project's root directory.
 
-### Watching for Live Updates (Coming Soon!!!!!!)  version 3.1.0
+## Development
 
-To automatically update your README as you make changes to your project, use the `live` command:
+If you want to contribute or test changes locally:
 
-```bash
-dokugen live
-```
+1. Clone the repository:
 
-This command watches your project files and updates the `README.md` whenever changes are detected.
+   ```bash
+   git clone https://github.com/samueltuoyo15/Dokugen.git
+   cd Dokugen
+   ```
 
-#### Options for the `live` command:
+2. Install dependencies:
 
--   `-p, --paths <paths>`: Comma-separated paths to watch (default: `.` ).
--   `-i, --ignore <patterns>`: Comma-separated patterns to ignore (default: `node_modules/**,.git/**,README.md`).
--   `-d, --debounce <ms>`: Debounce time in milliseconds (default: `2000`).
--   `-n, --notifications`: Show desktop notifications on updates (default: `true`).
--   `-g, --generate`: Generate documentation on start (default: `false`).
+   ```bash
+   npm install
+   ```
 
-### Configuration
+3. Build the project:
 
-Dokugen can be configured using a `.dokugenrc.json` file in your project's root directory. Here's an example configuration:
+   ```bash
+   npm run build
+   ```
 
-```json
-{
-  "templates": ["default"],
-  "watchPaths": ["."],
-  "ignore": ["node_modules/**", ".git/**", "README.md"],
-  "debounceTime": 2000,
-  "autoCommit": true,
-  "notification": true
-}
-```
+4. Test the CLI locally:
+
+   ```bash
+   node ./dist/bin/dokugen.mjs generate
+   ```
+
+## Contributing
+
+Contributions are welcome! Follow these steps to contribute:
+
+1. **Fork the repository**: Click the "Fork" button on GitHub.
+2. **Create a new branch**: Use a meaningful branch name.
+
+   ```bash
+   git checkout -b feature-your-feature-name
+   ```
+
+3. **Make your changes**: Ensure your code follows best practices.
+4. **Test your changes**: Run:
+
+   ```bash
+   npm run build
+   node ./dist/bin/dokugen.mjs generate
+   ```
+
+5. **Commit your changes**: Use descriptive commit messages.
+
+   ```bash
+   git commit -m "Added feature: [describe feature]"
+   ```
+
+6. **Push your branch**:
+
+   ```bash
+   git push origin feature-your-feature-name
+   ```
+
+7. **Create a Pull Request**: Go to GitHub and submit a pull request.
 
 ## Acknowledgements
 
 This project uses the following open-source libraries:
 
-*   [commander](https://github.com/tj/commander.js)
-*   [chalk](https://github.com/chalk/chalk)
-*   [fs-extra](https://github.com/jprichardson/node-fs-extra)
-*   [path](https://nodejs.org/api/path.html)
-*   [inquirer](https://github.com/SBoudrias/Inquirer.js)
-*   [axios](https://github.com/axios/axios)
+- [commander](https://github.com/tj/commander.js)
+- [chalk](https://github.com/chalk/chalk)
+- [fs-extra](https://github.com/jprichardson/node-fs-extra)
+- [path](https://nodejs.org/api/path.html)
+- [inquirer](https://github.com/SBoudrias/Inquirer.js)
+- [axios](https://github.com/axios/axios)
 
 ## ⚙️ Technologies Used
 
--   **TypeScript**: Used for developing a scalable and maintainable codebase.
--   **Chokidar**: File system watcher for live updates.
--   **Commander.js**: Library for building command-line interfaces.
--   **Inquirer.js**: Library for interactive command-line prompts.
--   **Next.js**: Used for building SEO and the dashboard interface.
--   **Supabase Postgre Db**: Used for monitoring active users in real time.
--   **OpenAI**: Used for generating the README.md content.
-
-## Contributing
-
-Contributions are welcome! Feel free to submit pull requests with improvements, bug fixes, or new features.
-
-1.  Fork the repository.
-2.  Create a new branch for your feature or bug fix.
-3.  Make your changes.
-4.  Submit a pull request.
+- **TypeScript**: Scalable and maintainable codebase.
+- **Chokidar**: File system watcher for live updates.
+- **Commander.js**: CLI framework.
+- **Inquirer.js**: Interactive command-line prompts.
+- **Next.js**: SEO-friendly dashboard interface.
+- **Supabase PostgreSQL**: Real-time active user monitoring.
+- **OpenAI**: Used for README content generation.
 
 ## License
 
 This project is open-source and available under the MIT License. See the `LICENSE` file for more information.
-### Contributors: [OritseWeyinmi Samuel Tuoyo](https://github.com/samueltuoyo15), [CharmingDc Adebayo](https://github.com/Charmingdc), [Ogunwele](https://github.com/ogunlewe)
+
+## Contributors
+
+- [OritseWeyinmi Samuel Tuoyo](https://github.com/samueltuoyo15)
+- [CharmingDc Adebayo](https://github.com/Charmingdc)
+- [Ogunwele](https://github.com/ogunlewe)
+
 ## Badges
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
