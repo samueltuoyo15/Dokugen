@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.1.0] - TODO
+### Added
+- **--no-overwrite flag**: added a flag to the cli tool that updates your readme instead of generating new/different readme.
+
+### Changed
+- **Refactored Codebase**: Improved code structure for better readability and maintainability.
+
+### Fixed
+- **Renaming All Js files to mjs in the dist folder**: Fixed bugs related to to converting .js files to .mjs.
+
 ## [3.0.0] - 2025-02-29
 ### Added
 - **Streaming Support**: Integrated real-time streaming for README generation using OpenAI's API.
