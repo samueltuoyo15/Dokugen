@@ -5,11 +5,11 @@
     "rootDir": ".",
     "allowJs": true,
     "moduleResolution": "NodeNext",
-    "outDir": "dist",
     "downlevelIteration": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
+    "outDir": "dist",
     "skipLibCheck": true
   },
   "include": ["bin/**/*", "scripts/**/*"],

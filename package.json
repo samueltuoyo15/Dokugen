@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "postinstall": "node dist/scripts/postinstall.mjs"
+    "postbuild": "node --no-warnings lib/rename.ts"
   },
   "bin": {
     "dokugen": "dist/bin/dokugen.mjs"
@@ -31,14 +31,20 @@
     "axios": "^1.8.1",
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
+    "esbuild": "^0.25.1",
     "fs": "^0.0.1-security",
     "fs-extra": "^11.3.0",
     "inquirer": "^12.4.2"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.3",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-typescript": "^12.1.2",
     "@types/axios": "^0.9.36",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.13.4",
+    "rollup": "^4.36.0",
+    "shx": "^0.4.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
   }

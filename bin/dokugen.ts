@@ -9,6 +9,7 @@ import { Readable } from "stream"
 import { execSync } from "child_process"
 import os from "os"
 
+
 const getUserInfo = (): { username: string, email?: string } => {
   try {
     const gitName = execSync("git config --get user.name", { encoding: "utf-8" }).trim()
@@ -21,9 +22,7 @@ const getUserInfo = (): { username: string, email?: string } => {
 
 const extractFullCode = async (projectFiles: string[], projectDir: string): Promise<string> => {
   const snippets = await Promise.all(
-    projectFiles
-      .filter(file => file.match(/\.(ts|js|json|jsx|tsx|html|go|ejs|mjs|py|rs|c|cs|cpp|h|hpp|java|kt|swift|php|rb|dart|scala|lua|sh|bat|asm|vb|cshtml|razor|m)$/))
-      .map(async file => {
+    projectFiles.filter(file => file.match(/\.(ts|js|json|jsx|tsx|html|go|ejs|mjs|py|rs|c|cs|cpp|h|hpp|java|kt|swift|php|rb|dart|scala|lua|sh|bat|asm|vb|cshtml|razor|m)$/)).map(async file => {
         try {
           const contentStream = fs.createReadStream(path.resolve(projectDir, file), "utf-8")
           let content = ""
@@ -80,6 +79,7 @@ const detectProjectType = async (projectDir: string): Promise<string> => {
     "Program.cs": "C# / .NET",
     "Main.kt": "Kotlin",
     "App.swift": "Swift",
+    "metro.config.js": "React Native"
   }
 
   const folderChecks: Record<string, string> = {
@@ -109,6 +109,7 @@ const detectProjectType = async (projectDir: string): Promise<string> => {
       if (dependencies["@angular/core"]) return "Angular"
       if (dependencies["next"]) return "Next.js"
       if (dependencies["nuxt"]) return "Nuxt.js"
+      if (dependencies["react-native"]) return "React Native"
     }
     return null
   }
@@ -264,8 +265,8 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
   }
 }
 
-program.name("dokugen").version("3.0.0").description("Automatically generate high-quality README for your application")
-program.command("generate").description("Scan project and generate a README.md").action(async () => {
+program.name("dokugen").version("3.1.0").description("Automatically generate high-quality README for your application")
+program.command("generate").description("Scan project and generate a README.md").option("--no-overwrite", "Do not overwrite existing README.md, append new features instead").action(async () => {
      const projectDir = process.cwd()
      const readmePath = path.join(projectDir, "README.md")
 
