@@ -21,7 +21,7 @@ const generateCacheKey = (projectType, projectFiles, fullCode) => {
 }
 */
 
-export default async (req, res) => {
+export default async (req: VercelRequest, res: VercelResponse) => {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method not allowed" })
   }
