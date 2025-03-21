@@ -33,7 +33,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       return res.status(400).json({ error: "Missing required fields in request body" })
     }
 
-    const { username, email } = userInfo || {}
+    const { username, email, osInfo} = userInfo || {}
     if (!username) return res.status(400).json({ message: "Missing OS username and ID" })
 
     const id = userInfo?.id || uuidv4()
@@ -49,17 +49,17 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     if (existingUser) {
       await supabase
         .from("active_users")
-        .update({ usage_count: existingUser.usage_count + 1 })
+        .update({ usage_count: existingUser.usage_count + 1, osInfo })
         .eq("id", existingUser.id)
     } else {
       const { error } = await supabase
         .from("active_users")
-        .insert([{ username, email, id, usage_count: 1 }])
+        .insert([{ username, email, id, osInfo, usage_count: 1 }])
 
       if (error) throw error
     }
 
-    console.log(`Updated Active user ${username}, (${email})`)
+    console.log(`Updated Active user ${username}, (${email}) ${osInfo}`)
 
     let prompt = `
     Generate a **high-quality, professional, and modern README.md** for a **${projectType}** project.

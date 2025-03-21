@@ -14,10 +14,15 @@ const getUserInfo = (): { username: string, email?: string } => {
   try {
     const gitName = execSync("git config --get user.name", { encoding: "utf-8" }).trim()
     const gitEmail = execSync("git config --get user.email", { encoding: "utf-8" }).trim()
-    if (gitName && gitEmail) return { username: gitName, email: gitEmail }
+    const osInfo = {
+     platform: os.platform(),
+     arch: os.arch(),
+     release: os.release()
+    }
+    if (gitName && gitEmail) return { username: gitName, email: gitEmail, osInfo}
   } catch {}
 
-  return { username: os.userInfo().username || "Unknown", email: process.env.USER || "Unknown" }
+  return { username: os.userInfo().username || "", email: process.env.USER || "", osInfo: {platform: "Unknown", arch: "Uknown", release: "Unknown"}}
 }
 
 const extractFullCode = async (projectFiles: string[], projectDir: string): Promise<string> => {
