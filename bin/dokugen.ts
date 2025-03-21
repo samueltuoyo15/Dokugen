@@ -22,7 +22,7 @@ const getUserInfo = (): { username: string, email?: string, osInfo: {platform: s
     if (gitName && gitEmail && osInfo) return { username: gitName, email: gitEmail, osInfo}
   } catch {}
 
-  return { username: os.userInfo().username || "", email: process.env.USER || "", osInfo: {platform: "Unknown", arch: "Uknown", release: "Unknown"}}
+  return { username: os.userInfo().username || "", email: process.env.USER || "", osInfo: {platform: "Unknown", arch: "Unknown", release: "Unknown"}}
 }
 
 const extractFullCode = async (projectFiles: string[], projectDir: string): Promise<string> => {
