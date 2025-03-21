@@ -10,7 +10,7 @@ import { execSync } from "child_process"
 import os from "os"
 
 
-const getUserInfo = (): { username: string, email?: string } => {
+const getUserInfo = (): { username: string, email?: string, osInfo: {platform: string, arch: string, release: string}} => {
   try {
     const gitName = execSync("git config --get user.name", { encoding: "utf-8" }).trim()
     const gitEmail = execSync("git config --get user.email", { encoding: "utf-8" }).trim()
@@ -19,7 +19,7 @@ const getUserInfo = (): { username: string, email?: string } => {
      arch: os.arch(),
      release: os.release()
     }
-    if (gitName && gitEmail) return { username: gitName, email: gitEmail, osInfo}
+    if (gitName && gitEmail && osInfo) return { username: gitName, email: gitEmail, osInfo}
   } catch {}
 
   return { username: os.userInfo().username || "", email: process.env.USER || "", osInfo: {platform: "Unknown", arch: "Uknown", release: "Unknown"}}
