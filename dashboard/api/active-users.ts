@@ -13,7 +13,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
   }
   
   try{
-    const {data, error } = await supabase.from("active_users").select("id, email, username, usage_count", "osInfo").order("usage_count", {ascending: false})
+    const {data, error } = await supabase.from("active_users").select("id, email, username, usage_count, osInfo").order("usage_count", {ascending: false})
     if(error) throw error
     
     return res.status(200).json({activeUsers: data})
