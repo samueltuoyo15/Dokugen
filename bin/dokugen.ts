@@ -34,6 +34,7 @@ const extractFullCode = async (projectFiles: string[], projectDir: string): Prom
           for await (const chunk of contentStream) content += chunk
           return `## ${file}\n\`\`\`${path.extname(file).slice(1) || "txt"}\n${content}\n\`\`\`\n`
         } catch(error){
+          console.error(`❌ Failed to read file: ${file}`)
           console.error(error)
           return null
         }
@@ -258,33 +259,23 @@ program.command("generate").description("Scan project and generate a README.md")
      const readmePath = path.join(projectDir, "README.md")
      const readmeExists = await fs.pathExists(readmePath)
    
-     if (readmeExists && !options.overwrite) {
-     const existingReadme = await fs.readFile(readmePath, "utf-8")
-     
+        
      const projectType = await detectProjectType(projectDir)
      const projectFiles = await scanFiles(projectDir)
      console.log(chalk.blue(`📂 Detected project type: ${projectType}`))
      console.log(chalk.yellow(`📂 Found: ${projectFiles.length} files in the project`))
-   
-     const readmeContent = await generateReadme(projectType, projectFiles, projectDir, existingReadme)
+ 
+     if (readmeExists && !options.overwrite) {
+     const existingReadme = await fs.readFile(readmePath, "utf-8")
+     await generateReadme(projectType, projectFiles, projectDir, existingReadme)
      console.log(chalk.green("✅ README.md has been successfully updated!!!"))
      } else if(readmeExists && options.overwrite) {
        const overwrite = await askYesNo("README.md already exists. Overwrite?")
       if (!overwrite) return
-      const projectType = await detectProjectType(projectDir)
-      const projectFiles = await scanFiles(projectDir)
-      console.log(chalk.blue(`📂 Detected project type: ${projectType}`))
-      console.log(chalk.yellow(`📂 Found: ${projectFiles.length} files in the project`))
-    
-     const readmeContent = await generateReadme(projectType, projectFiles, projectDir)
+     await generateReadme(projectType, projectFiles, projectDir)
      console.log(chalk.green("✅ README.md has been successfully created"))
      } else{
-      const projectType = await detectProjectType(projectDir)
-     const projectFiles = await scanFiles(projectDir)
-     console.log(chalk.blue(`📂 Detected project type: ${projectType}`))
-     console.log(chalk.yellow(`📂 Found: ${projectFiles.length} files in the project`))
-   
-     const readmeContent = await generateReadme(projectType, projectFiles, projectDir)
+     await generateReadme(projectType, projectFiles, projectDir)
      console.log(chalk.green("✅ README.md has been successfully created"))
      }
    })
