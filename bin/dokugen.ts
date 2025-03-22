@@ -26,21 +26,37 @@ const getUserInfo = (): { username: string, email?: string, osInfo: {platform: s
 }
 
 const extractFullCode = async (projectFiles: string[], projectDir: string): Promise<string> => {
-  const snippets = await Promise.all(
-    projectFiles.filter(file => file.match(/\.(ts|js|json|jsx|tsx|html|go|ejs|mjs|py|rs|c|cs|cpp|h|hpp|java|kt|swift|php|rb|dart|scala|lua|sh|bat|asm|vb|cshtml|razor|m)$/)).map(async file => {
-        try {
-          const contentStream = fs.createReadStream(path.resolve(projectDir, file), "utf-8")
-          let content = ""
-          for await (const chunk of contentStream) content += chunk
-          return `## ${file}\n\`\`\`${path.extname(file).slice(1) || "txt"}\n${content}\n\`\`\`\n`
-        } catch(error){
-          console.error(`❌ Failed to read file: ${file}`)
-          console.error(error)
-          return null
-        }
-      })
-  )
+  const fileGroups: Record<string, string[]> = {}
+  
+  projectFiles.forEach(file => {
+    const dir = path.dirname(file)
+    if (!fileGroups[dir]) fileGroups[dir] = []
+    fileGroups[dir].push(file)
+  })
 
+  const snippets = await Promise.all(
+    Object.entries(fileGroups).map(async ([dir, files]) => {
+      const dirSnippets = await Promise.all(
+        files.map(async file => {
+          try {
+            const filePath = path.resolve(projectDir, file)
+            const stats = await fs.stat(filePath)
+            const contentStream = fs.createReadStream(filePath, "utf-8")
+            let content = ""
+            for await (const chunk of contentStream) content += chunk
+
+            return `### ${file}\n- **Path:** ${file}\n- **Size:** ${(stats.size / 1024).toFixed(2)} KB\n\`\`\`${path.extname(file).slice(1) || "txt"}\n${content}\n\`\`\`\n`
+          } catch (error) {
+            console.error(chalk.red(`❌ Failed to read file: ${file}`))
+            console.error(error)
+            return null
+          }
+        })
+      )
+      
+      return `## ${dir}\n${dirSnippets.filter(Boolean).join("")}`
+    })
+  )
   return snippets.filter(Boolean).join("") || "No code snippets available"
 }
 
