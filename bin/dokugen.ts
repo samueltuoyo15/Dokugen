@@ -15,9 +15,9 @@ const getUserInfo = (): { username: string, email?: string, osInfo: {platform: s
     const gitName = execSync("git config --get user.name", { encoding: "utf-8" }).trim()
     const gitEmail = execSync("git config --get user.email", { encoding: "utf-8" }).trim()
     const osInfo = {
-     platform: os.platform(),
-     arch: os.arch(),
-     release: os.release()
+     platform: os.platform() || "unknown",
+     arch: os.arch() || "unknown",
+     release: os.release() || "unknown"
     }
     if (gitName && gitEmail && osInfo) return { username: gitName, email: gitEmail, osInfo}
   } catch {}
@@ -174,25 +174,6 @@ const checkDependency = async (filePath: string, keywords: string[]): Promise<bo
   }
 }
 
-const detectProjectFeatures = async (projectFiles: string[], projectDir: string) => {
-  const hasDocker = projectFiles.some(file => ["Dockerfile", "docker-compose.yml"].includes(file))
-
-  const results = await Promise.all([
-    checkDependency(path.join(projectDir, "package.json"), ["express", "fastify", "koa"]),
-    checkDependency(path.join(projectDir, "go.mod"), ["net/http", "gin-gonic", "fiber"]),
-    checkDependency(path.join(projectDir, "Cargo.toml"), ["actix-web", "rocket"]),
-    checkDependency(path.join(projectDir, "requirements.txt"), ["flask", "django", "fastapi"]),
-    checkDependency(path.join(projectDir, "pyproject.toml"), ["flask", "django", "fastapi"]),
-    checkDependency(path.join(projectDir, "pom.xml"), ["spring-boot", "jakarta.ws.rs"]),
-    checkDependency(path.join(projectDir, "package.json"), ["mongoose", "sequelize", "typeorm", "pg", "mysql", "sqlite"])
-  ])
-
-  return {
-    hasDocker,
-    hasAPI: results.slice(0, 6).some(Boolean),
-    hasDatabase: results[6]
-  }
-}
 
 const askYesNo = async (message: string): Promise<boolean> => {
   const { response } = await inquirer.prompt([{ type: "list", name: "response", message, choices: ["Yes", "No"] }])
@@ -205,7 +186,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
     const { hasDocker, hasAPI, hasDatabase } = await detectProjectFeatures(projectFiles, projectDir)
 
     const includeSetup = await askYesNo("Do you want to include setup instructions in the README?")
-    const isOpenSource = await askYesNo("Include contribution guidelines in README?")
+    const includeContributionGuideLine = await askYesNo("Include contribution guidelines in README?")
 
     const fullCode = await extractFullCode(projectFiles, projectDir)
     const userInfo = getUserInfo()
@@ -219,7 +200,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
       projectFiles,
       fullCode,
       userInfo,
-      options: { hasDocker, hasAPI, hasDatabase, includeSetup, isOpenSource },
+      options: { includeSetup, includeContributionGuideLine },
       existingReadme,
     }, {responseType: "stream"})
     
