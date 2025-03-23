@@ -34,7 +34,7 @@ const getGitRepoUrl = (): string | null => {
   try {
     const repoUrl = execSync("git config --get remote.origin.url", { encoding: "utf-8" }).trim()
     return repoUrl || null
-  } catch () {
+  } catch {
     return null
   }
 }
