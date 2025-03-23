@@ -150,7 +150,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
           3. Include the Dokugen badge at the bottom of the README.
           4. Do not wrap the README in markdown code blocks (```markdown or ```).
           5. Ensure the README sounds like a human wrote it. Avoid AI-generated phrasing.
-          `,
+          `
         },
         { role: "user", content: prompt }
       ],
