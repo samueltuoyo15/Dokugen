@@ -61,7 +61,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       if (error) throw error
     }
 
-    console.log(`Updated Active user ${username}, (${email}) ${osInfo || {}`)
+    console.log(`Updated Active user ${username}, (${email}) ${osInfo}`)
     let prompt = `
       Generate a **high-quality, professional, and modern README.md** for a **${projectType}** project.
       
