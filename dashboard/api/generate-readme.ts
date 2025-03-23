@@ -1,65 +1,65 @@
-import { supabase } from "../lib/supabase.mjs";
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-import crypto from "crypto";
-import os from "os";
-import { v4 as uuidv4 } from "uuid";
-import { OpenAI } from "openai";
-import dotenv from "dotenv";
-dotenv.config();
+import { supabase } from "../lib/supabase.mjs"
+import type { VercelRequest, VercelResponse } from "@vercel/node"
+import crypto from "crypto"
+import os from "os"
+import { v4 as uuidv4 } from "uuid"
+import { OpenAI } from "openai"
+import dotenv from "dotenv"
+dotenv.config()
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "",
-  baseURL: process.env.OPENAI_ENDPOINT || "",
-});
+  baseURL: process.env.OPENAI_ENDPOINT || ""
+})
 
 const generateCacheKey = (projectType: string, projectFiles: string[], fullCode: string) => {
-  const hash = crypto.createHash("sha256");
-  hash.update(projectType + projectFiles.join("") + fullCode);
-  return `readme:${hash.digest("hex")}`;
-};
+  const hash = crypto.createHash("sha256")
+  hash.update(projectType + projectFiles.join("") + fullCode)
+  return `readme:${hash.digest("hex")}`
+}
 
 export default async (req: VercelRequest, res: VercelResponse) => {
   if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
+    return res.status(405).json({ message: "Method not allowed" })
   }
 
   try {
-    const { projectType, projectFiles, fullCode, userInfo, options, existingReadme } = req.body;
-    console.log(req.body);
+    const { projectType, projectFiles, fullCode, userInfo, options, existingReadme } = req.body
+    console.log(req.body)
     if (!projectType || !projectFiles || !fullCode || (!userInfo && os.platform() !== "linux")) {
-      return res.status(400).json({ error: "Missing required fields in request body" });
+      return res.status(400).json({ error: "Missing required fields in request body" })
     }
 
-    const { username, email, osInfo } = userInfo || {};
-    if (!username) return res.status(400).json({ message: "Missing OS username and ID" });
+    const { username, email, osInfo } = userInfo || {}
+    if (!username) return res.status(400).json({ message: "Missing OS username and ID" })
 
-    const id = userInfo?.id || uuidv4();
+    const id = userInfo?.id || uuidv4()
 
     const { data: existingUser, error: userError } = await supabase
       .from("active_users")
       .select("id, usage_count")
       .eq("email", email)
-      .single();
+      .single()
 
-    if (userError && userError.code !== "PGRST116") throw userError;
+    if (userError && userError.code !== "PGRST116") throw userError
 
     if (existingUser) {
-      const updateData: any = { usage_count: existingUser.usage_count + 1 };
-      if (osInfo) updateData.osInfo = osInfo;
+      const updateData: any = { usage_count: existingUser.usage_count + 1 }
+      if (osInfo) updateData.osInfo = osInfo
 
       await supabase
         .from("active_users")
         .update(updateData)
-        .eq("id", existingUser.id);
+        .eq("id", existingUser.id)
     } else {
       const { error } = await supabase
         .from("active_users")
-        .insert([{ username, email, id, osInfo, usage_count: 1 }]);
+        .insert([{ username, email, id, osInfo, usage_count: 1 }])
 
-      if (error) throw error;
+      if (error) throw error
     }
 
-    console.log(`Updated Active user ${username}, ${email} (${osInfo})`);
+    console.log(`Updated Active user ${username}, ${email} (${osInfo})`)
     let prompt = `
       Generate a **high-quality, professional, and modern README.md** for a **${projectType}** project.
       
@@ -126,15 +126,15 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       
       ## Final Output:
       Generate the README.md content directly, without any additional explanations or wrapping.
-      `;
+      `
 
     if (existingReadme) {
-      prompt += `\n## Existing README Content:\n${existingReadme}\n`;
+      prompt += `\n## Existing README Content:\n${existingReadme}\n`
     }
 
-    res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Connection", "keep-alive");
+    res.setHeader("Content-Type", "text/event-stream")
+    res.setHeader("Cache-Control", "no-cache")
+    res.setHeader("Connection", "keep-alive")
 
     const stream = await openai.chat.completions.create({
       model: process.env.MODEL_NAME!,
@@ -153,19 +153,19 @@ export default async (req: VercelRequest, res: VercelResponse) => {
         { role: "user", content: prompt },
       ],
       stream: true,
-    });
+    })
 
     for await (const chunk of stream) {
-      const text = chunk.choices[0]?.delta?.content || "";
+      const text = chunk.choices[0]?.delta?.content || ""
       if (text) {
-        res.write(`data: ${JSON.stringify({ response: text })}\n\n`);
+        res.write(`data: ${JSON.stringify({ response: text })}\n\n`)
       }
     }
 
-    res.end();
-    console.log("✅ README Generated Successfully");
+    res.end()
+    console.log("✅ README Generated Successfully")
   } catch (error: any) {
-    console.error("❌ Error generating README:", error);
-    return res.status(500).json({ error: error.message || "Failed to generate README" });
+    console.error("❌ Error generating README:", error)
+    return res.status(500).json({ error: error.message || "Failed to generate README" })
   }
-};
+}
