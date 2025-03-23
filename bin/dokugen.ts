@@ -30,6 +30,15 @@ const getUserInfo = (): { username: string, email?: string, osInfo: {platform: s
   return { username: os.userInfo().username || "", email: process.env.USER || "", osInfo: {platform: "Unknown", arch: "Unknown", release: "Unknown"}}
 }
 
+const getGitRepoUrl = (): string | null => {
+  try {
+    const repoUrl = execSync("git config --get remote.origin.url", { encoding: "utf-8" }).trim()
+    return repoUrl || null
+  } catch () {
+    return null
+  }
+}
+
 const extractFullCode = async (projectFiles: string[], projectDir: string): Promise<string> => {
   const fileGroups: Record<string, string[]> = {}
   
@@ -216,6 +225,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
 
     const fullCode = await extractFullCode(projectFiles, projectDir)
     const userInfo = getUserInfo()
+    const repoUrl = getGitRepoUrl()
     
     console.log(chalk.blue("🔥 Generating README..."))
     
@@ -228,6 +238,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
       userInfo,
       options: { includeSetup, includeContributionGuideLine },
       existingReadme,
+      repoUrl,
     }, {responseType: "stream"})
     
     const responseStream = response.data as Readable 

@@ -9,7 +9,7 @@ dotenv.config()
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "",
-  baseURL: process.env.OPENAI_ENDPOINT || ""
+  baseURL: process.env.OPENAI_ENDPOINT || "https://api.openai.com/v1/chat/completions"
 })
 
 const generateCacheKey = (projectType: string, projectFiles: string[], fullCode: string) => {
@@ -24,7 +24,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
   }
 
   try {
-    const { projectType, projectFiles, fullCode, userInfo, options, existingReadme } = req.body
+    const { projectType, projectFiles, fullCode, userInfo, options, existingReadme, repoUrl} = req.body
     console.log(req.body)
     if (!projectType || !projectFiles || !fullCode || (!userInfo && os.platform() !== "linux")) {
       return res.status(400).json({ error: "Missing required fields in request body" })
@@ -35,11 +35,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
 
     const id = userInfo?.id || uuidv4()
 
-    const { data: existingUser, error: userError } = await supabase
-      .from("active_users")
-      .select("id, usage_count")
-      .eq("email", email)
-      .single()
+    const { data: existingUser, error: userError } = await supabase.from("active_users").select("id, usage_count").eq("email", email).single()
 
     if (userError && userError.code !== "PGRST116") throw userError
 
@@ -47,10 +43,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       const updateData: any = { usage_count: existingUser.usage_count + 1 }
       if (osInfo) updateData.osInfo = osInfo
 
-      await supabase
-        .from("active_users")
-        .update(updateData)
-        .eq("id", existingUser.id)
+      await supabase.from("active_users").update(updateData).eq("id", existingUser.id)
     } else {
       const { error } = await supabase
         .from("active_users")
@@ -78,13 +71,17 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       2. **Description**:
          - Write a **short and engaging description** of the project.
          - Use **emojis** and **modern formatting** to make it stand out.
-      
+     
       3. **Installation**:
-         ${options.includeSetup ? `
-         - Include **step-by-step instructions** for setting up the project locally.
-         - Use **emoji bullet points** and **code blocks** for clarity.
-         ` : ""}
-      
+        ${options.includeSetup ? `
+        - **Clone the Repository**:
+         \`\`\`bash
+         git clone ${repoUrl || "<repository-url>"}
+         \`\`\`
+        - Include **step-by-step instructions** for setting up the project locally.
+        - Use **emoji bullet points** and **code blocks** for clarity.
+        ` : ""}
+  
       4. **Usage**:
          - Include **examples**, **screenshots**, and **code snippets**.
          - Use **collapsible sections** for detailed instructions.
@@ -137,7 +134,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     res.setHeader("Connection", "keep-alive")
 
     const stream = await openai.chat.completions.create({
-      model: process.env.MODEL_NAME!,
+      model: process.env.MODEL_NAME || "gpt-4o",
       messages: [
         {
           role: "system",
@@ -169,3 +166,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     return res.status(500).json({ error: error.message || "Failed to generate README" })
   }
 }
+
+
+
+
