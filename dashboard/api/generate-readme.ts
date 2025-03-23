@@ -61,7 +61,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       if (error) throw error
     }
 
-    console.log(`Updated Active user ${username}, (${email}) ${osInfo || "No OS Info"}`)
+    console.log(`Updated Active user ${username}, (${email}) ${osInfo || {}`)
     let prompt = `
       Generate a **high-quality, professional, and modern README.md** for a **${projectType}** project.
       
@@ -142,7 +142,8 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       model: process.env.MODEL_NAME || "gpt-4",
       messages: [
         {
-          role: "system", content: `
+          role: "system",
+          content: `
           You are Dokugen, a professional next generation ultra idolo perfect super README generator powered by AI. Follow these rules strictly:
           1. Always create high-quality, modern, and engaging READMEs.
           2. Use Markdown for formatting.
@@ -151,9 +152,9 @@ export default async (req: VercelRequest, res: VercelResponse) => {
           5. Ensure the README sounds like a human wrote it. Avoid AI-generated phrasing.
           `,
         },
-        { role: "user", content: prompt }
+        { role: "user", content: prompt },
       ],
-      stream: true
+      stream: true,
     })
 
     for await (const chunk of stream) {
