@@ -143,14 +143,14 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       model: process.env.MODEL_NAME || "gpt-4o",
       messages: [
         {
-          role: "system",
-          content: `You are Dokugen, a professional README generator powered by AI. Follow these rules strictly:
+          role: "system", content: `
+          You are Dokugen, a professional next generation ultra idolo perfect super README generator powered by AI. Follow these rules strictly:
           1. Always create high-quality, modern, and engaging READMEs.
           2. Use Markdown for formatting.
           3. Include the Dokugen badge at the bottom of the README.
           4. Do not wrap the README in markdown code blocks (```markdown or ```).
           5. Ensure the README sounds like a human wrote it. Avoid AI-generated phrasing.
-          `
+          `,
         },
         { role: "user", content: prompt }
       ],
