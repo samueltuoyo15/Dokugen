@@ -11,16 +11,21 @@ import os from "os"
 
 
 const getUserInfo = (): { username: string, email?: string, osInfo: {platform: string, arch: string, release: string}} => {
+ let gitName = ""
+ let gitEmail = ""
+ 
   try {
-    const gitName = execSync("git config --get user.name", { encoding: "utf-8" }).trim()
-    const gitEmail = execSync("git config --get user.email", { encoding: "utf-8" }).trim()
+    gitName = execSync("git config --get user.name", { encoding: "utf-8" }).trim() ?? ""
+    gitEmail = execSync("git config --get user.email", { encoding: "utf-8" }).trim() ?? ""
     const osInfo = {
      platform: os.platform() || "unknown",
      arch: os.arch() || "unknown",
      release: os.release() || "unknown"
     }
     if (gitName && gitEmail && osInfo) return { username: gitName, email: gitEmail, osInfo}
-  } catch {}
+  } catch {
+    console.log(chalk.yellow("⚠️ Git User Info not found. Using Defaults......"))
+  }
 
   return { username: os.userInfo().username || "", email: process.env.USER || "", osInfo: {platform: "Unknown", arch: "Unknown", release: "Unknown"}}
 }
@@ -140,7 +145,7 @@ const detectProjectType = async (projectDir: string): Promise<string> => {
   if (detectedFile) return langMap[detectedFile]
 
    const detectedFolder = Object.keys(folderChecks).find(folder => 
-   fs.existsSync(path.join(projectDir, folder)))
+   fs.pathExists(path.join(projectDir, folder)))
    if (detectedFolder) return folderChecks[detectedFolder]
   
 
@@ -193,15 +198,19 @@ const checkDependency = async (filePath: string, keywords: string[]): Promise<bo
 
 
 const askYesNo = async (message: string): Promise<boolean> => {
-  const { response } = await inquirer.prompt([{ type: "list", name: "response", message, choices: ["Yes", "No"] }])
-  return response === "Yes"
+  try{
+    const { response } = await inquirer.prompt([{ type: "list", name: "response", message, choices: ["Yes", "No"], default: "Yes"}])
+   return response === "Yes"
+  } catch{
+    console.log(chalk.yellow("⚠️ No input receive. Defaulting to No...."))
+    return false
+  }
 }
 
 const generateReadme = async (projectType: string, projectFiles: string[], projectDir: string, existingReadme?: string): Promise<string> => {
   try {
     console.log(chalk.blue("🔍 Analyzing project files..."))
-    const { hasDocker, hasAPI, hasDatabase } = await detectProjectFeatures(projectFiles, projectDir)
-
+    
     const includeSetup = await askYesNo("Do you want to include setup instructions in the README?")
     const includeContributionGuideLine = await askYesNo("Include contribution guidelines in README?")
 
@@ -223,7 +232,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
     
     const responseStream = response.data as Readable 
     return new Promise((resolve, reject) => {
-      let buffer = "";
+      let buffer = ""
 
       responseStream.on("data", (chunk: Buffer) => {
         buffer += chunk.toString()
