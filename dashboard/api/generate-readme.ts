@@ -10,10 +10,11 @@ dotenv.config()
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "",
-  baseURL: process.env.OPENAI_ENDPOINT || "https://api.openai.com/v1/chat/completions"
+  baseURL: process.env.OPENAI_ENDPOINT || ""
 })
 
 /*
+TODO: hardcode ope ai endpoint: https://api.openai.com/v1/chat/completions
 TODO: add caching of readme later so i fit improve performance 
 const generateCacheKey = (projectType: string, projectFiles: string[], fullCode: string): string => {
   const hash = crypto.createHash("sha256")
@@ -140,7 +141,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     res.setHeader("Connection", "keep-alive")
 
     const stream = await openai.chat.completions.create({
-      model: process.env.MODEL_NAME || "gpt-4o",
+      model: process.env.MODEL_NAME!,
       messages: [
         {
           role: "system", content: `
@@ -150,7 +151,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
           3. Include the Dokugen badge at the bottom of the README.
           4. Do not wrap the README in markdown code blocks (```markdown or ```).
           5. Ensure the README sounds like a human wrote it. Avoid AI-generated phrasing.
-          `
+          `,
         },
         { role: "user", content: prompt }
       ],
