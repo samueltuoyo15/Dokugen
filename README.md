@@ -1,4 +1,5 @@
 # Dokugen: Effortlessly Generate High-Quality READMEs 🚀
+### current version 3.1.0 🤗
 
 Tired of writing READMEs? Dokugen is here to help! ✨ This open-source CLI tool automatically generates professional README.md files for your projects, saving you time and ensuring consistency.
 
