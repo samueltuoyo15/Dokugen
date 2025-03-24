@@ -23,7 +23,7 @@ const searchableContent = [
   {
     id: 3,
     title: "Can I auto generate my readme using the --live flag?",
-    content: "Coming Soon, you will be able to use the flag to watch ad auto generate your readme in upcoming Dokugen version 3.1.0.",
+    content: "Coming Soon, you will be able to use the flag to watch ad auto generate your readme in upcoming Dokugen version 3.2.0.",
     type: "faq",
   },
   {
