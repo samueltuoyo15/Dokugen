@@ -2,7 +2,71 @@
 
 Tired of writing READMEs? Dokugen is here to help! ✨ This open-source CLI tool automatically generates professional README.md files for your projects, saving you time and ensuring consistency.
 
-## 📦 Installation
+## 🔥 Installation
+
+To install Dokugen globally and make it accessible from any project directory, open your desired terminal:
+
+```bash
+cd my-awesome-project
+```
+
+```bash
+npm install -g dokugen
+```
+
+## Verify the installation
+
+```bash
+dokugen --version
+```
+
+## 👨‍🍳🍽️ Usage
+
+Navigate to your project's root directory in the terminal and run the following command:
+
+```bash
+npx dokugen generate
+```
+
+## 🚀🚀 Example
+
+Here's an example of running Dokugen in a project directory after successful installation:
+
+```bash
+cd my-awesome-project
+npx dokugen generate
+```
+
+## ✨ Features
+
+-   ✅ **Automated Generation**: Automatically analyzes your project and generates a comprehensive README.
+-   🎨 **Customizable Templates**: Choose from a variety of templates to match your project's style.
+-   🚀 **Easy to Use**: Simple command-line interface for quick and easy README creation.
+-   🌐 **Cross-Platform**: Works seamlessly on Windows, macOS, and Linux.
+-   🛠️ **Extensible**: Supports custom configurations and integrations.
+
+## 🛠️ Technologies Used
+
+| Technology  | Description                                        | Link                                                           |
+| :---------- | :------------------------------------------------- | :------------------------------------------------------------- |
+| Node.js     | JavaScript runtime environment                     | [https://nodejs.org/](https://nodejs.org/)                     |
+| TypeScript  | Typed superset of JavaScript                       | [https://www.typescriptlang.org/](https://www.typescriptlang.org/) |
+| Commander.js | Node.js command-line interfaces                   | [https://github.com/tj/commander.js](https://github.com/tj/commander.js) |
+| Inquirer.js | Interactive command line prompt toolkit           | [https://github.com/SBoudrias/Inquirer.js](https://github.com/SBoudrias/Inquirer.js) |
+| Axios | Promise based HTTP client for the browser and node.js | [https://github.com/axios/axios](https://github.com/axios/axios) |
+| Chalk | Terminal string styling done right | [https://github.com/chalk/chalk](https://github.com/chalk/chalk) |
+| Esbuild | An extremely fast JavaScript bundler and minifier | [https://github.com/evanw/esbuild](https://github.com/evanw/esbuild) |
+
+## 🤝 Contributing
+
+Contributions are welcome! Here's how you can help:
+
+1.  Fork the repository.
+2.  Create a new branch for your feature or bug fix.
+3.  Make your changes and commit them with clear, concise messages.
+4.  Submit a pull request.
+
+## 📦 Contribution Guideline 
 
 Get started with Dokugen in just a few steps!
 
@@ -41,52 +105,15 @@ Get started with Dokugen in just a few steps!
     yarn build
     ```
 
-5.  **Link Globally**:
-
-    ```bash
-    npm link
-    # or
-    yarn global add dokugen
-    ```
-
 ## 💻 Usage
 
 Run Dokugen in your project directory:
 
 ```bash
-dokugen
+node dist/bin/dokugen.mjs generate 
 ```
 
 Follow the prompts to generate a professional README.md file.
-
-## ✨ Features
-
--   ✅ **Automated Generation**: Automatically analyzes your project and generates a comprehensive README.
--   🎨 **Customizable Templates**: Choose from a variety of templates to match your project's style.
--   🚀 **Easy to Use**: Simple command-line interface for quick and easy README creation.
--   🌐 **Cross-Platform**: Works seamlessly on Windows, macOS, and Linux.
--   🛠️ **Extensible**: Supports custom configurations and integrations.
-
-## 🛠️ Technologies Used
-
-| Technology  | Description                                        | Link                                                           |
-| :---------- | :------------------------------------------------- | :------------------------------------------------------------- |
-| Node.js     | JavaScript runtime environment                     | [https://nodejs.org/](https://nodejs.org/)                     |
-| TypeScript  | Typed superset of JavaScript                       | [https://www.typescriptlang.org/](https://www.typescriptlang.org/) |
-| Commander.js | Node.js command-line interfaces                   | [https://github.com/tj/commander.js](https://github.com/tj/commander.js) |
-| Inquirer.js | Interactive command line prompt toolkit           | [https://github.com/SBoudrias/Inquirer.js](https://github.com/SBoudrias/Inquirer.js) |
-| Axios | Promise based HTTP client for the browser and node.js | [https://github.com/axios/axios](https://github.com/axios/axios) |
-| Chalk | Terminal string styling done right | [https://github.com/chalk/chalk](https://github.com/chalk/chalk) |
-| Esbuild | An extremely fast JavaScript bundler and minifier | [https://github.com/evanw/esbuild](https://github.com/evanw/esbuild) |
-
-## 🤝 Contributing
-
-Contributions are welcome! Here's how you can help:
-
-1.  Fork the repository.
-2.  Create a new branch for your feature or bug fix.
-3.  Make your changes and commit them with clear, concise messages.
-4.  Submit a pull request.
 
 ## 📜 License
 
@@ -98,6 +125,9 @@ This project is licensed under the ISC License - see the [LICENSE](LICENSE) file
 -   GitHub: [https://github.com/samueltuoyo15](https://github.com/samueltuoyo15)
 -   Twitter: [https://x.com/TuoyoS26091](https://x.com/TuoyoS26091)
 -   LinkedIn: [https://www.linkedin.com/in/samuel-tuoyo-8568b62b6](https://www.linkedin.com/in/samuel-tuoyo-8568b62b6)
+
+## 🤩 Collbaborators 
+[OritseWeyinmi Samuel Tuoyo](https://github.com/samueltuoyo15), [CharmingDc Adebayo](https://github.com/Charmingdc), [Ogunwele](https://github.com/ogunlewe)
 
 ##  badges
 
