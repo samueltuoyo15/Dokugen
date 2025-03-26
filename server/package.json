@@ -18,12 +18,16 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.48.1",
     "@types/express": "^5.0.1",
+    "compression": "^1.8.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "helmet": "^8.1.0",
     "openai": "^4.89.0",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
+    "@types/compression": "^1.7.5",
+    "@types/helmet": "^0.0.48",
     "@types/node": "^22.13.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
