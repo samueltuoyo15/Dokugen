@@ -27,6 +27,7 @@ app.use(cors({
 
 app.use(helmet())
 app.use(compression({ threshold: 0 }))
+app.use(limiter)
 app.use(express.json({limit: "500mb"}))
 app.use(express.urlencoded({ limit: '500mb', extended: true }))
 const openai = new OpenAI({
@@ -40,7 +41,7 @@ const generateCacheKey = (projectType: string, projectFiles: string[], fullCode:
   return `readme:${hash.digest('hex')}`
 }
 
-app.post("/api/generate-readme", limiter, async (req: Request, res: Response): Promise<any> => {
+app.post("/api/generate-readme", async (req: Request, res: Response): Promise<any> => {
 
   try {
     const { projectType, projectFiles, fullCode, userInfo, options, existingReadme, repoUrl } = req.body
