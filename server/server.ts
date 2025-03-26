@@ -1,5 +1,5 @@
 import express, { Application, Request, Response} from "express"
-import { supabase } from "./lib/supabase.mjs"
+import { supabase } from "../lib/supabase.mjs"
 import crypto from "crypto"
 import os from "os"
 import { v4 as uuidv4 } from "uuid"
