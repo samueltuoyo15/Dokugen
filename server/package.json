@@ -17,6 +17,7 @@
   "description": "Open source readme generator command line tool.",
   "dependencies": {
     "@supabase/supabase-js": "^2.48.1",
+    "@types/express": "^5.0.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "openai": "^4.89.0",
