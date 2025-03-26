@@ -15,7 +15,7 @@ const openai = new OpenAI({
   baseURL: process.env.OPENAI_ENDPOINT || "https://api.openai.com/v1/chat/completions"
 })
 
-const generateCacheKey = (projectType, projectFiles, fullCode) => {
+const generateCacheKey = (projectType: string, projectFiles: string[], fullCode: string) => {
   const hash = crypto.createHash('sha256')
   hash.update(projectType + projectFiles.join('') + fullCode)
   return `readme:${hash.digest('hex')}`
@@ -49,7 +49,7 @@ app.post('/api/generate-readme', async (req: Request, res: Response): Promise<an
         if (userError && userError.code !== 'PGRST116') throw userError
 
         if (existingUser) {
-          const updateData = { usage_count: existingUser.usage_count + 1 }
+          const updateData: { usage_count: number; osInfo?: string } = { usage_count: existingUser.usage_count + 1 }
           if (osInfo) updateData.osInfo = osInfo
           await supabase.from('active_users').update(updateData).eq('id', existingUser.id)
         } else {
@@ -162,9 +162,9 @@ app.post('/api/generate-readme', async (req: Request, res: Response): Promise<an
 
     res.end()
     console.log("✅ README Generated Successfully")
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ Error:", error)
-    res.status(500).json({ error: error.message || "Failed" })
+    res.status(500).json({error: "error generating readme })
   }
 })
 
