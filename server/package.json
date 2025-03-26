@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "private": false,
   "main": "server.ts",
-  "type": "module",
   "scripts": {
-    "start": "node server.ts"
+    "start": "ts-node server.ts"
   },
   "keywords": [
     "open source",
