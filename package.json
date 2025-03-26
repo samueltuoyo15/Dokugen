@@ -32,9 +32,13 @@
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
     "esbuild": "^0.25.1",
+    "express": "^4.21.2",
     "fs": "^0.0.1-security",
     "fs-extra": "^11.3.0",
-    "inquirer": "^12.4.2"
+    "inquirer": "^12.4.2",
+    "openai": "^4.89.0",
+    "uuid": "^11.1.0",
+   "@supabase/supabase-js": "^2.48.1"
   },
   "devDependencies": {
     "@types/axios": "^0.9.36",

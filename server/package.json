@@ -1,0 +1,31 @@
+{
+  "name": "dokugen",
+  "version": "1.0.0",
+  "private": false,
+  "main": "server.ts",
+  "type": "module",
+  "scripts": {
+    "start": "node server.ts"
+  },
+  "keywords": [
+    "open source",
+    "readme generator",
+    "cli tool",
+    "OritseWeyinmi samuel Tuoyo"
+  ],
+  "author": "OritseWeyinmi Samuel Tuoyo",
+  "license": "ISC",
+  "description": "Open source readme generator command line tool.",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.48.1",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "openai": "^4.89.0",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}
