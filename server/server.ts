@@ -19,9 +19,14 @@ const limiter = rateLimit({
 
 const app: Application = express()
 
-app.use(cors("*"))
+app.use(cors({
+  origin: "*", 
+  methods: ["POST"], 
+  allowedHeaders: ["Content-Type", "Authorization"], 
+}))
+
 app.use(helmet())
-app.use(compression())
+app.use(compression({ threshold: 0 }))
 app.use(express.json({limit: "500mb"}))
 app.use(express.urlencoded({ limit: '500mb', extended: true }))
 const openai = new OpenAI({
