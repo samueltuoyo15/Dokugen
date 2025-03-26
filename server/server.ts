@@ -1,4 +1,4 @@
-import express from "express"
+import express, { Application, Request, Response} from "express"
 import { supabase } from "./lib/supabase.mjs"
 import crypto from "crypto"
 import os from "os"
@@ -7,7 +7,7 @@ import { OpenAI } from "openai"
 import dotenv from "dotenv"
 dotenv.config()
 
-const app = express()
+const app: Application = express()
 app.use(express.json())
 
 const openai = new OpenAI({
@@ -21,7 +21,7 @@ const generateCacheKey = (projectType, projectFiles, fullCode) => {
   return `readme:${hash.digest('hex')}`
 }
 
-app.post('/api/generate-readme', async (req, res) => {
+app.post('/api/generate-readme', async (req: Request, res: Response) => {
   if (req.method !== 'POST') return res.status(405).json({ message: "Method not allowed" })
 
   try {
@@ -168,5 +168,5 @@ app.post('/api/generate-readme', async (req, res) => {
   }
 })
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT!
 app.listen(PORT, () => console.log(`Dokugen running on port ${PORT}`))
