@@ -40,8 +40,7 @@ const generateCacheKey = (projectType: string, projectFiles: string[], fullCode:
   return `readme:${hash.digest('hex')}`
 }
 
-app.post("/generate-readme", limiter, async (req: Request, res: Response): Promise<any> => {
-  if (req.method !== 'POST') return res.status(405).json({ message: "Method not allowed" })
+app.post("/api/generate-readme", limiter, async (req: Request, res: Response): Promise<any> => {
 
   try {
     const { projectType, projectFiles, fullCode, userInfo, options, existingReadme, repoUrl } = req.body
