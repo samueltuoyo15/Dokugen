@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.2.0] - 2025-03-26
+### Added
+- migrated from serveless function to native server and increase request payload limit 
+- Improved the model 100000x faster aand smarter
+
 ## [3.1.0] - 2025-03-24
 ### Added
 - **--no-overwrite flag**: added a flag to the cli tool that updates your readme instead of generating new/different readme.

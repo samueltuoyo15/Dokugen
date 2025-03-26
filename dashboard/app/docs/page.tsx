@@ -17,13 +17,13 @@ const searchableContent = [
   {
     id: 2,
     title: "Can I use custom templates?",
-    content: "Coming Soon, you will be able to use the --template flag to specify a custom template in upcoming Dokugen version 3.2.0.",
+    content: "Coming Soon, you will be able to use the --template flag to specify a custom template in upcoming Dokugen version 3.3.0.",
     type: "faq",
   },
   {
     id: 3,
     title: "Can I auto generate my readme using the --live flag?",
-    content: "Coming Soon, you will be able to use the flag to watch ad auto generate your readme in upcoming Dokugen version 3.2.0.",
+    content: "Coming Soon, you will be able to use the flag to watch ad auto generate your readme in upcoming Dokugen version 3.3.0.",
     type: "faq",
   },
   {
@@ -253,13 +253,13 @@ export default function DocsPage() {
                 <div>
                   <h3 className="text-xl font-bold mb-2">Can I use custom templates?</h3>
                   <p className="text-gray-300">
-                    Coming Soon, you will be able to use the <code className="text-green-400">--template flag</code> flag to specify a custom template in upcoming Dokugen version 3.1.0.
+                    Coming Soon, you will be able to use the <code className="text-green-400">--template flag</code> flag to specify a custom template in upcoming Dokugen version 3.2.0.
                   </p>
                 </div>
                    <div>
                   <h3 className="text-xl font-bold mb-2">Can I auto generate my readme using the --live flag?</h3>
                   <p className="text-gray-300">
-                    Coming Soon, you will be able to use the <code className="text-green-400">--live flag</code> flag to watch ad auto generate your readme in upcoming Dokugen version 3.1.0.
+                    Coming Soon, you will be able to use the <code className="text-green-400">--live flag</code> flag to watch ad auto generate your readme in upcoming Dokugen version 3.2.0.
                   </p>
                 </div>
               </div>

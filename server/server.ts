@@ -57,13 +57,8 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
     const id = userInfo?.id || uuidv4()
 
 
-    const [_, stream] = await Promise.all([
-      (async () => {
-        const { data: existingUser, error: userError } = await supabase
-          .from('active_users')
-          .select('id, usage_count')
-          .eq('email', email)
-          .single()
+    const [_, stream] = await Promise.all([(async () => {
+        const { data: existingUser, error: userError } = await supabase.from('active_users').select('id, usage_count').eq('email', email).single()
 
         if (userError && userError.code !== 'PGRST116') throw userError
 
