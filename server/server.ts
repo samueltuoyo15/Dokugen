@@ -4,11 +4,21 @@ import crypto from "crypto"
 import os from "os"
 import { v4 as uuidv4 } from "uuid"
 import { OpenAI } from "openai"
+import helmet from "helmet"
+import cors from "cors"
 import compression from "compression"
+import rateLimit from "express-rate-limit"
 import dotenv from "dotenv"
 dotenv.config()
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: 'Too many requests, try again later.'
+})
+
 const app: Application = express()
+
 app.use(cors("*"))
 app.use(helmet())
 app.use(compression())
@@ -25,7 +35,7 @@ const generateCacheKey = (projectType: string, projectFiles: string[], fullCode:
   return `readme:${hash.digest('hex')}`
 }
 
-app.post('/api/generate-readme', async (req: Request, res: Response): Promise<any> => {
+app.post('/api/generate-readme', limiter, async (req: Request, res: Response): Promise<any> => {
   if (req.method !== 'POST') return res.status(405).json({ message: "Method not allowed" })
 
   try {
