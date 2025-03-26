@@ -12,8 +12,8 @@ const app: Application = express()
 app.use(cors("*"))
 app.use(helmet())
 app.use(compression())
-app.use(express.json({limit: "50mb"}))
-app.use(express.urlencoded({ limit: '50mb', extended: true }))
+app.use(express.json({limit: "500mb"}))
+app.use(express.urlencoded({ limit: '500mb', extended: true }))
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "",
   baseURL: process.env.OPENAI_ENDPOINT || "https://api.openai.com/v1/chat/completions"
