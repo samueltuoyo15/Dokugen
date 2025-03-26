@@ -164,7 +164,7 @@ app.post('/api/generate-readme', async (req: Request, res: Response): Promise<an
     console.log("✅ README Generated Successfully")
   } catch (error: any) {
     console.error("❌ Error:", error)
-    res.status(500).json({error: "error generating readme })
+    res.status(500).json({error: "error generating readme" })
   }
 })
 
