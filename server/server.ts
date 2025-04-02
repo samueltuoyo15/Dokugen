@@ -21,8 +21,8 @@ const app: Application = express()
 
 app.use(cors({
   origin: "*", 
-  methods: ["POST"], 
-  allowedHeaders: ["Content-Type", "Authorization"], 
+  methods: ["POST", "OPTIONS"], 
+  allowedHeaders: ["*"], 
 }))
 
 app.use(helmet())
