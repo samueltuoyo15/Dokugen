@@ -41,10 +41,14 @@ const generateCacheKey = (projectType: string, projectFiles: string[], fullCode:
   return `readme:${hash.digest('hex')}`
 }
 
-app.post("/api/generate-readme", async (req: Request, res: Response): Promise<any> => {
 
+app.get("/keep-alive", (_req: Request, res: Response) => {
+  res.status(200).send("OK - Still awake")
+})
+
+app.post("/api/generate-readme", limiter, async (req: Request, res: Response): Promise<any> => {
   try {
-    const { projectType, projectFiles, fullCode, userInfo, options, existingReadme, repoUrl } = req.body
+    const { projectType, projectFiles, fullCode, userInfo, options = {}, existingReadme, repoUrl } = req.body
     console.log(req.body)
 
     if (!projectType || !projectFiles || !fullCode || (!userInfo && os.platform() !== 'linux')) {
