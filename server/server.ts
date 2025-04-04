@@ -42,7 +42,7 @@ const generateCacheKey = (projectType: string, projectFiles: string[], fullCode:
 }
 
 
-app.get("/keep-alive", (_req: Request, res: Response) => {
+app.get("/keep-alive", (req: Request, res: Response) => {
   res.status(200).send("OK - Still awake")
 })
 
