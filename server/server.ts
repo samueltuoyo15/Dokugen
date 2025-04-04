@@ -115,7 +115,7 @@ app.post("/api/generate-readme", limiter, async (req: Request, res: Response): P
          \`\`\`
         - Include **step-by-step instructions** for setting up the project locally.
         - Use **emoji bullet points** and **code blocks** for clarity.
-        ` : ""}
+        ` : "<!-- SKIP SECTION: User opted out of Installation Instructions -->"}
   
       4. **Usage**:
          - Include **examples**, **screenshots**, and **code snippets**.
@@ -131,7 +131,7 @@ app.post("/api/generate-readme", limiter, async (req: Request, res: Response): P
          ${options.includeContributionGuideLine ? `
          - Include **guidelines** for contributing to the project.
          - Use **modern formatting** with **emoji bullet points**.
-         ` : ""}
+         ` : "<!-- SKIP SECTION: User Opted out of contributions guidelines -->"}
       
       8. **License**:
          - Include a **license section** with a **link**.
