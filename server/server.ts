@@ -14,17 +14,23 @@ dotenv.config()
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
-  message: 'Too many requests, try again later.'
+  message: "Too many requests, try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => {
+    return req.path === "/keep-alive"
+  }
 })
 
 const app: Application = express()
 
+app.set("trust proxy", 1)
 app.use(cors({
   origin: "*", 
-  methods: ["POST", "OPTIONS"], 
+  methods: ["GET", "POST", "OPTIONS"], 
   allowedHeaders: ["*"], 
+  credentials: true
 }))
-
 app.use(helmet())
 app.use(compression({ threshold: 0 }))
 app.use(limiter)
@@ -42,8 +48,8 @@ const generateCacheKey = (projectType: string, projectFiles: string[], fullCode:
 }
 
 
-app.get("/keep-alive", (req: Request, res: Response) => {
-  res.status(200).send("OK - Still awake")
+app.get("/keep-alive", (_req: Request, res: Response) => {
+  res.status(200).json({status: "Ok", uptime: process.uptime(), memoryUsage: process.memoryUsage()})
 })
 
 app.post("/api/generate-readme", limiter, async (req: Request, res: Response): Promise<any> => {
@@ -184,6 +190,11 @@ app.post("/api/generate-readme", limiter, async (req: Request, res: Response): P
     console.error("❌ Error:", error)
     res.status(500).json({error: "error generating readme" })
   }
+})
+
+app.use((err: Error, req: Request, res: Response, next: Function) => {
+  console.error(err)
+  res.status(500).json({error: "Internal Server Error"})
 })
 
 const PORT = process.env.PORT!
