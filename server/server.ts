@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from "uuid"
 import { OpenAI } from "openai"
 import helmet from "helmet"
 import cors from "cors"
-import compression from "compression"
 import rateLimit from "express-rate-limit"
 import dotenv from "dotenv"
 dotenv.config()
@@ -32,7 +31,6 @@ app.use(cors({
   credentials: true
 }))
 app.use(helmet())
-app.use(compression({ threshold: 0 }))
 app.use(limiter)
 app.use(express.json({limit: "500mb"}))
 app.use(express.urlencoded({ limit: '500mb', extended: true }))
