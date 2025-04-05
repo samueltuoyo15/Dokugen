@@ -165,9 +165,17 @@ const detectProjectType = async (projectDir: string): Promise<string> => {
   return "Unknown"
 }
 
+const matchesIgnorePattern = (filename: string, pattern: string): boolean => {
+  if (pattern.startsWith("*.")) {
+    const ext = pattern.slice(1) 
+    return filename.endsWith(ext)
+  }
+  return filename === pattern
+}
+
 const scanFiles = async (dir: string): Promise<string[]> => {
-  const ignoreDirs = new Set(["node_modules", "tests" "_tests_", "_test_", "dist", ".git", ".next", "coverage", "out", "test", "uploads", "docs", "build", ".vscode", ".idea", "logs", "public", "storage", "bin", "obj", "lib", "venv", "cmake-build-debug"])
-  const ignoreFiles = new Set(["*.exe", "*.bin", "*.so", "*.a", "*.class", "*.o", ".dll", "*.pyc", "CHANGELOG.md", "style.css", "main.css", "output.css", ".gitignore", ".npmignore", "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "tsconfig.json", "jest.config.js", "README.md", "*.lock", ".DS_Store", ".env", "Thumbs.db", "tsconfig.*", "*.iml", ".editorconfig", ".prettierrc*", ".eslintrc*"])
+  const ignoreDirs = new Set(["node_modules", "tests", "_tests_", "_test_", "dist", ".git", ".next", "coverage", "out", "test", "uploads", "docs", "build", ".vscode", ".idea", "logs", "public", "storage", "bin", "obj", "lib", "venv", "cmake-build-debug"])
+  const ignoreFiles = new Set(["*.exe", "*.bin", "*.so", "*.a", "*.class", "*.o", "*.dll", "*.pyc", "CHANGELOG.md", "style.css", "main.css", "output.css", ".gitignore", ".npmignore", "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "tsconfig.json", "jest.config.js", "README.md", "*.lock", ".DS_Store", ".env", "Thumbs.db", "tsconfig.*", "*.iml", ".editorconfig", ".prettierrc*", ".eslintrc*"])
 
   const files: string[] = []
   const queue: string[] = [dir]
@@ -182,8 +190,13 @@ const scanFiles = async (dir: string): Promise<string[]> => {
         const fullPath = path.join(folder, file.name)
         if (file.isDirectory()) {
           if (!ignoreDirs.has(file.name)) queue.push(fullPath)
-        } else if (![...ignoreFiles].some(ext => file.name.endsWith(ext))) {
-          files.push(fullPath.replace(`${dir}/`, ""))
+        } else {
+            const shouldIgnore = [...ignoreFiles].some(pattern => 
+            matchesIgnorePattern(file.name, pattern))
+          
+          if (!shouldIgnore) {
+            files.push(fullPath.replace(`${dir}/`, ""))
+          }
         }
       }
     } catch(error){
