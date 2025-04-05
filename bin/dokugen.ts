@@ -3,7 +3,7 @@ import { program } from "commander"
 import chalk from "chalk"
 import fs from "fs-extra"
 import * as path from "path"
-import inquirer from "inquirer"
+import { select } from "@clack/prompts"
 import axios from "axios"
 import { Readable } from "stream"
 import { execSync } from "child_process"
@@ -207,14 +207,22 @@ const checkDependency = async (filePath: string, keywords: string[]): Promise<bo
 
 
 const askYesNo = async (message: string): Promise<boolean> => {
-  try{
-    const { response } = await inquirer.prompt([{ type: "list", name: "response", message, choices: ["Yes", "No"], default: "Yes"}])
-   return response === "Yes"
-  } catch{
-    console.log(chalk.yellow("⚠️ No input receive. Defaulting to No...."))
+  const response = await select({
+    message,
+    options: [
+      { value: "yes", label: "Yes" },
+      { value: "no", label: "No" }
+    ],
+  })
+
+  if (response === null) {
+    console.log(chalk.yellow("⚠️ No input received. Defaulting to No..."))
     return false
   }
+
+  return response === "yes"
 }
+
 
 const generateReadme = async (projectType: string, projectFiles: string[], projectDir: string, existingReadme?: string): Promise<string> => {
   try {

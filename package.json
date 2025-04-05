@@ -28,6 +28,7 @@
     "url": "https://github.com/samueltuoyo15/Dokugen/issues"
   },
   "dependencies": {
+    "@clack/prompts": "^0.10.0",
     "axios": "^1.8.1",
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
