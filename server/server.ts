@@ -52,7 +52,7 @@ app.get("/keep-alive", (_req: Request, res: Response) => {
   res.status(200).json({status: "Ok", uptime: process.uptime(), memoryUsage: process.memoryUsage()})
 })
 
-app.post("/api/generate-readme", limiter, async (req: Request, res: Response): Promise<any> => {
+app.post("/api/generate-readme", async (req: Request, res: Response): Promise<any> => {
   try {
     const { projectType, projectFiles, fullCode, userInfo, options = {}, existingReadme, repoUrl } = req.body
     console.log(req.body)
