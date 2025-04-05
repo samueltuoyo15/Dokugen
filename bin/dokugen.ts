@@ -166,8 +166,8 @@ const detectProjectType = async (projectDir: string): Promise<string> => {
 }
 
 const scanFiles = async (dir: string): Promise<string[]> => {
-  const ignoreDirs = new Set(["node_modules", "dist", ".git", ".next", "coverage", "out", "test", "uploads", "docs", "build", ".vscode", ".idea", "logs", "public", "storage", "bin", "obj", "lib", "venv", "cmake-build-debug"])
-  const ignoreFiles = new Set(["CHANGELOG.md", "style.css", "main.css", "output.css", ".gitignore", ".npmignore", "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "tsconfig.json", "jest.config.js", "README.md", "*.lock", ".DS_Store", ".env", "Thumbs.db", "tsconfig.*", "*.iml", ".editorconfig", ".prettierrc*", ".eslintrc*"])
+  const ignoreDirs = new Set(["node_modules", "tests" "_tests_", "_test_", "dist", ".git", ".next", "coverage", "out", "test", "uploads", "docs", "build", ".vscode", ".idea", "logs", "public", "storage", "bin", "obj", "lib", "venv", "cmake-build-debug"])
+  const ignoreFiles = new Set(["*.exe", "*.bin", "*.so", "*.a", "*.class", "*.o", ".dll", "*.pyc", "CHANGELOG.md", "style.css", "main.css", "output.css", ".gitignore", ".npmignore", "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "tsconfig.json", "jest.config.js", "README.md", "*.lock", ".DS_Store", ".env", "Thumbs.db", "tsconfig.*", "*.iml", ".editorconfig", ".prettierrc*", ".eslintrc*"])
 
   const files: string[] = []
   const queue: string[] = [dir]
