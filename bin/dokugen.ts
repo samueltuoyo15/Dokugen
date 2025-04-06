@@ -316,32 +316,39 @@ program.command("generate").description("Scan project and generate a README.md")
      const projectDir = process.cwd()
      const readmePath = path.join(projectDir, "README.md")
      const readmeExists = await fs.pathExists(readmePath)
-   
+     
      if (options.template && !options.template.includes('github.com')) {
-      console.log(chalk.red("❌ Invalid GitHub URL. Use format: https://github.com/user/repo/blob/main/README.md"))
-      process.exit(1)
+          console.log(chalk.red("❌ Invalid GitHub URL. Use format: https://github.com/user/repo/blob/main/README.md"))
+          process.exit(1)
+       }
+      const projectType = await detectProjectType(projectDir)
+      const projectFiles = await scanFiles(projectDir)
+      console.log(chalk.blue(`📂 Detected project type: ${projectType}`))
+      console.log(chalk.yellow(`📂 Found: ${projectFiles.length} files in the project`))
+     
+     if (options.template) {
+      const existingContent = readmeExists ? await fs.readFile(readmePath, "utf-8") : undefined
+      await generateReadme(projectType, projectFiles, projectDir, existingContent, options.template)
+      console.log(chalk.green("✅ README.md generated from template!"))
+      return
     }
-    
-     const projectType = await detectProjectType(projectDir)
-     const projectFiles = await scanFiles(projectDir)
-     console.log(chalk.blue(`📂 Detected project type: ${projectType}`))
-     console.log(chalk.yellow(`📂 Found: ${projectFiles.length} files in the project`))
-     if (readmeExists) {
-        if (options.overwrite === false || options.template) {
-          const existingReadme = await fs.readFile(readmePath, "utf-8");
-          await generateReadme(projectType, projectFiles, projectDir, existingReadme, options.template);
-          console.log(chalk.green("✅ README.md has been successfully updated!!!"));
-        } else {
-          const overwrite = await askYesNo("README.md already exists. Overwrite?");
-          if (overwrite) {
-            await generateReadme(projectType, projectFiles, projectDir);
-            console.log(chalk.green("✅ README.md has been successfully created"));
-          }
-        }
+
+    if (readmeExists) {
+      if (options.overwrite === false) {
+        const existingContent = await fs.readFile(readmePath, "utf-8")
+        await generateReadme(projectType, projectFiles, projectDir, existingContent)
+        console.log(chalk.green("✅ README.md updated successfully!"))
       } else {
-        await generateReadme(projectType, projectFiles, projectDir);
-        console.log(chalk.green("✅ README.md has been successfully created"));
+        const overwrite = await askYesNo("README.md exists. Overwrite?")
+        if (overwrite) {
+          await generateReadme(projectType, projectFiles, projectDir)
+          console.log(chalk.green("✅ New README.md created!"))
+        }
       }
+    } else {
+      await generateReadme(projectType, projectFiles, projectDir)
+      console.log(chalk.green("✅ README.md created successfully!"))
+    }
      } catch(error){
        console.error(error)
      }
