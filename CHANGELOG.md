@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.3.0] - 2025-04-6
+### Fix
+- Fixed Questions Section to ask isers what they want to include without crashing 
+- fix some ui and also cleaned up some mistakes 
+
 ## [3.2.0] - 2025-03-26
 ### Added
 - migrated from serveless function to native server and increase request payload limit 

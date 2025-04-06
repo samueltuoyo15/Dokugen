@@ -1,6 +1,6 @@
 {
   "name": "dokugen",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "private": false,
   "main": "dist/bin/dokugen.mjs",
   "type": "module",
@@ -34,8 +34,7 @@
     "commander": "^13.1.0",
     "esbuild": "^0.25.1",
     "fs": "^0.0.1-security",
-    "fs-extra": "^11.3.0",
-    "inquirer": "^12.4.2"
+    "fs-extra": "^11.3.0"
   },
   "devDependencies": {
     "@types/axios": "^0.9.36",
