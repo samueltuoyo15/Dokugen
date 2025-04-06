@@ -18,6 +18,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.48.1",
     "@types/express": "^5.0.1",
+    "axios": "^1.8.4",
     "compression": "^1.8.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -28,6 +29,7 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
+    "@types/axios": "^0.9.36",
     "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.17",
     "@types/helmet": "^0.0.48",
