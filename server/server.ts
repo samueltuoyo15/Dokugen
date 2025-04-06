@@ -5,6 +5,7 @@ import os from "os"
 import { v4 as uuidv4 } from "uuid"
 import { OpenAI } from "openai"
 import helmet from "helmet"
+import { fetchGitHubReadme } from "./lib/fetchGitHubReadme"
 import cors from "cors"
 import rateLimit from "express-rate-limit"
 import dotenv from "dotenv"
@@ -52,16 +53,21 @@ app.get("/keep-alive", (_req: Request, res: Response) => {
 
 app.post("/api/generate-readme", async (req: Request, res: Response): Promise<any> => {
   try {
-    const { projectType, projectFiles, fullCode, userInfo, options = {}, existingReadme, repoUrl } = req.body
+    const { projectType, projectFiles, fullCode, userInfo, options = {}, existingReadme, repoUrl, customReadmeFormat} = req.body
     console.log(req.body)
 
     if (!projectType || !projectFiles || !fullCode || (!userInfo && os.platform() !== 'linux')) {
       return res.status(400).json({ error: "Missing required fields in request body" })
     }
-
+    
+    let formatTemplate = ""
+    if(customReadmeFormat){
+      formatTemplate = await fetchGitHubReadme(customReadmeFormat)
+    }
+      
     const { username, email, osInfo } = userInfo || {}
     if (!username) return res.status(400).json({ message: "Missing OS username and ID" })
-
+    
     const id = userInfo?.id || uuidv4()
 
 
@@ -79,12 +85,13 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
         }
         console.log(`Updated Active user ${username}, ${email} (${osInfo})`)
       })(),
-
+      
+      
       openai.chat.completions.create({
         model: process.env.MODEL_NAME || "gpt-3.5-turbo",
         messages: [{
           role: "system",
-          content: `
+          content:`
           You are Dokugen, a professional next generation ultra idolo perfect super README generator powered by AI. Follow these rules strictly:
           1. Always create high-quality, modern, and engaging READMEs.
           2. Use Markdown for formatting.
@@ -93,8 +100,25 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
           5. Ensure the README sounds like a human wrote it. Avoid AI-generated phrasing.
           `
         }, {
-          role: "user",
-          content: `Generate a **high-quality, professional, and modern README.md** for a **${projectType}** project.
+      role: "user",
+      content: formatTemplate ? `
+      STRICTLY USE THIS TEMPLATE STRUCTURE:
+    """
+    ${formatTemplate}
+    """
+    
+    INJECT THESE PROJECT DETAILS:
+    - Repo URL: ${repoUrl || "Not specified"}  <!-- Added here! -->
+    - Project Type: ${projectType}
+    - Main Files: ${projectFiles.slice(0, 10).join(", ")}...
+    - Code Sample: ${fullCode.substring(0, 1000)}...
+    
+    RULES:
+    1. PRESERVE ALL TEMPLATE SECTIONS IN ORDER
+    2. REPLACE CONTENT BUT KEEP STYLING
+    3. ADD THIS BADGE AT BOTTOM:
+       [![Built with Dokugen](https://img.shields.io/badge/Built%20with-Dokugen-brightgreen)]`
+      : `Generate a **high-quality, professional, and modern README.md** for a **${projectType}** project.
       ## Project Overview:
       The project includes the following files:
       ${projectFiles.join("\n")}

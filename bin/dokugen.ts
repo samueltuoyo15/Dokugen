@@ -9,7 +9,6 @@ import { Readable } from "stream"
 import { execSync } from "child_process"
 import os from "os"
 
-
 const getUserInfo = (): { username: string, email?: string, osInfo: {platform: string, arch: string, release: string}} => {
  let gitName = ""
  let gitEmail = ""
@@ -237,7 +236,7 @@ const askYesNo = async (message: string): Promise<boolean> => {
 }
 
 
-const generateReadme = async (projectType: string, projectFiles: string[], projectDir: string, existingReadme?: string): Promise<string> => {
+const generateReadme = async (projectType: string, projectFiles: string[], projectDir: string, existingReadme?: string, templateUrl?: string): Promise<string> => {
   try {
     console.log(chalk.blue("🔍 Analyzing project files..."))
     
@@ -260,6 +259,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
       options: { includeSetup, includeContributionGuideLine },
       existingReadme,
       repoUrl,
+      templateUrl
     }, {responseType: "stream"})
     
     const responseStream = response.data as Readable 
@@ -311,29 +311,39 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
 }
 
 program.name("dokugen").version("3.1.0").description("Automatically generate high-quality README for your application")
-program.command("generate").description("Scan project and generate a README.md").option("--no-overwrite", "Do not overwrite existing README.md, append new features instead").action(async (options) => {
+program.command("generate").description("Scan project and generate a README.md").option("--no-overwrite", "Do not overwrite existing README.md, append new features instead").option("--template <url>", "use a custom GitHub repo readme file as a template to generate a concise and strict readme for your project").action(async (options) => {
+     try{
      const projectDir = process.cwd()
      const readmePath = path.join(projectDir, "README.md")
      const readmeExists = await fs.pathExists(readmePath)
    
-        
+     if (options.template && !options.template.includes('github.com')) {
+      console.log(chalk.red("❌ Invalid GitHub URL. Use format: https://github.com/user/repo/blob/main/README.md"))
+      process.exit(1)
+    }
+    
      const projectType = await detectProjectType(projectDir)
      const projectFiles = await scanFiles(projectDir)
      console.log(chalk.blue(`📂 Detected project type: ${projectType}`))
      console.log(chalk.yellow(`📂 Found: ${projectFiles.length} files in the project`))
- 
-     if (readmeExists && !options.overwrite) {
-     const existingReadme = await fs.readFile(readmePath, "utf-8")
-     await generateReadme(projectType, projectFiles, projectDir, existingReadme)
-     console.log(chalk.green("✅ README.md has been successfully updated!!!"))
-     } else if(readmeExists && options.overwrite) {
-       const overwrite = await askYesNo("README.md already exists. Overwrite?")
-      if (!overwrite) return
-     await generateReadme(projectType, projectFiles, projectDir)
-     console.log(chalk.green("✅ README.md has been successfully created"))
-     } else{
-     await generateReadme(projectType, projectFiles, projectDir)
-     console.log(chalk.green("✅ README.md has been successfully created"))
+     if (readmeExists) {
+        if (options.overwrite === false || options.template) {
+          const existingReadme = await fs.readFile(readmePath, "utf-8");
+          await generateReadme(projectType, projectFiles, projectDir, existingReadme, options.template);
+          console.log(chalk.green("✅ README.md has been successfully updated!!!"));
+        } else {
+          const overwrite = await askYesNo("README.md already exists. Overwrite?");
+          if (overwrite) {
+            await generateReadme(projectType, projectFiles, projectDir);
+            console.log(chalk.green("✅ README.md has been successfully created"));
+          }
+        }
+      } else {
+        await generateReadme(projectType, projectFiles, projectDir);
+        console.log(chalk.green("✅ README.md has been successfully created"));
+      }
+     } catch(error){
+       console.error(error)
      }
    })
 
@@ -348,5 +358,8 @@ process.on("SIGINT", () => {
 process.on("unhandledRejection", () => {
   process.exit(1)
 })
+
+
+
 
 
