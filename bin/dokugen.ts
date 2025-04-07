@@ -240,9 +240,13 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
   try {
     console.log(chalk.blue("🔍 Analyzing project files..."))
     
-    const includeSetup = await askYesNo("Do you want to include setup instructions in the README?")
-    const includeContributionGuideLine = await askYesNo("Include contribution guidelines in README?")
-
+    let includeSetup = false
+    let includeContributionGuideLine = false
+    if(!templateUrl){
+    includeSetup = await askYesNo("Do you want to include setup instructions in the README?")
+    includeContributionGuideLine = await askYesNo("Include contribution guidelines in README?")
+    }
+    
     const fullCode = await extractFullCode(projectFiles, projectDir)
     const userInfo = getUserInfo()
     const repoUrl = getGitRepoUrl()
@@ -325,30 +329,30 @@ program.command("generate").description("Scan project and generate a README.md")
       const projectFiles = await scanFiles(projectDir)
       console.log(chalk.blue(`📂 Detected project type: ${projectType}`))
       console.log(chalk.yellow(`📂 Found: ${projectFiles.length} files in the project`))
-     
-     if (options.template) {
-      const existingContent = readmeExists ? await fs.readFile(readmePath, "utf-8") : undefined
-      await generateReadme(projectType, projectFiles, projectDir, existingContent, options.template)
+      if (options.template) {
+      if (readmeExists && !options.overwrite) {
+        const existingContent = await fs.readFile(readmePath, "utf-8")
+        await generateReadme(projectType, projectFiles, projectDir, existingContent, options.template)
+      } else {
+        await generateReadme(projectType, projectFiles, projectDir, undefined, options.template)
+      }
       console.log(chalk.green("✅ README.md generated from template!"))
       return
     }
 
     if (readmeExists) {
-      if (options.overwrite === false) {
+      if (!options.overwrite) {
         const existingContent = await fs.readFile(readmePath, "utf-8")
         await generateReadme(projectType, projectFiles, projectDir, existingContent)
-        console.log(chalk.green("✅ README.md updated successfully!"))
       } else {
         const overwrite = await askYesNo("README.md exists. Overwrite?")
-        if (overwrite) {
-          await generateReadme(projectType, projectFiles, projectDir)
-          console.log(chalk.green("✅ New README.md created!"))
-        }
+        if (overwrite) await generateReadme(projectType, projectFiles, projectDir)
       }
     } else {
       await generateReadme(projectType, projectFiles, projectDir)
-      console.log(chalk.green("✅ README.md created successfully!"))
     }
+    console.log(chalk.green("✅ README.md created!"))
+    
      } catch(error){
        console.error(error)
      }
@@ -365,3 +369,7 @@ process.on("SIGINT", () => {
 process.on("unhandledRejection", () => {
   process.exit(1)
 })
+
+
+
+
