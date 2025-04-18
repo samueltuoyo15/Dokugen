@@ -191,17 +191,10 @@ const checkInternetConnection = async (): Promise<boolean> => {
 //function to call my server to generate readme eith the expected payload am passing 
 const generateReadme = async (projectType: string, projectFiles: string[], projectDir: string, existingReadme?: string, templateUrl?: string): Promise<string | null> => {
   try {
-    const projectDir = process.cwd()
-    const readmePath = path.join(projectDir, "README.md")
-    const hasGoodInternetConnection = await checkInternetConnection()
-    if(!hasGoodInternetConnection){
-      const username = await getUserInfo()?.username
-      console.log(chalk.red(`Opps... ${username} Check your device or pc internet connection and try again.`))
-      return null
-    }
     console.log(chalk.blue("🔍 Analyzing project files..."))
-    
-    currentReadmePath = readmePath
+    const projectDir = process.cwd()
+     const readmePath = path.join(projectDir, "README.md")
+     
     let includeSetup = false
     let includeContributionGuideLine = false  
     
@@ -222,9 +215,6 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
     
     console.log(chalk.blue("🔥 Generating README..."))
     
-   if(existingReadme === undefined){
-      await backupReadme(readmePath)
-    }
     const fileStream = fs.createWriteStream(readmePath)
     const response = await axios.post("https://dokugen-readme.onrender.com/api/generate-readme", {
       projectType,
@@ -292,13 +282,25 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
 }
 
 // Commander options version, name, flags e.t.c
-program.name("dokugen").version("3.1.0").description("Automatically generate high-quality README for your application")
+program.name("dokugen").version("3.3.0").description("Automatically generate high-quality README for your application")
 program.command("generate").description("Scan project and generate a README.md").option("--no-overwrite", "Do not overwrite existing README.md, append new features instead").option("--template <url>", "use a custom GitHub repo readme file as a template to generate a concise and strict readme for your project").action(async (options) => {
+    const projectDir = process.cwd()
+    const readmePath = path.join(projectDir, "README.md")
+    const readmeExists = await fs.pathExists(readmePath)
+    const hasGoodInternetConnection = await checkInternetConnection()
+  
+    if(!hasGoodInternetConnection){
+      const username = await getUserInfo()?.username
+      console.log(chalk.red(`Opps... ${username} Check your device or pc internet connection and try again.`))
+      process.exit(1)
+    }
+    currentReadmePath = readmePath
+    if(await fs.readFile(currentReadmePath, "utf-8") === undefined){
+      await backupReadme(currentReadmePath)
+    }
+    
+    
      try{
-     const projectDir = process.cwd()
-     const readmePath = path.join(projectDir, "README.md")
-     const readmeExists = await fs.pathExists(readmePath)
-     
      if (options.template && !options.template.includes('github.com')) {
           console.log(chalk.red("❌ Invalid GitHub URL. Use format: https://github.com/user/repo/blob/main/README.md"))
           process.exit(1)
