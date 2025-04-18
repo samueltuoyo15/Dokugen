@@ -2,15 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## [3.3.0] - 2025-04-6
-### Fix
-- Fixed Questions Section to ask isers what they want to include without crashing 
-- fix some ui and also cleaned up some mistakes 
 
-## [3.2.0] - 2025-03-26
+## [3.2.0] - 2025-04-18
 ### Added
 - migrated from serveless function to native server and increase request payload limit 
 - Improved the model 100000x faster aand smarter
+- Fixed Questions Section to ask isers what they want to include without crashing 
+- fix some ui and also cleaned up some mistakes 
 
 ## [3.1.0] - 2025-03-24
 ### Added

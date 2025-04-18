@@ -8,11 +8,17 @@ import axios from "axios"
 import { Readable } from "stream"
 import { execSync } from "child_process"
 import os from "os"
+//@ts-ignore
+import { detectProjectType } from "./projectDetect.mjs"
 
+
+let readmeBackup: string | null = null
+let currentReadmePath: string = "" 
+
+// function to get user info
 const getUserInfo = (): { username: string, email?: string, osInfo: {platform: string, arch: string, release: string}} => {
- let gitName = ""
- let gitEmail = ""
- 
+  let gitName = ""
+  let gitEmail = ""
   try {
     gitName = execSync("git config --get user.name", { encoding: "utf-8" }).trim() ?? ""
     gitEmail = execSync("git config --get user.email", { encoding: "utf-8" }).trim() ?? ""
@@ -29,6 +35,24 @@ const getUserInfo = (): { username: string, email?: string, osInfo: {platform: s
   return { username: os.userInfo().username || "", email: process.env.USER || "", osInfo: {platform: "Unknown", arch: "Unknown", release: "Unknown"}}
 }
 
+
+// function to backup overwrited readme in memory 
+
+const backupReadme = async (readmePath: string): Promise<void> => {
+  if (await fs.pathExists(readmePath)) {
+    readmeBackup = await fs.readFile(readmePath, 'utf-8')
+  }
+}
+
+const restoreReadme = async (): Promise<void> => { 
+  if (readmeBackup && currentReadmePath) {
+    await fs.writeFile(currentReadmePath, readmeBackup)
+    readmeBackup = null
+    currentReadmePath = ""
+  }
+}
+
+// function to fetch git repo
 const getGitRepoUrl = (): string | null => {
   try {
     const repoUrl = execSync("git config --get remote.origin.url", { encoding: "utf-8" }).trim()
@@ -38,6 +62,7 @@ const getGitRepoUrl = (): string | null => {
   }
 }
 
+// function to extract full codebase and format it like a json 
 const extractFullCode = async (projectFiles: string[], projectDir: string): Promise<string> => {
   const fileGroups: Record<string, string[]> = {}
   
@@ -73,105 +98,16 @@ const extractFullCode = async (projectFiles: string[], projectDir: string): Prom
   return snippets.filter(Boolean).join("") || "No code snippets available"
 }
 
-const detectProjectType = async (projectDir: string): Promise<string> => {
-  const files = await fs.readdir(projectDir)
-
- const langMap: Record<string, string> = {
-    "vite.config.ts": "React/Typescript (Vite + React)",
-    "vite.config.js": "React/JavaScript (Vite + React)",
-    "next.config.ts": "Next.js (Typescript)",
-    "next.config.js": "Next.js (JavaScript)",
-    "nuxt.config.ts": "Nuxt.js (Typescript)",
-    "nuxt.config.js": "Nuxt.js (JavaScript)",
-    "svelte.config.js": "Svelte",
-    "angular.json": "Angular",
-    "vue.config.js": "Vue.js",
-    "src/main.tsx": "React/Typescript",
-    "src/main.jsx": "React/JavaScript",
-    "src/App.vue": "Vue.js",
-    "src/main.svelte": "Svelte",
-    "src/main.ts": "Typescript",
-    "src/main.js": "JavaScript",
-    "go.mod": "Golang",
-    "Cargo.toml": "Rust",
-    "requirements.txt": "Python",
-    "pyproject.toml": "Python",
-    "pom.xml": "Java (Maven)",
-    "build.gradle": "Java (Gradle)",
-    "composer.json": "PHP",
-    "Gemfile": "Ruby",
-    "package.json": "Node.js", 
-    "pubspec.yaml": "Flutter/Dart",
-    "android/build.gradle": "Android (Kotlin/Java)",
-    "ios/Podfile": "iOS (Swift/Objective-C)",
-    "Dockerfile": "Docker",
-    "docker-compose.yml": "Docker Compose",
-    "terraform.tf": "Terraform",
-    "serverless.yml": "Serverless Framework",
-    "k8s/deployment.yaml": "Kubernetes",
-    "Makefile": "C/C++",
-    "CMakeLists.txt": "C++",
-    "Program.cs": "C# / .NET",
-    "Main.kt": "Kotlin",
-    "App.swift": "Swift",
-    "metro.config.js": "React Native"
-  }
-
-  const folderChecks: Record<string, string> = {
-    "src/components": "React/Typescript or React/JavaScript",
-    "src/views": "Vue.js",
-    "src/routes": "Svelte",
-    "src/app": "Angular",
-    "src/lib": "Svelte",
-    "src/pages": "Next.js or Nuxt.js",
-    "public": "Static Site (HTML/CSS/JS)",
-    "dist": "Built Project",
-  }
-
-
-  const checkPackageJson = async (): Promise<string | null> => {
-    const packageJsonPath = path.join(projectDir, "package.json")
-    if (await fs.pathExists(packageJsonPath)) {
-      const packageJson = await fs.readJson(packageJsonPath)
-      const dependencies = {
-        ...packageJson.dependencies,
-        ...packageJson.devDependencies,
-      }
-
-      if (dependencies["react"]) return "React/JavaScript"
-      if (dependencies["vue"]) return "Vue.js"
-      if (dependencies["svelte"]) return "Svelte"
-      if (dependencies["@angular/core"]) return "Angular"
-      if (dependencies["next"]) return "Next.js"
-      if (dependencies["nuxt"]) return "Nuxt.js"
-      if (dependencies["react-native"]) return "React Native"
-    }
-    return null
-  }
-
-  const detectedFile = Object.keys(langMap).find(file => files.includes(file))
-  if (detectedFile) return langMap[detectedFile]
-
-   const detectedFolder = Object.keys(folderChecks).find(folder => 
-   fs.pathExists(path.join(projectDir, folder)))
-   if (detectedFolder) return folderChecks[detectedFolder]
-  
-
-  const packageJsonDetection = await checkPackageJson()
-  if (packageJsonDetection) return packageJsonDetection
-
-
-  return "Unknown"
-}
 
 const matchesIgnorePattern = (filename: string, pattern: string): boolean => {
   if (pattern.startsWith("*.")) {
-    const ext = pattern.slice(1) 
+    const ext = pattern.slice(1)
     return filename.endsWith(ext)
   }
   return filename === pattern
 }
 
+// function to scan detect files and exclude files which are irrelevant 
 const scanFiles = async (dir: string): Promise<string[]> => {
   const ignoreDirs = new Set(["node_modules", "tests", "_tests_", "_test_", "dist", ".git", ".next", "coverage", "out", "test", "uploads", "docs", "build", ".vscode", ".idea", "logs", "public", "storage", "bin", "obj", "lib", "venv", "cmake-build-debug"])
   const ignoreFiles = new Set(["*.exe", "*.bin", "*.so", "*.a", "*.class", "*.o", "*.dll", "*.pyc", "CHANGELOG.md", "style.css", "main.css", "output.css", ".gitignore", ".npmignore", "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "tsconfig.json", "jest.config.js", "README.md", "*.lock", ".DS_Store", ".env", "Thumbs.db", "tsconfig.*", "*.iml", ".editorconfig", ".prettierrc*", ".eslintrc*"])
@@ -188,9 +124,11 @@ const scanFiles = async (dir: string): Promise<string[]> => {
       for (const file of dirContents) {
         const fullPath = path.join(folder, file.name)
         if (file.isDirectory()) {
-          if (!ignoreDirs.has(file.name)) queue.push(fullPath)
+          if (!ignoreDirs.has(file.name)) {
+            queue.push(fullPath)
+          }
         } else {
-            const shouldIgnore = [...ignoreFiles].some(pattern => 
+          const shouldIgnore = [...ignoreFiles].some(pattern => 
             matchesIgnorePattern(file.name, pattern))
           
           if (!shouldIgnore) {
@@ -198,7 +136,7 @@ const scanFiles = async (dir: string): Promise<string[]> => {
           }
         }
       }
-    } catch(error){
+    } catch(error) {
       console.error(error)
     }
   }
@@ -206,19 +144,11 @@ const scanFiles = async (dir: string): Promise<string[]> => {
   return files
 }
 
-const checkDependency = async (filePath: string, keywords: string[]): Promise<boolean> => {
-  try {
-    const content = await fs.readFile(filePath, "utf-8")
-    return keywords.some(keyword => content.toLowerCase().includes(keyword.toLowerCase()))
-  } catch (error: any){
-    if(error.code === "ENOENT") return false 
-    console.error(error)
-    return false
-  }
-}
 
 
-const askYesNo = async (message: string): Promise<boolean> => {
+// function to ask yes lr no if user want to include some certain things in their readme file
+const askYesNo = async (message: string): Promise<boolean | 'cancel'> => {
+  try{
   const response = await select({
     message,
     options: [
@@ -228,24 +158,52 @@ const askYesNo = async (message: string): Promise<boolean> => {
   })
 
   if (response === null) {
-    console.log(chalk.yellow("⚠️ No input received. Defaulting to No..."))
-    return false
+    console.log(chalk.yellow("⚠️ Readme Generation Cancelled"))
+    return "cancel"
   }
 
   return response === "yes"
+  } catch(error){
+    console.error(chalk.yellow("⚠️ Readme Generation Cancelled"))
+    return "cancel"
+  }
 }
 
-
-const generateReadme = async (projectType: string, projectFiles: string[], projectDir: string, existingReadme?: string, templateUrl?: string): Promise<string> => {
+// fubnction to check internet connection 
+const checkInternetConnection = async (): Promise<boolean> => {
   try {
+    await axios.get('https://www.google.com', { timeout: 5000 })
+    return true
+  } catch {
+    return false
+  }
+}
+
+//function to call my server to generate readme eith the expected payload am passing 
+const generateReadme = async (projectType: string, projectFiles: string[], projectDir: string, existingReadme?: string, templateUrl?: string): Promise<string | null> => {
+  try {
+    const projectDir = process.cwd()
+    const hasGoodInternetConnection = await checkInternetConnection()
+    if(!hasGoodInternetConnection){
+      const username = await getUserInfo()?.username
+      console.log(chalk.red(`Opps... ${username} Check your device or pc internet connection and try again.`))
+      return null
+    }
     console.log(chalk.blue("🔍 Analyzing project files..."))
     
     let includeSetup = false
-    let includeContributionGuideLine = false
-    if(!templateUrl){
-    includeSetup = await askYesNo("Do you want to include setup instructions in the README?")
-    includeContributionGuideLine = await askYesNo("Include contribution guidelines in README?")
+    let includeContributionGuideLine = false  
+    
+    if (!templateUrl) {
+      const setupAnswer = await askYesNo("Do you want to include setup instructions in the README?")
+      if (setupAnswer === 'cancel') return null
+      includeSetup = setupAnswer
+
+      const contributionAnswer = await askYesNo("Include contribution guidelines in README?")
+      if (contributionAnswer === 'cancel') return null
+      includeContributionGuideLine = contributionAnswer
     }
+
     
     const fullCode = await extractFullCode(projectFiles, projectDir)
     const userInfo = getUserInfo()
@@ -254,6 +212,9 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
     console.log(chalk.blue("🔥 Generating README..."))
     
     const readmePath = path.join(projectDir, "README.md")
+    if(existingReadme === undefined){
+      await backupReadme(readmePath)
+    }
     const fileStream = fs.createWriteStream(readmePath)
     const response = await axios.post("https://dokugen-readme.onrender.com/api/generate-readme", {
       projectType,
@@ -289,31 +250,38 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
         })
       })
      
-      
+     const projectDir = process.cwd()
+     const readmePath = path.join(projectDir, "README.md")
+ 
      responseStream.on("end", () => {
-       fileStream.end(() => {
+     fileStream.end(() => {
        console.log(chalk.green("\n✅ README.md created successfully"))
+       readmeBackup = null
       resolve(readmePath)
       })
     })
       
-      fileStream.on("error", (err) => {
+      fileStream.on("error", async (err) => {
         console.log(chalk.red("\n❌ Failed to write README"))
+        await restoreReadme()
         fileStream.end()
         reject(err)
       })
 
-      responseStream.on("error", (err: Error) => {
+      responseStream.on("error", async (err: Error) => {
         console.log(chalk.red("\n❌ Error receiving stream data"))
+        await restoreReadme()
         reject(err)
       })
     })
   } catch(error){
     console.error("\n Error Generating Readme", error)
-    process.exit(1)
+    await restoreReadme()
+    return null
   }
 }
 
+// Commander options version, name, flags e.t.c
 program.name("dokugen").version("3.1.0").description("Automatically generate high-quality README for your application")
 program.command("generate").description("Scan project and generate a README.md").option("--no-overwrite", "Do not overwrite existing README.md, append new features instead").option("--template <url>", "use a custom GitHub repo readme file as a template to generate a concise and strict readme for your project").action(async (options) => {
      try{
@@ -351,10 +319,12 @@ program.command("generate").description("Scan project and generate a README.md")
     } else {
       await generateReadme(projectType, projectFiles, projectDir)
     }
-    console.log(chalk.green("✅ README.md created!"))
+
+     console.log(chalk.green("✅ README.md created!"))
     
      } catch(error){
        console.error(error)
+       process.exit(1)
      }
    })
 
