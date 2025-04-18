@@ -1,3 +1,5 @@
+![Demo GIF](./dashboard/public/Demo.gif)
+
 # Dokugen
 
 Dokugen is lightweight README.md file Generator Command Line Interface Tool. It simplifies the process of writing your README.md file from scatch by generate professional README.md files for your projects, saving you time and ensuring consistency using AI.
@@ -5,10 +7,9 @@ Dokugen is lightweight README.md file Generator Command Line Interface Tool. It 
 ## Features
 
 -   ✅ **Automated Generation**: Automatically analyzes your project and generates a comprehensive README.
--   🎨 **Customizable Templates**: Choose from a variety of templates to match your project's style.
 -   🚀 **Easy to Use**: Simple command-line interface for quick and easy README creation.
 -   🌐 **Cross-Platform**: Works seamlessly on Windows, macOS, and Linux.
--   🛠️ **Extensible**: Supports custom configurations and integrations.
+-   🛠️ **Options & Flags**: Support flags and options like generate from a template, overwrite e.t.c
 
 ## 🛠️ Technologies Used
 
@@ -24,12 +25,7 @@ Dokugen is lightweight README.md file Generator Command Line Interface Tool. It 
 
 ## Contributing
 
-Contributions are welcome! Here's how you can help:
-
-1.  Fork the repository.
-2.  Create a new branch for your feature or bug fix.
-3.  Make your changes and commit them with clear, concise messages.
-4.  Submit a pull request.
+Contributions are welcome! Please open an issue first to discuss what you would like to change. 
 
 ## Contribution Guideline 
 
@@ -70,15 +66,11 @@ Get started with Dokugen in just a few steps!
     yarn build
     ```
 
-## 💻 Usage
-
-Run Dokugen in your project directory:
+5.  **Run Dokugen in your project directory**:
 
 ```bash
 node dist/bin/dokugen.mjs generate 
 ```
-
-Follow the prompts to generate a professional README.md file.
 
 ## 📜 License
 
