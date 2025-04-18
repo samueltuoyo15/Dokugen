@@ -18,13 +18,13 @@ const searchableContent = [
   {
     id: 2,
     title: "Can I use custom templates?",
-    content: "Coming Soon, you will be able to use the --template flag to specify a custom template in upcoming Dokugen version 3.3.0.",
+    content: "yes using --template flag to specify a custom template.",
     type: "faq",
   },
   {
     id: 3,
     title: "Can I auto generate my readme using the --live flag?",
-    content: "Coming Soon, you will be able to use the flag to watch ad auto generate your readme in upcoming Dokugen version 3.3.0.",
+    content: "Yes using --live flag",
     type: "faq",
   },
   {
@@ -72,14 +72,8 @@ export default function DocsPage() {
             Everything you need to know about Dokugen, from installation to advanced usage.
           </p>
           <div className="flex justify-center gap-4">
-            <Link href="/">
-              <Button className="bg-blue-600 hover:bg-blue-700">
-                <Terminal className="mr-2" />
-                Go to Home
-              </Button>
-            </Link>
             <Link href="https://github.com/samueltuoyo15/Dokugen/" target="_blank" rel="noopener noreferrer">
-              <Button className="text-white border-white">
+              <Button className="text-white text-center border-white">
                 <Github className="mr-2" />
                 Contribute
               </Button>
