@@ -1,44 +1,8 @@
-# Dokugen: Level Up Your READMEs in 2025 🤩
-### current version 3.2.0 🤗
+# Dokugen
 
-Tired of writing READMEs? Dokugen is here to help! ✨ This open-source CLI tool automatically generates professional README.md files for your projects, saving you time and ensuring consistency.
+Dokugen is lightweight README.md file Generator Command Line Interface Tool. It simplifies the process of writing your README.md file from scatch by generate professional README.md files for your projects, saving you time and ensuring consistency using AI.
 
-## 🔥 Installation
-
-To install Dokugen globally and make it accessible from any project directory, open your desired terminal:
-
-```bash
-cd my-awesome-project
-```
-
-```bash
-npm install -g dokugen
-```
-
-## Verify the installation
-
-```bash
-dokugen --version
-```
-
-## 👨‍🍳🍽️ Usage
-
-Navigate to your project's root directory in the terminal and run the following command:
-
-```bash
-npx dokugen generate
-```
-
-## 🚀🚀 Example
-
-Here's an example of running Dokugen in a project directory after successful installation:
-
-```bash
-cd my-awesome-project
-npx dokugen generate
-```
-
-## ✨ Features
+## Features
 
 -   ✅ **Automated Generation**: Automatically analyzes your project and generates a comprehensive README.
 -   🎨 **Customizable Templates**: Choose from a variety of templates to match your project's style.
@@ -58,7 +22,7 @@ npx dokugen generate
 | Chalk | Terminal string styling done right | [https://github.com/chalk/chalk](https://github.com/chalk/chalk) |
 | Esbuild | An extremely fast JavaScript bundler and minifier | [https://github.com/evanw/esbuild](https://github.com/evanw/esbuild) |
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Here's how you can help:
 
@@ -67,11 +31,11 @@ Contributions are welcome! Here's how you can help:
 3.  Make your changes and commit them with clear, concise messages.
 4.  Submit a pull request.
 
-## 📦 Contribution Guideline 
+## Contribution Guideline 
 
 Get started with Dokugen in just a few steps!
 
-### Prerequisites
+### Installation and Prerequisites 
 
 -   Node.js (version 18 or higher)
 -   npm or yarn
@@ -120,15 +84,13 @@ Follow the prompts to generate a professional README.md file.
 
 This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
 
-## 🧑 Author Info
+## Author Info
 
 -   **OritseWeyinmi Samuel Tuoyo**
 -   GitHub: [https://github.com/samueltuoyo15](https://github.com/samueltuoyo15)
 -   Twitter: [https://x.com/TuoyoS26091](https://x.com/TuoyoS26091)
 -   LinkedIn: [https://www.linkedin.com/in/samuel-tuoyo-8568b62b6](https://www.linkedin.com/in/samuel-tuoyo-8568b62b6)
 
-## 🤩 Collbaborators 
-[OritseWeyinmi Samuel Tuoyo](https://github.com/samueltuoyo15), [CharmingDc Adebayo](https://github.com/Charmingdc), [Ogunwele](https://github.com/ogunlewe)
 
 ##  badges
 

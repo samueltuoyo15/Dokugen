@@ -8,11 +8,13 @@ All notable changes to this project will be documented in this file.
 - migrated from serveless function to native server and increase request payload limit 
 - Improved the model 100000x faster aand smarter
 - Fixed Questions Section to ask isers what they want to include without crashing 
-- fix some ui and also cleaned up some mistakes 
-
+- fix ui to replicate vite cli interface and also cleaned up some mistakes 
+- added internet connection detection 
+- added flag to generate readme using templates
+- option to backup existing readme on user exit
 ## [3.1.0] - 2025-03-24
 ### Added
-- **--no-overwrite flag**: added a flag to the cli tool that updates your readme instead of generating new/different readme.
+- **--no-overwrite flag**: appdded a flag to the cli tool that updates your readme instead of generating new/different readme.
 - auto fetch git repo url from current project
 - added feature to fetch osInfo
 - Improved the model 100000x faster aand smarter

@@ -3,11 +3,59 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Rocket, Code, FileText, Terminal, Github } from "lucide-react"
+import { Terminal, Code, FileText, Search, Github } from "lucide-react"
 import { motion } from "framer-motion"
+import { useState } from "react"
 import MetricsSection from "@/components/metricsSection"
 
-export default function Home() {
+const searchableContent = [
+  {
+    id: 1,
+    title: "How do I install Dokugen?",
+    content: "Run npm install -g dokugen to install Dokugen globally.",
+    type: "faq",
+  },
+  {
+    id: 2,
+    title: "Can I use custom templates?",
+    content: "Coming Soon, you will be able to use the --template flag to specify a custom template in upcoming Dokugen version 3.3.0.",
+    type: "faq",
+  },
+  {
+    id: 3,
+    title: "Can I auto generate my readme using the --live flag?",
+    content: "Coming Soon, you will be able to use the flag to watch ad auto generate your readme in upcoming Dokugen version 3.3.0.",
+    type: "faq",
+  },
+  {
+    id: 4,
+    title: "Modern READMEs",
+    content: "Generate READMEs with emojis, badges, and modern formatting.",
+    type: "feature",
+  },
+  {
+    id: 5,
+    title: "Cross-Platform",
+    content: "Works on any OS and programming language.",
+    type: "feature",
+  },
+  {
+    id: 6,
+    title: "Easy Integration",
+    content: "Integrate with GitHub, GitLab, and VS Code.",
+    type: "feature",
+  },
+]
+
+export default function DocsPage() {
+  const [searchQuery, setSearchQuery] = useState("") 
+
+  const filteredContent = searchableContent.filter(
+    (item) =>
+      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.content.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
       <div className="container mx-auto px-4 py-16">
@@ -18,127 +66,208 @@ export default function Home() {
           transition={{ duration: 0.8 }}
           className="text-center"
         >
-          <Image src="/smile_logo.svg" className="block text-center mx-auto" height={50} width={50} alt="Smile Logo"/>
-          <h1 className="text-6xl font-bold mb-4">Dokugen</h1>
+         <Image src="/smile_logo.svg" className="block text-center mx-auto" height={50} width={50} alt="Smile Logo"/>
+          <h1 className="text-6xl font-bold mb-4">Dokugen Docs</h1>
           <p className="text-xl text-gray-300 mb-8">
-            Automatically generate high-quality READMEs for your projects.
+            Everything you need to know about Dokugen, from installation to advanced usage.
           </p>
           <div className="flex justify-center gap-4">
-            <Link href="https://github.com/samueltuoyo15/Dokugen/" target="_blank">
+            <Link href="/">
               <Button className="bg-blue-600 hover:bg-blue-700">
-                <Github className="mr-2" />
-                Fork Repo
+                <Terminal className="mr-2" />
+                Go to Home
               </Button>
             </Link>
-            <Link href="/docs">
+            <Link href="https://github.com/samueltuoyo15/Dokugen/" target="_blank" rel="noopener noreferrer">
               <Button className="text-white border-white">
-                <FileText className="mr-2" />
-                View Docs
+                <Github className="mr-2" />
+                Contribute
               </Button>
             </Link>
           </div>
+          <div className="mt-8 max-w-md mx-auto">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search the docs..."
+                className="w-full bg-gray-800 text-white px-4 py-2 rounded-lg border border-gray-700 focus:outline-none focus:border-blue-500"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)} 
+              />
+              <Search className="absolute right-3 top-2.5 text-gray-400" />
+            </div>
+          </div>
         </motion.div>
+
+        {/* Display Search Results */}
+        {searchQuery && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="mt-8"
+          >
+            <h2 className="text-2xl font-bold mb-4">Search Results</h2>
+            <div className="space-y-4">
+              {filteredContent.length > 0 ? (
+                filteredContent.map((item) => (
+                  <div key={item.id} className="bg-gray-800 p-4 rounded-lg">
+                    <h3 className="text-xl font-bold">{item.title}</h3>
+                    <p className="text-gray-300">{item.content}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-300">No results found.</p>
+              )}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Getting Started Section */}
+        {!searchQuery && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="mt-16"
+          >
+            <h2 className="text-4xl font-bold mb-8">Getting Started</h2>
+            <div className="space-y-8">
+              {/* Step 1: Prerequisites */}
+              <div className="bg-gray-800 p-6 rounded-lg">
+                <h3 className="text-2xl font-bold mb-4">1. Prerequisites</h3>
+                <p className="text-gray-300 mb-4">
+                  Ensure you have <strong>Node.js</strong> installed on your machine. If not, download and install it from{" "}
+                  <a href="https://nodejs.org" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">
+                    nodejs.org
+                  </a>.
+                </p>
+                <p className="text-gray-300 mb-4">
+                  Verify your Node.js installation by running:
+                </p>
+                <pre className="bg-gray-900 p-4 rounded-lg">
+                  <code className="text-green-400">node -v</code>
+                </pre>
+              </div>
+
+              {/* Step 2: Navigate to Your Project */}
+              <div className="bg-gray-800 p-6 rounded-lg">
+                <h3 className="text-2xl font-bold mb-4">2. Navigate to Your Project</h3>
+                <p className="text-gray-300 mb-4">
+                  Open your terminal and navigate to your project directory:
+                </p>
+                <pre className="bg-gray-900 p-4 rounded-lg">
+                  <code className="text-green-400">cd your-project</code>
+                </pre>
+              </div>
+
+              {/* Step 3: Install Dokugen Globally */}
+              <div className="bg-gray-800 p-6 rounded-lg">
+                <h3 className="text-2xl font-bold mb-4">3. Install Dokugen Globally</h3>
+                <p className="text-gray-300 mb-4">
+                  Install Dokugen globally using npm:
+                </p>
+                <pre className="bg-gray-900 p-4 rounded-lg">
+                  <code className="text-green-400">npm install -g dokugen</code>
+                </pre>
+              </div>
+
+              {/* Step 4: Generate README */}
+              <div className="bg-gray-800 p-6 rounded-lg">
+                <h3 className="text-2xl font-bold mb-4">4. Generate README</h3>
+                <p className="text-gray-300 mb-4">
+                  Run the following command to generate your README:
+                </p>
+                <pre className="bg-gray-900 p-4 rounded-lg">
+                  <code className="text-green-400">npx dokugen generate</code>
+                </pre>
+              </div>
+
+              {/* Step 5: Customize */}
+              <div className="bg-gray-800 p-6 rounded-lg">
+                <h3 className="text-2xl font-bold mb-4">5. Customize</h3>
+                <p className="text-gray-300 mb-4">
+                  Edit the generated <code className="text-green-400">README.md</code> file to suit your project.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* Features Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="mt-16"
-        >
-          <h2 className="text-4xl font-bold mb-8">Features</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Card 1: Modern READMEs */}
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <Rocket className="w-12 h-12 mb-4 text-blue-500" />
-              <h3 className="text-xl font-bold mb-2">Modern READMEs</h3>
-              <p className="text-gray-300">
-                Generate READMEs with emojis, badges, and modern formatting to make your projects stand out.
-              </p>
-            </div>
-
-            {/* Card 2: Cross-Platform & Multipurpose */}
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <Terminal className="w-12 h-12 mb-4 text-green-500" />
-              <h3 className="text-xl font-bold mb-2">Cross-Platform & Multipurpose</h3>
-              <p className="text-gray-300">
-                Works on any OS and programming language. Fast, seamless, and easy to integrate.
-              </p>
-            </div>
-
-            {/* Card 3: Easy to Install */}
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <FileText className="w-12 h-12 mb-4 text-purple-500" />
-              <h3 className="text-xl font-bold mb-2">Easy to Install</h3>
-              <p className="text-gray-300">
-                Get started in minutes with a simple installation process and intuitive CLI.
-              </p>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Mockup Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="mt-16"
-        >
-          <div className="bg-gray-800 p-6 md:p-12 rounded-lg">
-            <h2 className="text-4xl font-bold mb-8 text-center">How Dokugen Works</h2>
+        {!searchQuery && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="mt-16"
+          >
+            <h2 className="text-4xl font-bold mb-8">Features</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Step 1: Write Code */}
-              <div className="text-center">
-                <Code className="w-16 h-16 mx-auto mb-4 text-blue-500" />
-                <h3 className="text-2xl font-bold mb-2">1. Write Code</h3>
+              {/* Feature 1: Modern READMEs */}
+              <div className="bg-gray-800 p-6 rounded-lg">
+                <FileText className="w-12 h-12 mb-4 text-blue-500" />
+                <h3 className="text-xl font-bold mb-2">Modern READMEs</h3>
                 <p className="text-gray-300">
-                  Develop your project as usual. Dokugen will automatically detect your code structure.
+                  Generate READMEs with emojis, badges, and modern formatting.
                 </p>
               </div>
 
-              {/* Step 2: Generate README */}
-              <div className="text-center">
-                <Terminal className="w-16 h-16 mx-auto mb-4 text-green-500" />
-                <h3 className="text-2xl font-bold mb-2">2. Generate README</h3>
+              {/* Feature 2: Cross-Platform */}
+              <div className="bg-gray-800 p-6 rounded-lg">
+                <Terminal className="w-12 h-12 mb-4 text-green-500" />
+                <h3 className="text-xl font-bold mb-2">Cross-Platform</h3>
                 <p className="text-gray-300">
-                  Run the Dokugen CLI to generate a professional README in seconds.
+                  Works on any OS and programming language.
                 </p>
               </div>
 
-              {/* Step 3: Publish */}
-              <div className="text-center">
-                <FileText className="w-16 h-16 mx-auto mb-4 text-purple-500" />
-                <h3 className="text-2xl font-bold mb-2">3. Publish</h3>
+              {/* Feature 3: Easy Integration */}
+              <div className="bg-gray-800 p-6 rounded-lg">
+                <Code className="w-12 h-12 mb-4 text-purple-500" />
+                <h3 className="text-xl font-bold mb-2">Easy Integration</h3>
                 <p className="text-gray-300">
-                  Push your README to GitHub and showcase your project to the world.
+                  Integrate with GitHub, GitLab, and VS Code.
                 </p>
               </div>
             </div>
+          </motion.div>
+        )}
 
-            {/* Matrix-Style Mockup */}
-            <div className="mt-12">
-              <div className="bg-gray-900 p-3 md:p-6 rounded-lg">
-                <div className="flex flex-col md:flex-row justify-center gap-4">
-                  <div className="bg-gray-700 p-4 rounded-lg flex-1">
-                    <Code className="w-8 h-8 mx-auto mb-2 text-blue-500" />
-                    <p className="text-center text-gray-300 text-sm">Code</p>
-                  </div>
-                  <div className="bg-gray-700 p-4 rounded-lg flex-1">
-                    <Terminal className="w-8 h-8 mx-auto mb-2 text-green-500" />
-                    <p className="text-center text-gray-300 text-sm">CLI</p>
-                  </div>
-                  <div className="bg-gray-700 p-4 rounded-lg flex-1">
-                    <FileText className="w-8 h-8 mx-auto mb-2 text-purple-500" />
-                    <p className="text-center text-gray-300 text-sm">README</p>
-                  </div>
+        {/* FAQs Section */}
+        {!searchQuery && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
+            className="mt-16"
+          >
+            <h2 className="text-4xl font-bold mb-8">FAQs</h2>
+            <div className="bg-gray-800 p-6 rounded-lg">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-xl font-bold mb-2">How do I install Dokugen?</h3>
+                  <p className="text-gray-300">
+                    Run <code className="text-green-400">npm install -g dokugen</code> to install Dokugen globally.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Can I use custom templates?</h3>
+                  <p className="text-gray-300">
+                    Coming Soon, you will be able to use the <code className="text-green-400">--template flag</code> flag to specify a custom template in upcoming Dokugen version 3.2.0.
+                  </p>
+                </div>
+                   <div>
+                  <h3 className="text-xl font-bold mb-2">Can I auto generate my readme using the --live flag?</h3>
+                  <p className="text-gray-300">
+                    Coming Soon, you will be able to use the <code className="text-green-400">--live flag</code> flag to watch ad auto generate your readme in upcoming Dokugen version 3.2.0.
+                  </p>
                 </div>
               </div>
             </div>
-          </div>
-        </motion.div>
-
-        {/* Image Mockup Section */}
-        <motion.div
+          </motion.div>
+        )}
+                <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
@@ -149,27 +278,8 @@ export default function Home() {
            <video src="/Demo.mp4" muted autoPlay className="w-full h-full object-cover rounded-lg">Your browser does not support the video tag.</video>
           </div>
         </motion.div>
-
-
-        {/* CTA Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1 }}
-          className="mt-16"
-        >
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 md:p-12 rounded-lg text-center">
-            <h2 className="text-4xl font-bold mb-4">Ready to Elevate Your READMEs?</h2>
-            <p className="text-gray-200 mb-8">
-              Join thousands of developers using Dokugen to create stunning READMEs in seconds.
-            </p>
-            <Link href="https://github.com/samueltuoyo15/Dokugen/" target="_blank" className="bg-white text-gray-900 px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition">
-              Get Started Now
-            </Link>
-          </div>
-        </motion.div>
-
-        {/* User Metrics Section */}
+        
+                       {/* User Metrics Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -177,6 +287,16 @@ export default function Home() {
           className="mt-16"
         >
           <MetricsSection />
+        </motion.div>
+        
+        {/* Footer Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1 }}
+          className="mt-16 text-center"
+        >
+          <p className="text-gray-300">Need help? Check out our <a href="https://github.com/samueltuoyo15/Dokugen" className="text-blue-500 hover:underline">GitHub</a> or <a href="https://github.com/samueltuoyo15/Dokugen" className="text-blue-500 hover:underline">support page</a>.</p>
         </motion.div>
       </div>
     </div>
