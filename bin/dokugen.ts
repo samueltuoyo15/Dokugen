@@ -297,6 +297,8 @@ program.command("generate").description("Scan project and generate a README.md")
       const projectFiles = await scanFiles(projectDir)
       console.log(chalk.blue(`📂 Detected project type: ${projectType}`))
       console.log(chalk.yellow(`📂 Found: ${projectFiles.length} files in the project`))
+   
+     
       if (options.template) {
       if (readmeExists && !options.overwrite) {
         const existingContent = await fs.readFile(readmePath, "utf-8")
@@ -308,20 +310,29 @@ program.command("generate").description("Scan project and generate a README.md")
       return
     }
 
-    if (readmeExists) {
-      if (!options.overwrite) {
-        const existingContent = await fs.readFile(readmePath, "utf-8")
-        await generateReadme(projectType, projectFiles, projectDir, existingContent)
+        if (readmeExists) {
+        if (!options.overwrite) {
+          const existingContent = await fs.readFile(readmePath, "utf-8")
+          await generateReadme(projectType, projectFiles, projectDir, existingContent)
+        } else {
+         const overwrite = await askYesNo("README.md exists. Overwrite?")
+          
+          if (overwrite === true) {
+            await generateReadme(projectType, projectFiles, projectDir)
+          } else if (overwrite === false) {
+            console.log(chalk.yellow("⚠️ README update skipped (user selected No)"))
+            return
+          } else if (overwrite === 'cancel') {
+            console.log(chalk.yellow("⚠️ README generation cancelled"))
+            return
+          }
+        }
       } else {
-        const overwrite = await askYesNo("README.md exists. Overwrite?")
-        if (overwrite) await generateReadme(projectType, projectFiles, projectDir)
+        await generateReadme(projectType, projectFiles, projectDir)
       }
-    } else {
-      await generateReadme(projectType, projectFiles, projectDir)
-    }
 
-     console.log(chalk.green("✅ README.md created!"))
-    
+      console.log(chalk.green("✅ README.md created!"))
+ 
      } catch(error){
        console.error(error)
        process.exit(1)
@@ -339,6 +350,9 @@ process.on("SIGINT", () => {
 process.on("unhandledRejection", () => {
   process.exit(1)
 })
+
+
+
 
 
 
