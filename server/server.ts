@@ -12,7 +12,7 @@ import dotenv from "dotenv"
 dotenv.config()
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
+  windowMs: 10 * 60 * 1000,
   max: 10,
   message: "Too many requests, try again later.",
   standardHeaders: true,
@@ -33,8 +33,8 @@ app.use(cors({
 }))
 app.use(helmet())
 app.use(limiter)
-app.use(express.json({limit: "500mb"}))
-app.use(express.urlencoded({ limit: '500mb', extended: true }))
+app.use(express.json({limit: "400mb"}))
+app.use(express.urlencoded({ limit: '400mb', extended: true }))
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "",
   baseURL: process.env.OPENAI_ENDPOINT || "https://api.openai.com/v1/chat/completions"

@@ -40,15 +40,24 @@ const getUserInfo = (): { username: string, email?: string, osInfo: {platform: s
 
 const backupReadme = async (readmePath: string): Promise<void> => {
   if (await fs.pathExists(readmePath)) {
+    currentReadmePath = readmePath
     readmeBackup = await fs.readFile(readmePath, 'utf-8')
+    console.log(chalk.green(`📝 [${new Date().toISOString()}] Current README backed up in memory`))
   }
 }
 
 const restoreReadme = async (): Promise<void> => { 
   if (readmeBackup && currentReadmePath) {
-    await fs.writeFile(currentReadmePath, readmeBackup)
-    readmeBackup = null
-    currentReadmePath = ""
+    try {
+      await fs.writeFile(currentReadmePath, readmeBackup)
+      console.log(chalk.green("♻️ Original README content restored successfully"))
+      readmeBackup = null
+      currentReadmePath = ""
+    } catch (error) {
+      console.error(chalk.red("❌ Failed to restore README:"), error)
+    }
+  } else {
+    console.log(chalk.yellow("⚠️ No README backup available to restore"))
   }
 }
 
@@ -183,6 +192,7 @@ const checkInternetConnection = async (): Promise<boolean> => {
 const generateReadme = async (projectType: string, projectFiles: string[], projectDir: string, existingReadme?: string, templateUrl?: string): Promise<string | null> => {
   try {
     const projectDir = process.cwd()
+    const readmePath = path.join(projectDir, "README.md")
     const hasGoodInternetConnection = await checkInternetConnection()
     if(!hasGoodInternetConnection){
       const username = await getUserInfo()?.username
@@ -191,6 +201,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
     }
     console.log(chalk.blue("🔍 Analyzing project files..."))
     
+    currentReadmePath = readmePath
     let includeSetup = false
     let includeContributionGuideLine = false  
     
@@ -211,8 +222,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
     
     console.log(chalk.blue("🔥 Generating README..."))
     
-    const readmePath = path.join(projectDir, "README.md")
-    if(existingReadme === undefined){
+   if(existingReadme === undefined){
       await backupReadme(readmePath)
     }
     const fileStream = fs.createWriteStream(readmePath)
@@ -324,6 +334,7 @@ program.command("generate").description("Scan project and generate a README.md")
             return
           } else if (overwrite === 'cancel') {
             console.log(chalk.yellow("⚠️ README generation cancelled"))
+            await restoreReadme()
             return
           }
         }
@@ -335,6 +346,7 @@ program.command("generate").description("Scan project and generate a README.md")
  
      } catch(error){
        console.error(error)
+       await restoreReadme()
        process.exit(1)
      }
    })
