@@ -8,6 +8,7 @@ import helmet from "helmet"
 import { fetchGitHubReadme } from "./lib/fetchGitHubReadme"
 import cors from "cors"
 import rateLimit from "express-rate-limit"
+import cron from "node-cron"
 import dotenv from "dotenv"
 dotenv.config()
 
@@ -47,7 +48,7 @@ const generateCacheKey = (projectType: string, projectFiles: string[], fullCode:
 }
 
 
-app.get("/keep-alive", (_req: Request, res: Response) => {
+app.get("/api/keep-alive", (_req: Request, res: Response) => {
   res.status(200).json({status: "Ok", uptime: process.uptime(), memoryUsage: process.memoryUsage()})
 })
 
@@ -220,4 +221,14 @@ app.use((err: Error, req: Request, res: Response, next: Function) => {
 })
 
 const PORT = process.env.PORT!
-app.listen(PORT, () => console.log(`Dokugen running on port ${PORT}`))
+app.listen(PORT, () => {
+  console.log(`Dokugen running on port ${PORT}`)
+  cron.schedule('*/14 * * * *', () => {
+    const keepAliveUrl = `https://dokugen-readme.onrender.com/api/keep-alive`
+    console.log(`Performing self-ping to: ${keepAliveUrl}`)
+    
+    fetch(keepAliveUrl).then(res => console.log(`Keep-alive ping successful (Status: ${res.status})`)).catch(err => console.error('Keep-alive ping failed:', err))
+  })
+  
+  console.log('Self-pinger initialized (runs every 14 minutes)')
+})
