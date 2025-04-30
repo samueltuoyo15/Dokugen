@@ -166,7 +166,7 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
          - Include a **license section** with a **link**.
       
       9. **Author Info**:
-         - Create a **modern author section** with **social media links**.
+         - Create a **modern author section** with **social media links. Plwdont guess authors links if i dont know their username just leave placeholders for them to write theirselves**.
       
       10. **Badges**:
           - Add **dynamic badges** for technologies, build status, and more at the bottom of the README.

@@ -1,4 +1,3 @@
-
 # Dokugen
 ![Demo GIF](./dashboard/public/Demo.gif)
 
@@ -27,6 +26,8 @@ Dokugen is lightweight README.md file Generator Command Line Interface Tool. It 
 ## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+[![Contributions Welcome](./CONTRIBUTION.md)](https://github.com/samueltuoyo15/Dokugen/blob/main/CONTRIBUTION.md)
 
 ## Author Info
 
