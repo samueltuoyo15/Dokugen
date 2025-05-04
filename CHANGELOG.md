@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [3.4.0] - 2025-05-04
 ### Added
-- added concise documentation 
+- added docs to README.md file
 -
 ## [3.3.0] - 2025-04-18
 ### Added
