@@ -2,7 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
-
+## [3.4.0] - 2025-05-04
+### Added
+- added concise documentation 
+-
 ## [3.3.0] - 2025-04-18
 ### Added
 - migrated from serveless function to native server and increase request payload limit 

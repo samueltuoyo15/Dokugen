@@ -281,8 +281,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
   }
 }
 
-// Commander options version, name, flags e.t.c
-program.name("dokugen").version("3.3.0").description("Automatically generate high-quality README for your application")
+program.name("dokugen").version("3.4.0").description("Automatically generate high-quality README for your application")
 program.command("generate").description("Scan project and generate a README.md").option("--no-overwrite", "Do not overwrite existing README.md, append new features instead").option("--template <url>", "use a custom GitHub repo readme file as a template to generate a concise and strict readme for your project").action(async (options) => {
     const projectDir = process.cwd()
     const readmePath = path.join(projectDir, "README.md")
