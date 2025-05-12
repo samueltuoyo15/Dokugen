@@ -153,8 +153,6 @@ const scanFiles = async (dir: string): Promise<string[]> => {
   return files
 }
 
-
-
 // function to ask yes lr no if user want to include some certain things in their readme file
 const askYesNo = async (message: string): Promise<boolean | 'cancel'> => {
   try{

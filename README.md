@@ -39,12 +39,29 @@ dokugen --version
 
 > Displays Current Version (3.4.0)
 
+
 ## Features
 
 -   **Automated Generation**: Automatically analyzes your project and generates a comprehensive README.
 -   **Easy to Use**: Simple command-line interface for quick and easy README creation.
 -   **Cross-Platform**: Works seamlessly on Windows, macOS, and Linux.
+-   **Programming Language and Framework Agnostic**: Works seamlessly any language e.g python, JavaScript, go, c#, c, rust e.t.c
 -   **Options & Flags**: Support flags and options like generate from a template, overwrite e.t.c
+
+### Progrmamming Language & Framework Agnostic compatible mostly all languages. Some examples are:
+![Golang](./public/go.jpg)
+
+![Php](./public/php.jpg)
+
+![Php](./public/java.jpg)
+
+![React](./public/react.jpg)
+
+![Typescript](./public/typescript.jpg)
+
+![Express](./public/express.jpg)
+
+![Django](./public/django.jpg)
 
 ##  Technologies Used
 
@@ -58,24 +75,24 @@ dokugen --version
 | Chalk | Terminal string styling done right | [https://github.com/chalk/chalk](https://github.com/chalk/chalk) |
 | Esbuild | An extremely fast JavaScript bundler and minifier | [https://github.com/evanw/esbuild](https://github.com/evanw/esbuild) |
 
+## Used by
+
+[![samueltuoyo15](https://github.com/samueltuoyo15.png?size=50)](https://github.com/username1)
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Contributing
+## Contributing 
 
-Contributions are welcome! [Read the guide Â»](https://github.com/samueltuoyo15/Dokugen/blob/main/CONTRIBUTION.md)
-
+Contributions are welcome but first and mostly open an issue with your feature request! [Read the guide here.](https://github.com/samueltuoyo15/Dokugen/blob/main/CONTRIBUTION.md)
 ## Author Info
 
--   **OritseWeyinmi Samuel Tuoyo**
--   GitHub: [https://github.com/samueltuoyo15](https://github.com/samueltuoyo15)
--   Twitter: [https://x.com/TuoyoS26091](https://x.com/TuoyoS26091)
--   LinkedIn: [https://www.linkedin.com/in/samuel-tuoyo-8568b62b6](https://www.linkedin.com/in/samuel-tuoyo-8568b62b6)
+-   **OritseWeyinmi Samuel Tuoyo** 
+  - [Twitter](https://x.com/TuoyoS26091)
+  - [LinkedIn](https://www.linkedin.com/in/samuel-tuoyo-8568b62b6)
 
-
-##  badges
+##  Badges
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://opensource.org/)
