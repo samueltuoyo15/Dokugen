@@ -49,18 +49,26 @@ dokugen --version
 -   **Options & Flags**: Support flags and options like generate from a template, overwrite e.t.c
 
 ### Progrmamming Language & Framework Agnostic compatible mostly all languages. Some examples are:
+
+### Golang
 ![Golang](./public/go.jpg)
 
+### Php
 ![Php](./public/php.jpg)
 
-![Php](./public/java.jpg)
+### Java
+![Java](./public/java.jpg)
 
+### React 
 ![React](./public/react.jpg)
 
+### Typescript 
 ![Typescript](./public/typescript.jpg)
 
+### Express.Js
 ![Express](./public/express.jpg)
 
+### Python Django 
 ![Django](./public/django.jpg)
 
 ##  Technologies Used
@@ -74,10 +82,6 @@ dokugen --version
 | Axios | Promise based HTTP client for the browser and node.js | [https://github.com/axios/axios](https://github.com/axios/axios) |
 | Chalk | Terminal string styling done right | [https://github.com/chalk/chalk](https://github.com/chalk/chalk) |
 | Esbuild | An extremely fast JavaScript bundler and minifier | [https://github.com/evanw/esbuild](https://github.com/evanw/esbuild) |
-
-## Used by
-
-[![samueltuoyo15](https://github.com/samueltuoyo15.png?size=50)](https://github.com/username1)
 
 ## License
 
