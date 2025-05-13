@@ -11,11 +11,10 @@ import os from "os"
 //@ts-ignore
 import { detectProjectType } from "./projectDetect.mjs"
 
-
+const API_TIMEOUT = 180000
 let readmeBackup: string | null = null
-let currentReadmePath: string = "" 
+let currentReadmePath: string = ""
 
-// function to get user info
 const getUserInfo = (): { username: string, email?: string, osInfo: {platform: string, arch: string, release: string}} => {
   let gitName = ""
   let gitEmail = ""
@@ -35,33 +34,37 @@ const getUserInfo = (): { username: string, email?: string, osInfo: {platform: s
   return { username: os.userInfo().username || "", email: process.env.USER || "", osInfo: {platform: "Unknown", arch: "Unknown", release: "Unknown"}}
 }
 
-
-// function to backup overwrited readme in memory 
-
 const backupReadme = async (readmePath: string): Promise<void> => {
-  if (await fs.pathExists(readmePath)) {
-    currentReadmePath = readmePath
-    readmeBackup = await fs.readFile(readmePath, 'utf-8')
-    console.log(chalk.green(`📝 [${new Date().toISOString()}] Current README backed up in memory`))
+  try {
+    if (await fs.pathExists(readmePath)) {
+      currentReadmePath = readmePath
+      readmeBackup = await fs.readFile(readmePath, "utf-8")
+      console.log(chalk.green(`📝 [${new Date().toISOString()}] Current README backed up in memory`))
+    }
+  } catch (error) {
+    console.error(chalk.red("❌ Failed to backup README:"), error)
   }
 }
 
-const restoreReadme = async (): Promise<void> => { 
+const restoreReadme = async (): Promise<string | null> => { 
   if (readmeBackup && currentReadmePath) {
     try {
       await fs.writeFile(currentReadmePath, readmeBackup)
       console.log(chalk.green("♻️ Original README content restored successfully"))
-      readmeBackup = null
-      currentReadmePath = ""
+      return readmeBackup
     } catch (error) {
       console.error(chalk.red("❌ Failed to restore README:"), error)
+      return null
+    } finally {
+      readmeBackup = null
+      currentReadmePath = ""
     }
   } else {
     console.log(chalk.yellow("⚠️ No README backup available to restore"))
+    return null
   }
 }
 
-// function to fetch git repo
 const getGitRepoUrl = (): string | null => {
   try {
     const repoUrl = execSync("git config --get remote.origin.url", { encoding: "utf-8" }).trim()
@@ -71,7 +74,6 @@ const getGitRepoUrl = (): string | null => {
   }
 }
 
-// function to extract full codebase and format it like a json 
 const extractFullCode = async (projectFiles: string[], projectDir: string): Promise<string> => {
   const fileGroups: Record<string, string[]> = {}
   
@@ -107,7 +109,6 @@ const extractFullCode = async (projectFiles: string[], projectDir: string): Prom
   return snippets.filter(Boolean).join("") || "No code snippets available"
 }
 
-
 const matchesIgnorePattern = (filename: string, pattern: string): boolean => {
   if (pattern.startsWith("*.")) {
     const ext = pattern.slice(1)
@@ -116,10 +117,9 @@ const matchesIgnorePattern = (filename: string, pattern: string): boolean => {
   return filename === pattern
 }
 
-// function to scan detect files and exclude files which are irrelevant 
 const scanFiles = async (dir: string): Promise<string[]> => {
-  const ignoreDirs = new Set(["node_modules", "tests", "_tests_", "_test_", "dist", ".git", ".next", "coverage", "out", "test", "uploads", "docs", "build", ".vscode", ".idea", "logs", "public", "storage", "bin", "obj", "lib", "venv", "cmake-build-debug"])
-  const ignoreFiles = new Set(["*.exe", "*.bin", "*.so", "*.a", "*.class", "*.o", "*.dll", "*.pyc", "CHANGELOG.md", "style.css", "main.css", "output.css", ".gitignore", ".npmignore", "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "tsconfig.json", "jest.config.js", "README.md", "*.lock", ".DS_Store", ".env", "Thumbs.db", "tsconfig.*", "*.iml", ".editorconfig", ".prettierrc*", ".eslintrc*"])
+const ignoreDirs = new Set(["node_modules", ".next", ".nuxt", ".svelte-kit", ".vercel", ".serverless", ".cache", "tests", "_tests_", "_test_", "__tests__", "coverage", "test", "spec", "cypress", "e2e", "dist", "build", "out", "bin", "obj", "lib", "target", "release", "debug", "artifacts", "generated", ".git", ".svn", ".hg", ".vscode", ".idea", ".vs", "venv", ".venv", "env", ".env", "virtualenv", "envs", "docs", "javadoc", "logs", "android", "ios", "windows", "linux", "macos", "web", ".dart_tool", ".gradle", ".mvn", ".npm", ".yarn", "tmp", "temp", "uploads", "public", "static", "assets", "images", "media", "migrations", "data", "db", "database", ".github", ".circleci", ".husky", "storage", "vendor", "cmake-build-debug", "packages", "plugins"])
+const ignoreFiles = new Set(["*.exe", "*.mp4", "*.mp3", "*.bin", "*.so", "*.a", "*.dll", "*.pyc", "*.class", "*.o", "*.jar", "*.war", "*.ear", "*.apk", "*.ipa", "*.dylib", "*.lock", "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "Gemfile.lock", "CHANGELOG.md", "style.css", "main.css", "output.css", ".gitignore", ".npmignore", "tsconfig.json", "jest.config.js", "README.md", ".DS_Store", ".env", "Thumbs.db", "tsconfig.*", "*.iml", ".editorconfig", ".prettierrc*", ".eslintrc*", "*.log", "*.min.js", "*.min.css", "*.pdf", "*.jpg", "*.png", "*.gif", "*.svg", "*.ico", "*.woff", "*.woff2", "*.ttf", "*.eot", "*.mp3", "*.mp4", "*.zip", "*.tar", "*.gz", "*.rar", "*.7z", "*.sqlite", "*.db", "*.sublime-workspace", "*.sublime-project", "*.bak", "*.swp", "*.swo", "*.pid", "*.seed", "*.pid.lock"])
 
   const files: string[] = []
   const queue: string[] = [dir]
@@ -153,8 +153,7 @@ const scanFiles = async (dir: string): Promise<string[]> => {
   return files
 }
 
-// function to ask yes lr no if user want to include some certain things in their readme file
-const askYesNo = async (message: string): Promise<boolean | 'cancel'> => {
+const askYesNo = async (message: string): Promise<boolean | "cancel"> => {
   try{
   const response = await select({
     message,
@@ -176,37 +175,34 @@ const askYesNo = async (message: string): Promise<boolean | 'cancel'> => {
   }
 }
 
-// fubnction to check internet connection 
 const checkInternetConnection = async (): Promise<boolean> => {
   try {
-    await axios.get('https://www.google.com', { timeout: 5000 })
+    await axios.get("https://www.google.com", { timeout: 5000 })
     return true
   } catch {
     return false
   }
 }
 
-//function to call my server to generate readme eith the expected payload am passing 
 const generateReadme = async (projectType: string, projectFiles: string[], projectDir: string, existingReadme?: string, templateUrl?: string): Promise<string | null> => {
   try {
     console.log(chalk.blue("🔍 Analyzing project files..."))
     const projectDir = process.cwd()
-     const readmePath = path.join(projectDir, "README.md")
+    const readmePath = path.join(projectDir, "README.md")
      
     let includeSetup = false
     let includeContributionGuideLine = false  
     
     if (!templateUrl) {
       const setupAnswer = await askYesNo("Do you want to include setup instructions in the README?")
-      if (setupAnswer === 'cancel') return null
+      if (setupAnswer === "cancel") return null
       includeSetup = setupAnswer
 
       const contributionAnswer = await askYesNo("Include contribution guidelines in README?")
-      if (contributionAnswer === 'cancel') return null
+      if (contributionAnswer === "cancel") return null
       includeContributionGuideLine = contributionAnswer
     }
 
-    
     const fullCode = await extractFullCode(projectFiles, projectDir)
     const userInfo = getUserInfo()
     const repoUrl = getGitRepoUrl()
@@ -223,7 +219,10 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
       existingReadme,
       repoUrl,
       templateUrl
-    }, {responseType: "stream"})
+    }, {
+      responseType: "stream",
+      timeout: API_TIMEOUT 
+    })
     
     const responseStream = response.data as Readable 
     return new Promise((resolve, reject) => {
@@ -232,7 +231,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
       responseStream.on("data", (chunk: Buffer) => {
         buffer += chunk.toString()
 
-       const lines = buffer.split("\n")
+        const lines = buffer.split("\n")
         buffer = lines.pop() || ""
         lines.forEach((line) => {
           if (line.startsWith("data:")) {
@@ -248,34 +247,31 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
         })
       })
      
-     const projectDir = process.cwd()
-     const readmePath = path.join(projectDir, "README.md")
- 
-     responseStream.on("end", () => {
-     fileStream.end(() => {
-       console.log(chalk.green("\n✅ README.md created successfully"))
-       readmeBackup = null
-      resolve(readmePath)
+      responseStream.on("end", () => {
+        fileStream.end(() => {
+          console.log(chalk.green("\n✅ README.md created successfully"))
+          readmeBackup = null
+          resolve(readmePath)
+        })
       })
-    })
       
       fileStream.on("error", async (err) => {
         console.log(chalk.red("\n❌ Failed to write README"))
-        await restoreReadme()
+        const restoredContent = await restoreReadme()
         fileStream.end()
-        reject(err)
+        reject(restoredContent || err)
       })
 
       responseStream.on("error", async (err: Error) => {
         console.log(chalk.red("\n❌ Error receiving stream data"))
-        await restoreReadme()
-        reject(err)
+        const restoredContent = await restoreReadme()
+        reject(restoredContent || err)
       })
     })
-  } catch(error){
+  } catch(error) {
     console.error("\n Error Generating Readme", error)
-    await restoreReadme()
-    return null
+    const restoredContent = await restoreReadme()
+    return restoredContent || null
   }
 }
 
@@ -291,47 +287,46 @@ program.command("generate").description("Scan project and generate a README.md")
       console.log(chalk.red(`Opps... ${username} Check your device or pc internet connection and try again.`))
       process.exit(1)
     }
-    currentReadmePath = readmePath
-    if(await fs.readFile(currentReadmePath, "utf-8") === undefined){
-      await backupReadme(currentReadmePath)
+
+   if (readmeExists) {
+      await backupReadme(readmePath)
     }
     
-    
-     try{
-     if (options.template && !options.template.includes('github.com')) {
-          console.log(chalk.red("❌ Invalid GitHub URL. Use format: https://github.com/user/repo/blob/main/README.md"))
-          process.exit(1)
-       }
+    try {
+      if (options.template && !options.template.includes("github.com")) {
+        console.log(chalk.red("❌ Invalid GitHub URL. Use format: https://github.com/user/repo/blob/main/README.md"))
+        process.exit(1)
+      }
+      
       const projectType = await detectProjectType(projectDir)
       const projectFiles = await scanFiles(projectDir)
       console.log(chalk.blue(`📂 Detected project type: ${projectType}`))
       console.log(chalk.yellow(`📂 Found: ${projectFiles.length} files in the project`))
    
-     
       if (options.template) {
-      if (readmeExists && !options.overwrite) {
-        const existingContent = await fs.readFile(readmePath, "utf-8")
-        await generateReadme(projectType, projectFiles, projectDir, existingContent, options.template)
-      } else {
-        await generateReadme(projectType, projectFiles, projectDir, undefined, options.template)
+        if (readmeExists && !options.overwrite) {
+          const existingContent = await fs.readFile(readmePath, "utf-8")
+          await generateReadme(projectType, projectFiles, projectDir, existingContent, options.template)
+        } else {
+          await generateReadme(projectType, projectFiles, projectDir, undefined, options.template)
+        }
+        console.log(chalk.green("✅ README.md generated from template!"))
+        return
       }
-      console.log(chalk.green("✅ README.md generated from template!"))
-      return
-    }
 
-        if (readmeExists) {
+      if (readmeExists) {
         if (!options.overwrite) {
           const existingContent = await fs.readFile(readmePath, "utf-8")
           await generateReadme(projectType, projectFiles, projectDir, existingContent)
         } else {
-         const overwrite = await askYesNo("README.md exists. Overwrite?")
+          const overwrite = await askYesNo("README.md exists. Overwrite?")
           
           if (overwrite === true) {
             await generateReadme(projectType, projectFiles, projectDir)
           } else if (overwrite === false) {
             console.log(chalk.yellow("⚠️ README update skipped (user selected No)"))
             return
-          } else if (overwrite === 'cancel') {
+          } else if (overwrite === "cancel") {
             console.log(chalk.yellow("⚠️ README generation cancelled"))
             await restoreReadme()
             return
@@ -343,13 +338,12 @@ program.command("generate").description("Scan project and generate a README.md")
 
       console.log(chalk.green("✅ README.md created!"))
  
-     } catch(error){
-       console.error(error)
-       await restoreReadme()
-       process.exit(1)
-     }
-   })
-
+    } catch(error) {
+      console.error(error)
+      await restoreReadme()
+      process.exit(1)
+    }
+})
 
 program.parse(process.argv)
 
@@ -361,10 +355,3 @@ process.on("SIGINT", () => {
 process.on("unhandledRejection", () => {
   process.exit(1)
 })
-
-
-
-
-
-
-
