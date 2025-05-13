@@ -1,6 +1,6 @@
 {
   "name": "dokugen",
-  "version": "3.5.0",
+  "version": "3.6.0",
   "private": false,
   "main": "dist/bin/dokugen.mjs",
   "type": "module",
@@ -23,10 +23,10 @@
   "description": "Readme generator command line tool.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/samueltuoyo15/Dokugen.git"
+    "url": "git+https://github.com/samueltuoyo15/Dokugen.git"
   },
   "bugs": {
-    "url": "https://github.com/samueltuoyo15/Dokugen/issues"
+    "url": "git+https://github.com/samueltuoyo15/Dokugen/issues"
   },
   "dependencies": {
     "@clack/prompts": "^0.10.0",

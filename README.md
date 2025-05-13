@@ -11,6 +11,11 @@ Dokugen is lightweight README.md file Generator Command Line Interface Tool. It 
 npm install -g dokugen
 ```
 
+### Cd into the current project you want to work with 
+
+```bash
+cd my-project
+```
 ### Generate a new README interactively
 
 ```bash
@@ -24,7 +29,7 @@ dokugen generate
 ### Generate README with template
 
 ```bash
-dokugen --template https://raw.githubusercontent.com/username/repo-name/blob/main/README.md
+dokugen generate --template https://raw.githubusercontent.com/username/repo-name/blob/main/README.md
 ```
 
 > use a custom GitHub repo readme file as a template to generate a concise and strict readme for your project.
@@ -37,7 +42,7 @@ dokugen --template https://raw.githubusercontent.com/username/repo-name/blob/mai
 dokugen --version
 ```
 
-> Displays Current Version (3.4.0)
+> Displays Current Version (3.6.0)
 
 
 ## Features

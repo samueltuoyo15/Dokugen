@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.6.0] - 2025-13-05
+### Fixed
+- Readme Docs
+
 ## [3.5.0] - 2025-13-05
 ### Fixed
 - Unnecessary Process Cancellation which prevents generating the readme or even viewing the interactive question section
