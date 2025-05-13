@@ -1,6 +1,6 @@
 {
   "name": "dokugen",
-  "version": "3.4.0",
+  "version": "3.5.0",
   "private": false,
   "main": "dist/bin/dokugen.mjs",
   "type": "module",
@@ -14,12 +14,13 @@
   "keywords": [
     "open source",
     "readme generator",
-    "cli tool",
-    "OritseWeyinmi samuel Tuoyo"
+    "readme.md generator",
+    "dokugen",
+    "cli tool"
   ],
   "author": "OritseWeyinmi Samuel Tuoyo",
   "license": "ISC",
-  "description": "Open source readme generator command line tool.",
+  "description": "Readme generator command line tool.",
   "repository": {
     "type": "git",
     "url": "https://github.com/samueltuoyo15/Dokugen.git"

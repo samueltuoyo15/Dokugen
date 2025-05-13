@@ -1,5 +1,5 @@
 # Dokugen 
-![Demo GIF](./dashboard/public/Demo.gif)
+![Demo GIF](./public/Demo.gif)
 
 Dokugen is lightweight README.md file Generator Command Line Interface Tool. It simplifies the process of writing your README.md file from scratch by generate professional README.md files for your projects, saving you time and ensuring consistency using AI.
 

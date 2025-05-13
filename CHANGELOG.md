@@ -2,10 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.5.0] - 2025-13-05
+### Fixed
+- Unnecessary Process Cancellation which prevents generating the readme or even viewing the interactive question section
+- added more irrelevant files extension to exclude 
+- improved detect project logic
+
 ## [3.4.0] - 2025-05-04
 ### Added
 - added docs to README.md file
--
+
 ## [3.3.0] - 2025-04-18
 ### Added
 - migrated from serveless function to native server and increase request payload limit 
