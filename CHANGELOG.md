@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.7.0] - 2025-13-05
+### Fixed
+- Forgot to run build
+- 
 ## [3.6.0] - 2025-13-05
 ### Fixed
 - Readme Docs

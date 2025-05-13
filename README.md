@@ -42,7 +42,7 @@ dokugen generate --template https://raw.githubusercontent.com/username/repo-name
 dokugen --version
 ```
 
-> Displays Current Version (3.6.0)
+> Displays Current Version (3.7.0)
 
 
 ## Features
