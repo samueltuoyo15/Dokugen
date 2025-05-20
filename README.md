@@ -1,25 +1,27 @@
-# Dokugen 
+# Dokugen
+
 ![Demo GIF](./public/Demo.gif)
 
-Dokugen is lightweight README.md file Generator Command Line Interface Tool. It simplifies the process of writing your README.md file from scratch by generate professional README.md files for your projects, saving you time and ensuring consistency using AI.
+Dokugen is a lightweight README.md file Generator Command Line Interface Tool. It simplifies the process of writing your README.md file from scratch by generating professional README.md files for your projects, saving you time and ensuring consistency using AI.
 
 ## Usage
 
-### Install Dokugen globally! (Recommended)
+### Install Dokugen globally (Recommended)
 
 ```bash
-npm install -g dokugen
+npm install -g dokugen #or yarn global add dokugen 
 ```
 
-### Cd into the current project you want to work with 
+### Navigate to the project you want to work with
 
 ```bash
 cd my-project
 ```
+
 ### Generate a new README interactively
 
 ```bash
-dokugen generate 
+dokugen generate
 ```
 
 > This command launches an interactive prompt to guide you through creating a professional README file.
@@ -32,11 +34,11 @@ dokugen generate
 dokugen generate --template https://raw.githubusercontent.com/username/repo-name/blob/main/README.md
 ```
 
-> use a custom GitHub repo readme file as a template to generate a concise and strict readme for your project.
+> Use a custom GitHub repo readme file as a template to generate a concise and strict readme for your project.
 
 ---
 
-### Check Version 
+### Check Version
 
 ```bash
 dokugen --version
@@ -44,68 +46,77 @@ dokugen --version
 
 > Displays Current Version (3.7.0)
 
-
 ## Features
 
--   **Automated Generation**: Automatically analyzes your project and generates a comprehensive README.
--   **Easy to Use**: Simple command-line interface for quick and easy README creation.
--   **Cross-Platform**: Works seamlessly on Windows, macOS, and Linux.
--   **Programming Language and Framework Agnostic**: Works seamlessly any language e.g python, JavaScript, go, c#, c, rust e.t.c
--   **Options & Flags**: Support flags and options like generate from a template, overwrite e.t.c
+- **Automated Generation**: Automatically analyzes your project and generates a comprehensive README.
+- **Easy to Use**: Simple command-line interface for quick and easy README creation.
+- **Cross-Platform**: Works seamlessly on Windows, macOS, and Linux.
+- **Programming Language and Framework Agnostic**: Works with any language (e.g., Python, JavaScript, Go, C#, C, Rust, etc.)
+- **Options & Flags**: Supports flags and options like generating from a template, overwriting existing files, etc.
 
-### Progrmamming Language & Framework Agnostic compatible mostly all languages. Some examples are:
+### Programming Language & Framework Compatibility
+
+Dokugen works with almost all programming languages and frameworks. Here are some examples:
 
 ### Golang
+
 ![Golang](./public/go.jpg)
 
-### Php
-![Php](./public/php.jpg)
+### PHP
+
+![PHP](./public/php.jpg)
 
 ### Java
+
 ![Java](./public/java.jpg)
 
-### React 
+### React
+
 ![React](./public/react.jpg)
 
-### Typescript 
-![Typescript](./public/typescript.jpg)
+### TypeScript
 
-### Express.Js
+![TypeScript](./public/typescript.jpg)
+
+### Express.js
+
 ![Express](./public/express.jpg)
 
-### Python Django 
+### Python Django
+
 ![Django](./public/django.jpg)
 
-##  Technologies Used
+## Technologies Used
 
-| Technology  | Description                                        | Link                                                           |
-| :---------- | :------------------------------------------------- | :------------------------------------------------------------- |
-| Node.js     | JavaScript runtime environment                     | [https://nodejs.org/](https://nodejs.org/)                     |
-| TypeScript  | Typed superset of JavaScript                       | [https://www.typescriptlang.org/](https://www.typescriptlang.org/) |
-| Commander.js | Node.js command-line interfaces                   | [https://github.com/tj/commander.js](https://github.com/tj/commander.js) |
-| Inquirer.js | Interactive command line prompt toolkit           | [https://github.com/SBoudrias/Inquirer.js](https://github.com/SBoudrias/Inquirer.js) |
-| Axios | Promise based HTTP client for the browser and node.js | [https://github.com/axios/axios](https://github.com/axios/axios) |
-| Chalk | Terminal string styling done right | [https://github.com/chalk/chalk](https://github.com/chalk/chalk) |
-| Esbuild | An extremely fast JavaScript bundler and minifier | [https://github.com/evanw/esbuild](https://github.com/evanw/esbuild) |
+| Technology   | Description                                           | Link                                                                                 |
+| :----------- | :---------------------------------------------------- | :----------------------------------------------------------------------------------- |
+| Node.js      | JavaScript runtime environment                        | [https://nodejs.org/](https://nodejs.org/)                                           |
+| TypeScript   | Typed superset of JavaScript                          | [https://www.typescriptlang.org/](https://www.typescriptlang.org/)                   |
+| Commander.js | Node.js command-line interfaces                       | [https://github.com/tj/commander.js](https://github.com/tj/commander.js)             |
+| Inquirer.js  | Interactive command line prompt toolkit               | [https://github.com/SBoudrias/Inquirer.js](https://github.com/SBoudrias/Inquirer.js) |
+| Axios        | Promise-based HTTP client for the browser and Node.js | [https://github.com/axios/axios](https://github.com/axios/axios)                     |
+| Chalk        | Terminal string styling done right                    | [https://github.com/chalk/chalk](https://github.com/chalk/chalk)                     |
+| Esbuild      | An extremely fast JavaScript bundler and minifier     | [https://github.com/evanw/esbuild](https://github.com/evanw/esbuild)                 |
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Contributing 
+## Contributing
 
-Contributions are welcome but first and mostly open an issue with your feature request! [Read the guide here.](https://github.com/samueltuoyo15/Dokugen/blob/main/CONTRIBUTION.md)
-## Author Info
+Contributions are welcome! Please first open an issue with your feature request before submitting a pull request. [Read the contribution guide here.](https://github.com/samueltuoyo15/Dokugen/blob/main/CONTRIBUTION.md)
 
--   **OritseWeyinmi Samuel Tuoyo** 
-  - [Twitter](https://x.com/TuoyoS26091)
-  - [LinkedIn](https://www.linkedin.com/in/samuel-tuoyo-8568b62b6)
+## Author
 
-##  Badges
+- **OritseWeyinmi Samuel Tuoyo**
+- [Twitter](https://x.com/TuoyoS26091)
+- [LinkedIn](https://www.linkedin.com/in/samuel-tuoyo-8568b62b6)
+- [GitHub](https://github.com/samueltuoyo15)
+
+## Badges
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://opensource.org/)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
-
 [![Readme was generated by Dokugen](https://img.shields.io/badge/Readme%20was%20generated%20by-Dokugen-brightgreen)](https://www.npmjs.com/package/dokugen)
 [![Made in Nigeria](https://img.shields.io/badge/made%20in-nigeria-008751.svg?style=flat-square)](https://github.com/acekyd/made-in-nigeria)
