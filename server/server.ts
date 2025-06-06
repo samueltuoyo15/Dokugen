@@ -9,6 +9,7 @@ import { fetchGitHubReadme } from "./lib/fetchGitHubReadme"
 import cors from "cors"
 import rateLimit from "express-rate-limit"
 import cron from "node-cron"
+import logger from "./utils/logger"
 import dotenv from "dotenv"
 dotenv.config()
 
@@ -41,12 +42,13 @@ const openai = new OpenAI({
   baseURL: process.env.OPENAI_ENDPOINT || "https://api.openai.com/v1/chat/completions"
 })
 
+/* TODO
 const generateCacheKey = (projectType: string, projectFiles: string[], fullCode: string) => {
   const hash = crypto.createHash('sha256')
   hash.update(projectType + projectFiles.join('') + fullCode)
   return `readme:${hash.digest('hex')}`
 }
-
+*/
 
 app.get("/api/keep-alive", (_req: Request, res: Response) => {
   res.status(200).json({status: "Ok", uptime: process.uptime(), memoryUsage: process.memoryUsage()})
@@ -55,7 +57,7 @@ app.get("/api/keep-alive", (_req: Request, res: Response) => {
 app.post("/api/generate-readme", async (req: Request, res: Response): Promise<any> => {
   try {
     const { projectType, projectFiles, fullCode, userInfo, options = {}, existingReadme, repoUrl, customReadmeFormat} = req.body
-    console.log(req.body)
+    logger.info(req.body)
 
     if (!projectType || !projectFiles || !fullCode || (!userInfo && os.platform() !== 'linux')) {
       return res.status(400).json({ error: "Missing required fields in request body" })
@@ -84,23 +86,76 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
         } else {
           await supabase.from('active_users').insert([{ username, email, id, osInfo, usage_count: 1 }])
         }
-        console.log(`Updated Active user ${username}, ${email} (${osInfo})`)
+        logger.info(`Updated Active user ${username}, ${email} (${osInfo})`)
       })(),
       
       
       openai.chat.completions.create({
         model: process.env.MODEL_NAME || "gpt-3.5-turbo",
         messages: [{
-          role: "system",
-          content:`
-          You are Dokugen, a professional next generation ultra idolo perfect super README generator powered by AI. Follow these rules strictly:
-          1. Always create high-quality, modern, and engaging READMEs.
-          2. Use Markdown for formatting.
-          3. Include the Dokugen badge at the bottom of the README.
-          4. Do not wrap the README in markdown code blocks (\`\`\`markdown or \`\`\`).
-          5. Ensure the README sounds like a human wrote it. Avoid AI-generated phrasing.
-          `
-        }, {
+        role: "system",
+        content: `
+        # Dokugen Backend Documentation Specialist
+        
+        ## Core Principle
+        When you detect a backend project (API servers, databases, authentication systems), 
+        use THIS EXACT TEMPLATE STRUCTURE with technical precision:
+      
+        """
+        # [ProjectName] API
+      
+        ## Overview
+        [1-2 sentence technical description mentioning key frameworks/languages]
+        
+        ## Features
+        - [Technology]: [Purpose]
+        - [Technology]: [Purpose]
+      
+        ## Getting Started
+        ### Installation
+        [Step-by-step commands]
+        
+        ### Environment Variables
+        [List ALL required variables with examples]
+      
+        ## API Documentation
+        ### Base URL
+        [API root path]
+      
+        ### Endpoints
+        #### [HTTP METHOD] [ENDPOINT PATH]
+        **Request**:
+        [Payload structure with required fields]
+        
+        **Response**:
+        [Success response example]
+        
+        **Errors**:
+        - [HTTP Status]: [Error scenario]
+        """
+      
+        ## Mandatory Rules
+        1. Detection:
+           - Analyze code for API patterns (routes, controllers, models)
+           - Identify database/auth systems
+      
+        2. Documentation:
+           ✓ All endpoints documented
+           ✓ Exact request/response schemas
+           ✓ Environment variables with examples
+           ✓ Error codes and meanings
+           ✓ Zero emojis or promotional language
+      
+        3. For non-backend projects:
+           - Use standard formatting (emojis, screenshots etc.)
+           - Include Dokugen badge
+      
+        4. Universal:
+           - Never wrap in code blocks (\`\`\`markdown)
+           - Sound human-written
+           - Use Markdown formatting
+        `
+      }, {
       role: "user",
       content: formatTemplate ? `
       STRICTLY USE THIS TEMPLATE STRUCTURE:
@@ -208,27 +263,27 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
     }
 
     res.end()
-    console.log("✅ README Generated Successfully")
+    logger.info("✅ README Generated Successfully")
   } catch (error: any) {
-    console.error("Error:", error)
+    logger.error("Error:", error)
     res.status(500).json({error: "error generating readme" })
   }
 })
 
 app.use((err: Error, req: Request, res: Response, next: Function) => {
-  console.error(err)
+  logger.error(err)
   res.status(500).json({error: "Internal Server Error"})
 })
 
 const PORT = process.env.PORT!
 app.listen(PORT, () => {
-  console.log(`Dokugen running on port ${PORT}`)
+  logger.info(`Dokugen running on port ${PORT}`)
   cron.schedule('*/14 * * * *', () => {
     const keepAliveUrl = `https://dokugen-readme.onrender.com/api/keep-alive`
-    console.log(`Performing self-ping to: ${keepAliveUrl}`)
+    logger.info(`Performing self-ping to: ${keepAliveUrl}`)
     
-    fetch(keepAliveUrl).then(res => console.log(`Keep-alive ping successful (Status: ${res.status})`)).catch(err => console.error('Keep-alive ping failed:', err))
+    fetch(keepAliveUrl).then(res => logger.info(`Keep-alive ping successful (Status: ${res.status})`)).catch(err => logger.error('Keep-alive ping failed:', err))
   })
   
-  console.log('Self-pinger initialized (runs every 14 minutes)')
+  logger.info('Self-pinger initialized (runs every 14 minutes)')
 })

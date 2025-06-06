@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
+    "test": "jest --runInBand --detectOpenHandles --forceExit",
     "postbuild": "node --no-warnings lib/rename.ts"
   },
   "bin": {
