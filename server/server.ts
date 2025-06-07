@@ -141,6 +141,7 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
       
         2. Documentation:
            ✓ All endpoints documented
+           ✓ Do not wrap the entire documented part of the readme in a detail and summary tag!!!!!!
            ✓ Exact request/response schemas
            ✓ Environment variables with examples
            ✓ Error codes and meanings
