@@ -296,7 +296,7 @@ program.command("generate").description("Scan project and generate a README.md")
       const username = await getUserInfo()?.username
       return console.log(chalk.red(`Opps... ${username} kindly check your device or pc internet connection and try again.`))
     }
-
+ 
    if (readmeExists) {
       await backupReadme(readmePath)
     }
@@ -353,6 +353,10 @@ program.command("generate").description("Scan project and generate a README.md")
       process.exit(1)
     }
 })
+
+program.command("compose-docker").description("Generate dockerfiles or docker compose for multiple services of your project").action(() => {
+    console.log("testing.....")
+  })
 
 program.parse(process.argv)
 
