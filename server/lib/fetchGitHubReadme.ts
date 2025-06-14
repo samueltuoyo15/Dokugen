@@ -7,7 +7,7 @@ export const fetchGitHubReadme = async (url: string): Promise<string> => {
     const response = await axios.get<string>(rawUrl, { responseType: "text" })
     return response.data
   } catch (error) {
-    console.error("❌ Failed to fetch GitHub README:", error)
+    console.error("Failed to fetch GitHub README:", error)
     throw new Error("Invalid GitHub URL or README not found")
   }
 }
