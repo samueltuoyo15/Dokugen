@@ -4,6 +4,10 @@ import chalk from "chalk"
 import fs from "fs-extra"
 import * as path from "path"
 import { select } from "@clack/prompts"
+import figlet from "figlet"
+import gradient from "gradient-string"
+import { createSpinner } from "nanospinner"
+import { setTimeout as sleep } from "timers/promises"
 import axios from "axios"
 import { Readable } from "stream"
 import { execSync } from "child_process"
@@ -11,7 +15,7 @@ import os from "os"
 //@ts-ignore
 import { detectProjectType } from "./projectDetect.mjs"
 
-const API_TIMEOUT = 180000
+const API_TIMEOUT = 300000
 let readmeBackup: string | null = null
 let currentReadmePath: string = ""
 
@@ -25,7 +29,7 @@ const getUserInfo = (): { username: string, email?: string, osInfo: {platform: s
      platform: os.platform() || "unknown",
      arch: os.arch() || "unknown",
      release: os.release() || "unknown"
-    }
+    } 
     if (gitName && gitEmail && osInfo) return { username: gitName, email: gitEmail, osInfo}
   } catch {
     console.log(chalk.yellow("⚠️ Git User Info not found. Using Defaults......"))
@@ -33,6 +37,7 @@ const getUserInfo = (): { username: string, email?: string, osInfo: {platform: s
 
   return { username: os.userInfo().username || "", email: process.env.USER || "", osInfo: {platform: "Unknown", arch: "Unknown", release: "Unknown"}}
 }
+
 
 const backupReadme = async (readmePath: string): Promise<void> => {
   try {
@@ -202,13 +207,12 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
       if (contributionAnswer === "cancel") return null
       includeContributionGuideLine = contributionAnswer
     }
-
+   
     const fullCode = await extractFullCode(projectFiles, projectDir)
     const userInfo = getUserInfo()
     const repoUrl = getGitRepoUrl()
-    
-    console.log(chalk.blue("🔥 Generating README..."))
-    
+  
+    const spinner = createSpinner(chalk.blue("🔥 Generating README...")).start()
     const fileStream = fs.createWriteStream(readmePath)
     const response = await axios.post("https://dokugen-readme.onrender.com/api/generate-readme", {
       projectType,
@@ -248,8 +252,8 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
       })
      
       responseStream.on("end", () => {
-        fileStream.end(() => {
-          console.log(chalk.green("\n✅ README.md created successfully"))
+        fileStream.end(async () => {
+          spinner.success({ text: chalk.green("\n✅ README.md created successfully")})
           readmeBackup = null
           resolve(readmePath)
         })
@@ -257,6 +261,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
       
       fileStream.on("error", async (err) => {
         console.log(chalk.red("\n❌ Failed to write README"))
+        spinner.error({ text: chalk.red("Failed to generate README") })
         const restoredContent = await restoreReadme()
         fileStream.end()
         reject(restoredContent || err)
@@ -264,6 +269,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
 
       responseStream.on("error", async (err: Error) => {
         console.log(chalk.red("\n❌ Error receiving stream data"))
+         spinner.error({ text: chalk.red("Failed to generate README") })
         const restoredContent = await restoreReadme()
         reject(restoredContent || err)
       })
@@ -277,15 +283,18 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
 
 program.name("dokugen").version("3.7.0").description("Automatically generate high-quality README for your application")
 program.command("generate").description("Scan project and generate a README.md").option("--no-overwrite", "Do not overwrite existing README.md, append new features instead").option("--template <url>", "use a custom GitHub repo readme file as a template to generate a concise and strict readme for your project").action(async (options) => {
+     await sleep(50)
+    console.log('\n\n' + chalk.hex('#000080')(figlet.textSync('DOKUGEN', { font: 'Small Slant', horizontalLayout: 'fitted' })) + '\n\n')
     const projectDir = process.cwd()
     const readmePath = path.join(projectDir, "README.md")
     const readmeExists = await fs.pathExists(readmePath)
+    const connectionSpinner = createSpinner("🌐 Checking internet...").start()
     const hasGoodInternetConnection = await checkInternetConnection()
-  
+    connectionSpinner.stop()
+
     if(!hasGoodInternetConnection){
       const username = await getUserInfo()?.username
-      console.log(chalk.red(`Opps... ${username} Check your device or pc internet connection and try again.`))
-      process.exit(1)
+      return console.log(chalk.red(`Opps... ${username} kindly check your device or pc internet connection and try again.`))
     }
 
    if (readmeExists) {
@@ -299,9 +308,11 @@ program.command("generate").description("Scan project and generate a README.md")
       }
       
       const projectType = await detectProjectType(projectDir)
+      const scanSpinner = createSpinner("🔍 Scanning project files...").start()
       const projectFiles = await scanFiles(projectDir)
+      scanSpinner.success({ text: chalk.yellow(`📂 Found: ${projectFiles.length} files in the project`) })
+
       console.log(chalk.blue(`📂 Detected project type: ${projectType}`))
-      console.log(chalk.yellow(`📂 Found: ${projectFiles.length} files in the project`))
    
       if (options.template) {
         if (readmeExists && !options.overwrite) {
@@ -335,8 +346,6 @@ program.command("generate").description("Scan project and generate a README.md")
       } else {
         await generateReadme(projectType, projectFiles, projectDir)
       }
-
-      console.log(chalk.green("✅ README.md created!"))
  
     } catch(error) {
       console.error(error)

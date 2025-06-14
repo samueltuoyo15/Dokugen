@@ -585,8 +585,7 @@ const detectionPatterns: Record<string, DetectionPattern> = {
 
 export const detectProjectType = async (projectDir: string): Promise<string> => {
   const detectedTypes: ProjectType[] = []
-  
-  // First check for Go projects specifically since they can be minimal
+ 
   const goModPath = path.join(projectDir, "go.mod")
   const goFiles = await fs.readdir(projectDir).catch(() => [])
   const hasGoFiles = goFiles.some(file => file.endsWith(".go"))
@@ -599,17 +598,16 @@ export const detectProjectType = async (projectDir: string): Promise<string> => 
     })
   }
   
-  // Check all other detection patterns
+ 
   for (const [type, pattern] of Object.entries(detectionPatterns)) {
-    // Skip Go if we already detected it
     if (type === "Go" && detectedTypes.some(t => t.type === "Go")) continue
     
     let confidence = 0
     
-    // Check for files
+    // To check  for files first
     if (pattern.files) {
       for (const file of pattern.files) {
-        // Handle wildcard patterns
+        // To Handle wildcard patterns
         if (file.includes("*")) {
           const files = await fs.readdir(projectDir).catch(() => [])
           if (files.some(f => new RegExp(file.replace("*", ".*")).test(f))) {
@@ -623,7 +621,7 @@ export const detectProjectType = async (projectDir: string): Promise<string> => 
       }
     }
     
-    // Check for folders
+    // To check for  folders too
     if (pattern.folders) {
       for (const folder of pattern.folders) {
         if (await fs.pathExists(path.join(projectDir, folder))) {
@@ -633,7 +631,7 @@ export const detectProjectType = async (projectDir: string): Promise<string> => 
       }
     }
     
-    // Check file contents
+    // To Check file contents 
     if (pattern.contents) {
       for (const contentCheck of pattern.contents) {
         const filePath = path.join(projectDir, contentCheck.file)
@@ -646,13 +644,13 @@ export const detectProjectType = async (projectDir: string): Promise<string> => 
       }
     }
     
-    // Check package.json
+    // To Check package.json dependencies and scripts
     if (pattern.packageJson) {
       const packageJsonPath = path.join(projectDir, "package.json")
       if (await fs.pathExists(packageJsonPath)) {
         const packageJson = await fs.readJson(packageJsonPath)
         
-        // Check dependencies
+      
         if (pattern.packageJson.dependencies) {
           const deps = packageJson.dependencies || {}
           if (pattern.packageJson.dependencies.some(dep => deps[dep])) {
@@ -660,7 +658,7 @@ export const detectProjectType = async (projectDir: string): Promise<string> => 
           }
         }
         
-        // Check devDependencies
+
         if (pattern.packageJson.devDependencies) {
           const devDeps = packageJson.devDependencies || {}
           if (pattern.packageJson.devDependencies.some(dep => devDeps[dep])) {
@@ -668,7 +666,7 @@ export const detectProjectType = async (projectDir: string): Promise<string> => 
           }
         }
         
-        // Check scripts
+    
         if (pattern.packageJson.scripts) {
           const scripts = packageJson.scripts || {}
           if (pattern.packageJson.scripts.some(script => scripts[script])) {
@@ -687,7 +685,7 @@ export const detectProjectType = async (projectDir: string): Promise<string> => 
     }
   }
   
-  // Sort by confidence and return the most likely type
+  // To Sort by confidence and return the most likely type
   if (detectedTypes.length > 0) {
     detectedTypes.sort((a, b) => b.confidence - a.confidence)
     return detectedTypes[0].type

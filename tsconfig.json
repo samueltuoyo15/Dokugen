@@ -1,17 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es2016",
+    "target": "es2022",
     "module": "NodeNext",
     "rootDir": ".",
     "allowJs": true,
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
+    "outDir": "dist",
     "downlevelIteration": true,
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "outDir": "dist",
     "skipLibCheck": true
   },
   "include": ["bin/**/*", "scripts/**/*"],
-  "exclude": ["dashboard", "dist", "node_modules"]
+  "exclude": ["dashboard", "lib", "dist", "node_modules"]
 }

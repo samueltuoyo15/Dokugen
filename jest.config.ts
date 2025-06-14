@@ -1,4 +1,4 @@
-import { createDefaultPreset } from "ts-jest/presets"
+import  createDefaultPreset from "ts-jest/presets"
 import type { Config } from "@jest/types"
 
 const tsJestTransformCfg = createDefaultPreset().transform
