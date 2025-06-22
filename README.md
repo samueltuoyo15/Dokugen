@@ -44,7 +44,7 @@ dokugen generate --template https://raw.githubusercontent.com/username/repo-name
 dokugen --version
 ```
 
-> Displays Current Version (3.7.0)
+> Displays Current Version (3.8.0)
 
 ## Features
 
@@ -56,7 +56,7 @@ dokugen --version
 
 ### Programming Language & Framework Compatibility
 
-Dokugen works with almost all programming languages and frameworks. Here are some examples:
+Dokugen works with almost all programming languages and frameworks. Here are some highlights:
 
 ### Golang
 
@@ -111,7 +111,6 @@ Contributions are welcome! Please first open an issue with your feature request 
 - **OritseWeyinmi Samuel Tuoyo**
 - [Twitter](https://x.com/TuoyoS26091)
 - [LinkedIn](https://www.linkedin.com/in/samuel-tuoyo-8568b62b6)
-- [GitHub](https://github.com/samueltuoyo15)
 
 ## Badges
 

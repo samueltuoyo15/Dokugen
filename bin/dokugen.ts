@@ -214,7 +214,10 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
   
     const spinner = createSpinner(chalk.blue("🔥 Generating README...")).start()
     const fileStream = fs.createWriteStream(readmePath)
-    const response = await axios.post("https://dokugen-readme.onrender.com/api/generate-readme", {
+
+     const getBackendDomain = await axios.get<{ domain: string }>("https://dokugen-readme-backend.vercel.app/api/newDomain")
+     const backendDomain = getBackendDomain.data.domain
+    const response = await axios.post(`${backendDomain}/api/generate-readme`, {
       projectType,
       projectFiles,
       fullCode,
@@ -281,7 +284,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
   }
 }
 
-program.name("dokugen").version("3.7.0").description("Automatically generate high-quality README for your application")
+program.name("dokugen").version("3.8.0").description("Automatically generate high-quality README for your application")
 program.command("generate").description("Scan project and generate a README.md").option("--no-overwrite", "Do not overwrite existing README.md, append new features instead").option("--template <url>", "use a custom GitHub repo readme file as a template to generate a concise and strict readme for your project").action(async (options) => {
      await sleep(50)
     console.log('\n\n' + chalk.hex('#000080')(figlet.textSync('DOKUGEN', { font: 'Small Slant', horizontalLayout: 'fitted' })) + '\n\n')
@@ -355,7 +358,7 @@ program.command("generate").description("Scan project and generate a README.md")
 })
 
 program.command("compose-docker").description("Generate dockerfiles or docker compose for multiple services of your project").action(() => {
-    console.log("testing.....")
+    console.log("testing coming soon.....")
   })
 
 program.parse(process.argv)

@@ -2,15 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
-## [3.7.0] - 2025-13-05
+## [3.8.0] - 2025-06-22
+### Fixed
+- Feature to generate docker compose coming soon!!!
+- migrated from full server to serverless platform
+- ui updates and more
+
+## [3.7.0] - 2025-05-13
 ### Fixed
 - Forgot to run build
 - 
-## [3.6.0] - 2025-13-05
+## [3.6.0] - 2025-05-13
 ### Fixed
 - Readme Docs
 
-## [3.5.0] - 2025-13-05
+## [3.5.0] - 2025-05-13
 ### Fixed
 - Unnecessary Process Cancellation which prevents generating the readme or even viewing the interactive question section
 - added more irrelevant files extension to exclude 
