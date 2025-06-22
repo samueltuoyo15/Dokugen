@@ -54,8 +54,8 @@ app.get("/api/keep-alive", (_req: Request, res: Response) => {
   res.status(200).json({status: "Ok", uptime: process.uptime(), memoryUsage: process.memoryUsage()})
 })
 
-app.get("/api/newDomain", (req: Request, res: Response) => {
-  res.status(200).json({ domain: "https://dokugen-readme.vercel.app"})
+app.get("/api/newDomain", (_req: Request, res: Response) => {
+  res.status(200).json({ domain: "https://dokugen-readme-backend.vercel.app"})
 })
 app.post("/api/generate-readme", async (req: Request, res: Response): Promise<any> => {
   try {
