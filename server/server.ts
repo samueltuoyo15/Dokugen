@@ -54,6 +54,9 @@ app.get("/api/keep-alive", (_req: Request, res: Response) => {
   res.status(200).json({status: "Ok", uptime: process.uptime(), memoryUsage: process.memoryUsage()})
 })
 
+app.get("/api/newDomain", (req: Request, res: Response) => {
+  res.status(200).json({ domain: "https://dokugen-readme.vercel.app"})
+})
 app.post("/api/generate-readme", async (req: Request, res: Response): Promise<any> => {
   try {
     const { projectType, projectFiles, fullCode, userInfo, options = {}, existingReadme, repoUrl, customReadmeFormat} = req.body
@@ -254,7 +257,7 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
       ## Final Output:
       Generate the README.md content directly, without any additional explanations or wrapping.
       `
-
+    //TODO:
     /*
     if (existingReadme) {
       prompt += `\n## Existing README Content:\n${existingReadme}\n`
@@ -289,12 +292,16 @@ app.use((err: Error, req: Request, res: Response, next: Function) => {
 const PORT = process.env.PORT!
 app.listen(PORT, () => {
   logger.info(`Dokugen running on port ${PORT}`)
-  cron.schedule('*/14 * * * *', () => {
-    const keepAliveUrl = `https://dokugen-readme.onrender.com/api/keep-alive`
-    logger.info(`Performing self-ping to: ${keepAliveUrl}`)
-    
-    fetch(keepAliveUrl).then(res => logger.info(`Keep-alive ping successful (Status: ${res.status})`)).catch(err => logger.error('Keep-alive ping failed:', err))
-  })
   
-  logger.info('Self-pinger initialized (runs every 14 minutes)')
+  // Render Whala just incase so i can switch easily
+//  cron.schedule('0 0,6,12,18 * * *', () => {
+//   const keepAliveUrl = `https://dokugen-readme.onrender.com/api/keep-alive`
+//   logger.info(`Performing self-ping to: ${keepAliveUrl}`)
+  
+//   fetch(keepAliveUrl)
+//     .then(res => logger.info(`Keep-alive ping successful (Status: ${res.status})`))
+//     .catch(err => logger.error('Keep-alive ping failed:', err))
+// })
+
+ // logger.info('Self-pinger initialized (runs every 14 minutes)')
 })
