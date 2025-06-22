@@ -2,5 +2,4 @@
 dashboard/
 lib/
 node_modules/
-tests
-server/
+_tests_
