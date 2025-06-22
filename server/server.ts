@@ -1,4 +1,4 @@
-import express, { Application, Request, Response} from "express"
+import express, { Application, Request, Response } from "express"
 import { supabase } from "./supabase"
 import crypto from "crypto"
 import os from "os"
@@ -28,21 +28,21 @@ const app: Application = express()
 
 app.set("trust proxy", 1)
 app.use(cors({
-  origin: "*", 
-  methods: ["GET", "POST", "OPTIONS"], 
-  allowedHeaders: ["*"], 
+  origin: "*",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["*"],
   credentials: true
 }))
 app.use(helmet())
 app.use(limiter)
-app.use(express.json({limit: "600mb"}))
-app.use(express.urlencoded({ limit: '600mb', extended: true }))
+app.use(express.json({ limit: "600mb" }))
+app.use(express.urlencoded({ limit: "600mb", extended: true }))
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "",
   baseURL: process.env.OPENAI_ENDPOINT || "https://api.openai.com/v1/chat/completions"
 })
 
-/* TODO
+/*
 const generateCacheKey = (projectType: string, projectFiles: string[], fullCode: string) => {
   const hash = crypto.createHash('sha256')
   hash.update(projectType + projectFiles.join('') + fullCode)
@@ -51,53 +51,50 @@ const generateCacheKey = (projectType: string, projectFiles: string[], fullCode:
 */
 
 app.get("/api/keep-alive", (_req: Request, res: Response) => {
-  res.status(200).json({status: "Ok", uptime: process.uptime(), memoryUsage: process.memoryUsage()})
+  res.status(200).json({ status: "Ok", uptime: process.uptime(), memoryUsage: process.memoryUsage() })
 })
 
 app.get("/api/newDomain", (_req: Request, res: Response) => {
   res.status(200).json({ domain: "https://dokugen-readme-7zzj.onrender.com" })
 })
+
 app.post("/api/generate-readme", async (req: Request, res: Response): Promise<any> => {
   try {
-    const { projectType, projectFiles, fullCode, userInfo, options = {}, existingReadme, repoUrl, customReadmeFormat} = req.body
+    const { projectType, projectFiles, fullCode, userInfo, options = {}, existingReadme, repoUrl, customReadmeFormat } = req.body
     logger.info(req.body)
 
-    if (!projectType || !projectFiles || !fullCode || (!userInfo && os.platform() !== 'linux')) {
+    if (!projectType || !projectFiles || !fullCode || (!userInfo && os.platform() !== "linux")) {
       return res.status(400).json({ error: "Missing required fields in request body" })
     }
-    
+
     let formatTemplate = ""
-    if(customReadmeFormat){
+    if (customReadmeFormat) {
       formatTemplate = await fetchGitHubReadme(customReadmeFormat)
     }
-      
+
     const { username, email, osInfo } = userInfo || {}
     if (!username) return res.status(400).json({ message: "Missing OS username and ID" })
-    
+
     const id = userInfo?.id || uuidv4()
 
-
     const [_, stream] = await Promise.all([(async () => {
-        const { data: existingUser, error: userError } = await supabase.from('active_users').select('id, usage_count').eq('email', email).single()
+      const { data: existingUser, error: userError } = await supabase.from("active_users").select("id, usage_count").eq("email", email).single()
+      if (userError && userError.code !== "PGRST116") throw userError
+      if (existingUser) {
+        const updateData: { usage_count: number; osInfo?: string } = { usage_count: existingUser.usage_count + 1 }
+        if (osInfo) updateData.osInfo = osInfo
+        await supabase.from("active_users").update(updateData).eq("id", existingUser.id)
+      } else {
+        await supabase.from("active_users").insert([{ username, email, id, osInfo, usage_count: 1 }])
+      }
+      logger.info(`Updated Active user ${username}, ${email} (${osInfo})`)
+    })(),
 
-        if (userError && userError.code !== 'PGRST116') throw userError
-
-        if (existingUser) {
-          const updateData: { usage_count: number; osInfo?: string } = { usage_count: existingUser.usage_count + 1 }
-          if (osInfo) updateData.osInfo = osInfo
-          await supabase.from('active_users').update(updateData).eq('id', existingUser.id)
-        } else {
-          await supabase.from('active_users').insert([{ username, email, id, osInfo, usage_count: 1 }])
-        }
-        logger.info(`Updated Active user ${username}, ${email} (${osInfo})`)
-      })(),
-      
-      
       openai.chat.completions.create({
         model: process.env.MODEL_NAME || "gpt-3.5-turbo",
         messages: [{
-        role: "system",
-        content: `
+          role: "system",
+          content: `
         # Dokugen Backend Documentation Specialist
         
         ## Core Principle
@@ -159,9 +156,9 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
            - Sound human-written
            - Use Markdown formatting
         `
-      }, {
+        }, {
           role: "system",
-          content:`
+          content: `
           You are Dokugen, a professional next generation ultra idolo perfect super README generator powered by AI. Follow these rules strictly:
           1. Always create high-quality, modern, and engaging READMEs.
           2. Use Markdown for formatting.
@@ -170,25 +167,25 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
           5. Ensure the README sounds like a human/graduate wrote it 100%. Avoid AI-generated phrasing please!.
           `
         }, {
-      role: "user",
-      content: formatTemplate ? `
+          role: "user",
+          content: formatTemplate ? `
       STRICTLY USE THIS TEMPLATE STRUCTURE:
     """
     ${formatTemplate}
     """
     
     INJECT THESE PROJECT DETAILS:
-    - Repo URL: ${repoUrl || "Not specified"}  <!-- Added here! -->
+    - Repo URL: ${repoUrl || "Not specified"}
     - Project Type: ${projectType}
-    - Main Files: ${projectFiles}...
-    - Code Sample: ${fullCode}...
+    - Main Files: ${projectFiles.slice(0, 10).join(", ")}...
+    - Code Sample: ${fullCode.substring(0, 1000)}...
     
     RULES:
     1. PRESERVE ALL TEMPLATE SECTIONS IN ORDER
     2. REPLACE CONTENT BUT KEEP STYLING
     3. ADD THIS BADGE AT BOTTOM:
        [![Readme was generated by Dokugen](https://img.shields.io/badge/Readme%20was%20generated%20by-Dokugen-brightgreen)](https://www.npmjs.com/package/dokugen)`
-      : `Generate a **high-quality, professional, and modern README.md that must impress recruiters and make them hire me** for a **${projectType}** project.
+            : `Generate a **high-quality, professional, and modern README.md that must impress recruiters and make them hire me** for a **${projectType}** project.
       ## Project Overview:
       The project includes the following files:
       ${projectFiles.join("\n")}
@@ -257,50 +254,50 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
       ## Final Output:
       Generate the README.md content directly, without any additional explanations or wrapping.
       `
-    //TODO:
-    /*
-    if (existingReadme) {
-      prompt += `\n## Existing README Content:\n${existingReadme}\n`
-    }*/
         }],
         stream: true
       })
     ])
 
-    res.setHeader('Content-Type', 'text/event-stream')
-    res.setHeader('Cache-Control', 'no-cache')
-    res.setHeader('Connection', 'keep-alive')
+    res.setHeader("Content-Type", "text/event-stream")
+    res.setHeader("Cache-Control", "no-cache")
+    res.setHeader("Connection", "keep-alive")
 
     for await (const chunk of stream) {
       const text = chunk.choices[0]?.delta?.content || ""
       if (text) res.write(`data: ${JSON.stringify({ response: text })}\n\n`)
     }
 
+    req.on("close", () => {
+      logger.warn("Client disconnected during generation.")
+      stream.controller?.abort()
+    })
+
     res.end()
     logger.info("✅ README Generated Successfully")
   } catch (error: any) {
     logger.error("Error:", error)
-    res.status(500).json({error: "error generating readme" })
+    res.status(500).json({ error: "error generating readme" })
   }
 })
 
 app.use((err: Error, req: Request, res: Response, next: Function) => {
   logger.error(err)
-  res.status(500).json({error: "Internal Server Error"})
+  res.status(500).json({ error: "Internal Server Error" })
 })
 
 const PORT = process.env.PORT!
 app.listen(PORT, () => {
   logger.info(`Dokugen running on port ${PORT}`)
-  
- cron.schedule('0 0,6,12,18 * * *', () => {
-  const keepAliveUrl = `https://dokugen-readme-7zzj.onrender.com/api/keep-alive`
-  logger.info(`Performing self-ping to: ${keepAliveUrl}`)
-  
-  fetch(keepAliveUrl)
-    .then(res => logger.info(`Keep-alive ping successful (Status: ${res.status})`))
-    .catch(err => logger.error('Keep-alive ping failed:', err))
-})
 
- logger.info('Self-pinger initialized)')
+  cron.schedule("0 0,6,12,18 * * *", () => {
+    const keepAliveUrl = `https://dokugen-readme-7zzj.onrender.com/api/keep-alive`
+    logger.info(`Performing self-ping to: ${keepAliveUrl}`)
+
+    fetch(keepAliveUrl)
+      .then(res => logger.info(`Keep-alive ping successful (Status: ${res.status})`))
+      .catch(err => logger.error("Keep-alive ping failed:", err))
+  })
+
+  logger.info("Self-pinger initialized)")
 })

@@ -215,7 +215,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
     const spinner = createSpinner(chalk.blue("🔥 Generating README...")).start()
     const fileStream = fs.createWriteStream(readmePath)
 
-     const getBackendDomain = await axios.get<{ domain: string }>("https://dokugen-readme-backend.vercel.app/api/newDomain")
+     const getBackendDomain = await axios.get<{ domain: string }>("https://dokugen-readme-7zzj.onrender.com/api/newDomain")
      const backendDomain = getBackendDomain.data.domain
     const response = await axios.post(`${backendDomain}/api/generate-readme`, {
       projectType,
