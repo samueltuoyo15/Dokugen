@@ -55,7 +55,7 @@ app.get("/api/keep-alive", (_req: Request, res: Response) => {
 })
 
 app.get("/api/newDomain", (_req: Request, res: Response) => {
-  res.status(200).json({ domain: "https://dokugen-readme-backend.vercel.app"})
+  res.status(200).json({ domain: "https://dokugen-readme-7zzj.onrender.com" })
 })
 app.post("/api/generate-readme", async (req: Request, res: Response): Promise<any> => {
   try {
@@ -293,15 +293,14 @@ const PORT = process.env.PORT!
 app.listen(PORT, () => {
   logger.info(`Dokugen running on port ${PORT}`)
   
-  // Render Whala just incase so i can switch easily
-//  cron.schedule('0 0,6,12,18 * * *', () => {
-//   const keepAliveUrl = `https://dokugen-readme.onrender.com/api/keep-alive`
-//   logger.info(`Performing self-ping to: ${keepAliveUrl}`)
+ cron.schedule('0 0,6,12,18 * * *', () => {
+  const keepAliveUrl = `https://dokugen-readme-7zzj.onrender.com/api/keep-alive`
+  logger.info(`Performing self-ping to: ${keepAliveUrl}`)
   
-//   fetch(keepAliveUrl)
-//     .then(res => logger.info(`Keep-alive ping successful (Status: ${res.status})`))
-//     .catch(err => logger.error('Keep-alive ping failed:', err))
-// })
+  fetch(keepAliveUrl)
+    .then(res => logger.info(`Keep-alive ping successful (Status: ${res.status})`))
+    .catch(err => logger.error('Keep-alive ping failed:', err))
+})
 
- // logger.info('Self-pinger initialized (runs every 14 minutes)')
+ logger.info('Self-pinger initialized)')
 })
