@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "postinstall": "node dist/scripts/postinstall.mjs",
-    "test": "jest --runInBand --detectOpenHandles --forceExit",
+    "test": "vitest",
     "postbuild": "node --no-warnings --loader ts-node/esm lib/rename.ts"
   },
   "bin": {
@@ -17,6 +17,7 @@
     "open source",
     "readme generator",
     "readme.md generator",
+    "readme generation",
     "dokugen",
     "cli tool"
   ],
@@ -49,13 +50,10 @@
     "@types/axios": "^0.9.36",
     "@types/figlet": "^1.7.0",
     "@types/fs-extra": "^11.0.4",
-    "@types/jest": "^29.5.14",
     "@types/marked": "^5.0.2",
     "@types/node": "^22.13.4",
-    "jest": "^29.7.0",
     "supertest": "^7.1.0",
-    "ts-jest": "^29.3.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.3"
+    "typescript": "^5.8.3"
   }
 }

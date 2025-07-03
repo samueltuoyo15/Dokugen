@@ -8,7 +8,6 @@ import helmet from "helmet"
 import { fetchGitHubReadme } from "./lib/fetchGitHubReadme"
 import cors from "cors"
 import rateLimit from "express-rate-limit"
-import cron from "node-cron"
 import logger from "./utils/logger"
 import dotenv from "dotenv"
 dotenv.config()
@@ -20,7 +19,7 @@ const limiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req: Request) => {
-    return req.path === "/keep-alive"
+    return req.path === "/health" || req.path === "/api/health"
   }
 })
 
@@ -50,12 +49,8 @@ const generateCacheKey = (projectType: string, projectFiles: string[], fullCode:
 }
 */
 
-app.get("/api/keep-alive", (_req: Request, res: Response) => {
+app.get("/api/health", (_req: Request, res: Response) => {
   res.status(200).json({ status: "Ok", uptime: process.uptime(), memoryUsage: process.memoryUsage() })
-})
-
-app.get("/api/newDomain", (_req: Request, res: Response) => {
-  res.status(200).json({ domain: "https://dokugen-readme-7zzj.onrender.com" })
 })
 
 app.post("/api/generate-readme", async (req: Request, res: Response): Promise<any> => {
@@ -289,15 +284,4 @@ app.use((err: Error, req: Request, res: Response, next: Function) => {
 const PORT = process.env.PORT!
 app.listen(PORT, () => {
   logger.info(`Dokugen running on port ${PORT}`)
-
-  cron.schedule("0 0,6,12,18 * * *", () => {
-    const keepAliveUrl = `https://dokugen-readme-7zzj.onrender.com/api/keep-alive`
-    logger.info(`Performing self-ping to: ${keepAliveUrl}`)
-
-    fetch(keepAliveUrl)
-      .then(res => logger.info(`Keep-alive ping successful (Status: ${res.status})`))
-      .catch(err => logger.error("Keep-alive ping failed:", err))
-  })
-
-  logger.info("Self-pinger initialized)")
 })
