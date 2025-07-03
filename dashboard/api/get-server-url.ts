@@ -13,7 +13,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
 
   try {
     const serverUrl = process.env.SERVER_URL 
-    return res.status(200).json({ serverUrl })
+    return res.status(200).json({ domain: serverUrl })
   } catch (error) {
     console.error("Error Fetching Server URL", error)
     return res.status(500).json({ message: "Failed to fetch server URL" })
