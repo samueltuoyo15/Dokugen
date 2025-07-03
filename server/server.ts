@@ -34,8 +34,8 @@ app.use(cors({
 }))
 app.use(helmet())
 app.use(limiter)
-app.use(express.json({ limit: "600mb" }))
-app.use(express.urlencoded({ limit: "600mb", extended: true }))
+app.use(express.json({ limit: "500mb" }))
+app.use(express.urlencoded({ limit: "500mb", extended: true }))
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "",
   baseURL: process.env.OPENAI_ENDPOINT || "https://api.openai.com/v1/chat/completions"
@@ -271,13 +271,13 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
     res.end()
     logger.info("✅ README Generated Successfully")
   } catch (error: any) {
-    logger.error("Error:", error)
+    console.error("Error:", error)
     res.status(500).json({ error: "error generating readme" })
   }
 })
 
 app.use((err: Error, req: Request, res: Response, next: Function) => {
-  logger.error(err)
+  console.error(err)
   res.status(500).json({ error: "Internal Server Error" })
 })
 

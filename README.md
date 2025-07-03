@@ -56,35 +56,7 @@ dokugen --version
 
 ### Programming Language & Framework Compatibility
 
-Dokugen works with almost all programming languages and frameworks. Here are some highlights:
-
-### Golang
-
-![Golang](./public/go.jpg)
-
-### PHP
-
-![PHP](./public/php.jpg)
-
-### Java
-
-![Java](./public/java.jpg)
-
-### React
-
-![React](./public/react.jpg)
-
-### TypeScript
-
-![TypeScript](./public/typescript.jpg)
-
-### Express.js
-
-![Express](./public/express.jpg)
-
-### Python Django
-
-![Django](./public/django.jpg)
+![Generate Readme - Language & Framework agnostic](./public/Generate%20Readme%20-%20Language%20&%20Framework%20agnostic.png)
 
 ## Technologies Used
 

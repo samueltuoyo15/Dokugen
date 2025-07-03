@@ -6,8 +6,6 @@
     "allowJs": true,
     "moduleResolution": "NodeNext",
     "outDir": "dist",
-    "noEmit": true,
-    "allowImportingTsExtensions": true,
     "downlevelIteration": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
