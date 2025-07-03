@@ -44,8 +44,7 @@
     "fs": "^0.0.1-security",
     "fs-extra": "^11.3.0",
     "gradient-string": "^3.0.0",
-    "nanospinner": "^1.2.2",
-    "node-cron": "^4.2.0"
+    "nanospinner": "^1.2.2"
   },
   "devDependencies": {
     "@types/axios": "^0.9.36",
