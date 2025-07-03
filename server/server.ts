@@ -9,6 +9,7 @@ import { fetchGitHubReadme } from "./lib/fetchGitHubReadme"
 import cors from "cors"
 import rateLimit from "express-rate-limit"
 import logger from "./utils/logger"
+import cron from "node-cron"
 import dotenv from "dotenv"
 dotenv.config()
 
@@ -191,7 +192,7 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
           
       ## README Requirements:
       1. **Title**:
-         - Create a **bold and catchy title** for the project. Please avoid emojis please. If you want to add emojis to the title then add just one, and that one emoji should match what the title is all about. Dont just use stupid emoji if you dont have any emoji that matches the title then dont add.
+         - Create a **bold and catchy title** for the project. You can find the project title from maybe the meta data file of the project files (e.g package.json go.mod e.t.c) if you dont find it, then come up with a human reasonable name Please avoid emojis please. If you want to add emojis to the title then add just one, and that one emoji should match what the title is all about. Dont just use stupid emoji if you dont have any emoji that matches the title then dont add.
       
       2. **Description**:
          - Write a **short and engaging description** of the project.
@@ -284,4 +285,14 @@ app.use((err: Error, req: Request, res: Response, next: Function) => {
 const PORT = process.env.PORT!
 app.listen(PORT, () => {
   logger.info(`Dokugen running on port ${PORT}`)
+    cron.schedule("*/14 * * * *", () => {
+    const keepAliveUrl = `${process.env.BACKEND_DOMAIN}/api/health`
+    logger.info(`Performing self-ping to: ${keepAliveUrl}`)
+
+    fetch(keepAliveUrl)
+      .then(res => logger.info(`Keep-alive ping successful (Status: ${res.status})`))
+      .catch(err => logger.error("Keep-alive ping failed:", err))
+  })
+
+  logger.info("Self-pinger initialized)")
 })
