@@ -289,9 +289,7 @@ app.listen(PORT, () => {
     const keepAliveUrl = `${process.env.BACKEND_DOMAIN}/api/health`
     logger.info(`Performing self-ping to: ${keepAliveUrl}`)
 
-    fetch(keepAliveUrl)
-      .then(res => logger.info(`Keep-alive ping successful (Status: ${res.status})`))
-      .catch(err => logger.error("Keep-alive ping failed:", err))
+    fetch(keepAliveUrl).then(res => logger.info(`Keep-alive ping successful (Status: ${res.status})`)).catch(err => logger.error("Keep-alive ping failed:", err))
   })
 
   logger.info("Self-pinger initialized)")
