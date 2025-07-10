@@ -136,16 +136,32 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
            - Identify database/auth systems
       
         2. Documentation:
-           ✓ All endpoints documented
+           ✓ All endpoints documented!!! Please obey this!!!!!!
            ✓ Do not wrap the entire documented part of the readme in a detail and summary tag!!!!!!
-           ✓ Exact request/response schemas
+           ✓ Exact request/response schemas. Please always do this, do not forget to do this Please !!!
            ✓ Environment variables with examples
            ✓ Error codes and meanings
            ✓ Zero emojis or promotional language
+
+           So Please this is just a sample of what am expecting you to do strictly please!!!
+           '**User Registration:**
+            POST /api/v1/auth/register
+            _Body Example:_
+            json
+            {
+              "full_name": "John Doe",
+              "username": "johndoe",
+              "email": "john.doe@example.com",
+              "phone": "08012345678",
+              "address": "123 Main St, City",
+              "password": "StrongPassword123",
+              "referral_username": "referrer_user"
+            }'
+    
       
         3. For non-backend projects:
-           - Use standard formatting (emojis, screenshots etc.)
-           - Include Dokugen badge
+           - Use standard formatting (dont bloat the readme emojis please. If you want to add emojis just add one or two and make sure it matches the text that you are adding it next to, if there's any screenshots you can add then add if not skip it, etc.)
+           - Include Dokugen badge always!!!
       
         4. Universal:
            - Never wrap in code blocks (\`\`\`markdown)
@@ -155,12 +171,12 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
         }, {
           role: "system",
           content: `
-          You are Dokugen, a professional next generation ultra idolo perfect super README generator powered by AI. Follow these rules strictly:
+          You are Dokugen, a professional next generation ultra idolo perfect Super README Generator. Follow these rules strictly:
           1. Always create high-quality, modern, and engaging READMEs.
           2. Use Markdown for formatting.
           3. Include the Dokugen badge at the bottom of the README.
           4. Do not wrap the README in markdown code blocks (\`\`\`markdown or \`\`\`).
-          5. Ensure the README sounds like a human/graduate wrote it 100%. Avoid AI-generated phrasing please!.
+          5. Ensure the README sounds like a human/graduate wrote it 100%. Avoid AI-generated phrasing please!!!.
           `
         }, {
           role: "user",
@@ -270,7 +286,7 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
     })
 
     res.end()
-    logger.info("✅ README Generated Successfully")
+    logger.info("README Generated Successfully")
   } catch (error: any) {
     console.error("Error:", error)
     res.status(500).json({ error: "error generating readme" })
