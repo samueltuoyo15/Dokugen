@@ -244,7 +244,7 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
          - Include a **license section** with a **link**, please if the user does not have a LISCENSE file in the project files dont add a liscense link in the readme.
       
       9. **Author Info**:
-         - Create a **modern author section** with **social media links. Please dont guess authors links if you dont know their username just leave placeholders for them to write theirselves**.
+         - Create a **modern author section** with **social media links expect github link. Please dont guess authors links if you dont know their username just leave placeholders for them to write theirselves**.
       
       10. **Badges**:
           - Add **dynamic badges** for technologies, build status, and more at the bottom of the README.
