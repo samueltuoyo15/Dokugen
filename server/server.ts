@@ -3,7 +3,7 @@ import { supabase } from "./supabase"
 import crypto from "crypto"
 import os from "os"
 import { v4 as uuidv4 } from "uuid"
-import { OpenAI } from "openai"
+import { GoogleGenAI } from "@google/genai"
 import helmet from "helmet"
 import { fetchGitHubReadme } from "./lib/fetchGitHubReadme"
 import cors from "cors"
@@ -37,12 +37,11 @@ app.use(helmet())
 app.use(limiter)
 app.use(express.json({ limit: "500mb" }))
 app.use(express.urlencoded({ limit: "500mb", extended: true }))
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || "",
-  baseURL: process.env.OPENAI_ENDPOINT || "https://api.openai.com/v1/chat/completions"
-})
+
+const ai = new GoogleGenAI({apiKey: process.env.GOOGLE_GEMINI_API_KEY || ""})
 
 /*
+TODO
 const generateCacheKey = (projectType: string, projectFiles: string[], fullCode: string) => {
   const hash = crypto.createHash('sha256')
   hash.update(projectType + projectFiles.join('') + fullCode)
@@ -73,7 +72,8 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
 
     const id = userInfo?.id || uuidv4()
 
-    const [_, stream] = await Promise.all([(async () => {
+    const [_, result] = await Promise.all([(async () => {
+      if (!email) return
       const { data: existingUser, error: userError } = await supabase.from("active_users").select("id, usage_count").eq("email", email).single()
       if (userError && userError.code !== "PGRST116") throw userError
       if (existingUser) {
@@ -86,101 +86,86 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
       logger.info(`Updated Active user ${username}, ${email} (${osInfo})`)
     })(),
 
-      openai.chat.completions.create({
-        model: process.env.MODEL_NAME || "gpt-3.5-turbo",
-        messages: [{
-          role: "system",
-          content: `
-        # Dokugen Backend Documentation Specialist
-        
-        ## Core Principle
-        When you detect a backend project (API servers, databases, authentication systems), 
-        use THIS EXACT TEMPLATE STRUCTURE with technical precision:
+    (async () => {
+      const systemInstruction = `
+      # Dokugen Backend Documentation Specialist
       
-        """
-        # [ProjectName] API
-      
-        ## Overview
-        [1-2 sentence technical description mentioning key frameworks/languages]
-        
-        ## Features
-        - [Technology]: [Purpose]
-        - [Technology]: [Purpose]
-      
-        ## Getting Started
-        ### Installation
-        [Step-by-step commands]
-        
-        ### Environment Variables
-        [List ALL required variables with examples]
-      
-        ## API Documentation
-        ### Base URL
-        [API root path]
-      
-        ### Endpoints
-        #### [HTTP METHOD] [ENDPOINT PATH]
-        **Request**:
-        [Payload structure with required fields]
-        
-        **Response**:
-        [Success response example]
-        
-        **Errors**:
-        - [HTTP Status]: [Error scenario]
-        """
-      
-        ## Mandatory Rules
-        1. Detection:
-           - Analyze code for API patterns (routes, controllers, models)
-           - Identify database/auth systems
-      
-        2. Documentation:
-           ✓ All endpoints documented!!! Please obey this!!!!!!
-           ✓ Do not wrap the entire documented part of the readme in a detail and summary tag!!!!!!
-           ✓ Exact request/response schemas. Please always do this, do not forget to do this Please !!!
-           ✓ Environment variables with examples
-           ✓ Error codes and meanings
-           ✓ Zero emojis or promotional language
-
-           So Please this is just a sample of what am expecting you to do strictly please!!!
-           '**User Registration:**
-            POST /api/v1/auth/register
-            _Body Example:_
-            json
-            {
-              "full_name": "John Doe",
-              "username": "johndoe",
-              "email": "john.doe@example.com",
-              "phone": "08012345678",
-              "address": "123 Main St, City",
-              "password": "StrongPassword123",
-              "referral_username": "referrer_user"
-            }'
+      ## Core Principle
+      When you detect a backend project (API servers, databases, authentication systems), 
+      use THIS EXACT TEMPLATE STRUCTURE with technical precision:
     
+      """
+      # [ProjectName] API
+    
+      ## Overview
+      [1-2 sentence technical description mentioning key frameworks/languages]
       
-        3. For non-backend projects:
-           - Use standard formatting (dont bloat the readme emojis please. If you want to add emojis just add one or two and make sure it matches the text that you are adding it next to, if there's any screenshots you can add then add if not skip it, etc.)
-           - Include Dokugen badge always!!!
+      ## Features
+      - [Technology]: [Purpose]
+      - [Technology]: [Purpose]
+    
+      ## Getting Started
+      ### Installation
+      [Step-by-step commands]
       
-        4. Universal:
-           - Never wrap in code blocks (\`\`\`markdown)
-           - Sound human-written
-           - Use Markdown formatting
-        `
-        }, {
-          role: "system",
-          content: `
-          You are Dokugen, a professional next generation ultra idolo perfect Super README Generator. Follow these rules strictly:
-          1. Always create high-quality, modern, and engaging READMEs.
-          2. Use Markdown for formatting.
-          3. Include the Dokugen badge at the bottom of the README.
-          4. Do not wrap the README in markdown code blocks (\`\`\`markdown or \`\`\`).
-          5. Ensure the README sounds like a human/graduate wrote it 100%. Avoid AI-generated phrasing please!!!.
-          `
-        }, {
-          role: "user",
-          content: formatTemplate ? `
+      ### Environment Variables
+      [List ALL required variables with examples]
+    
+      ## API Documentation
+      ### Base URL
+      [API root path]
+    
+      ### Endpoints
+      #### [HTTP METHOD] [ENDPOINT PATH]
+      **Request**:
+      [Payload structure with required fields]
+      
+      **Response**:
+      [Success response example]
+      
+      **Errors**:
+      - [HTTP Status]: [Error scenario]
+      """
+    
+      ## Mandatory Rules
+      1. Detection:
+         - Analyze code for API patterns (routes, controllers, models)
+         - Identify database/auth systems
+    
+      2. Documentation:
+         ✓ All endpoints documented!!! Please obey this!!!!!!
+         ✓ Do not wrap the entire documented part of the readme in a detail and summary tag!!!!!!
+         ✓ Exact request/response schemas. Please always do this, do not forget to do this Please !!!
+         ✓ Environment variables with examples
+         ✓ Error codes and meanings
+         ✓ Zero emojis or promotional language
+
+         So Please this is just a sample of what am expecting you to do strictly please!!!
+         '**User Registration:**
+          POST /api/v1/auth/register
+          _Body Example:_
+          json
+          {
+            "full_name": "John Doe",
+            "username": "johndoe",
+            "email": "john.doe@example.com",
+            "phone": "08012345678",
+            "address": "123 Main St, City",
+            "password": "StrongPassword123",
+            "referral_username": "referrer_user"
+          }'
+    
+      3. For non-backend projects:
+         - Use standard formatting (dont bloat the readme emojis please. If you want to add emojis just add one or two and make sure it matches the text that you are adding it next to, if there's any screenshots you can add then add if not skip it, etc.)
+         - Include Dokugen badge always!!!
+    
+      4. Universal:
+         - Never wrap in code blocks (\`\`\`markdown)
+         - Sound human-written
+         - Use Markdown formatting
+      `
+
+      const userPrompt = formatTemplate ? `
       STRICTLY USE THIS TEMPLATE STRUCTURE:
     """
     ${formatTemplate}
@@ -197,7 +182,7 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
     2. REPLACE CONTENT BUT KEEP STYLING
     3. ADD THIS BADGE AT BOTTOM:
        [![Readme was generated by Dokugen](https://img.shields.io/badge/Readme%20was%20generated%20by-Dokugen-brightgreen)](https://www.npmjs.com/package/dokugen)`
-            : `Generate a **high-quality, professional, and modern README.md that must impress recruiters and make them hire me** for a **${projectType}** project.
+        : `Generate a **high-quality, professional, and modern README.md that must impress recruiters and make them hire me** for a **${projectType}** project.
       ## Project Overview:
       The project includes the following files:
       ${projectFiles.join("\n")}
@@ -252,7 +237,7 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
       11. **Dokugen Badge**:
           - Always include this badge at the **very bottom** of the README:
             \`\`\`
-   [![Readme was generated by Dokugen](https://img.shields.io/badge/Readme%20was%20generated%20by-Dokugen-brightgreen)](https://www.npmjs.com/package/dokugen)
+     [![Readme was generated by Dokugen](https://img.shields.io/badge/Readme%20was%20generated%20by-Dokugen-brightgreen)](https://www.npmjs.com/package/dokugen)
             \`\`\`
       
       ## Tone and Style:
@@ -266,23 +251,43 @@ app.post("/api/generate-readme", async (req: Request, res: Response): Promise<an
       ## Final Output:
       Generate the README.md content directly, without any additional explanations or wrapping.
       `
-        }],
-        stream: true
+
+      const response = ai.models.generateContentStream({
+        model: process.env.MODEL_NAME || "gemini-2.0-flash-001",
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: systemInstruction }]
+          },
+          {
+            role: "model", 
+            parts: [{ text: "Understood. I will follow the Dokugen README generation rules strictly." }]
+          },
+          {
+            role: "user",
+            parts: [{ text: userPrompt }]
+          }
+        ]
       })
+
+      return response
+    })()
     ])
 
     res.setHeader("Content-Type", "text/event-stream")
     res.setHeader("Cache-Control", "no-cache")
     res.setHeader("Connection", "keep-alive")
 
-    for await (const chunk of stream) {
-      const text = chunk.choices[0]?.delta?.content || ""
-      if (text) res.write(`data: ${JSON.stringify({ response: text })}\n\n`)
+    for await (const chunk of result) {
+      if (!chunk) continue
+      const text = chunk.text
+      if (text) {
+        res.write(`data: ${JSON.stringify({ response: text })}\n\n`)
+      }
     }
 
     req.on("close", () => {
       logger.warn("Client disconnected during generation.")
-      stream.controller?.abort()
     })
 
     res.end()
@@ -298,15 +303,13 @@ app.use((err: Error, req: Request, res: Response, next: Function) => {
   res.status(500).json({ error: "Internal Server Error" })
 })
 
-const PORT = process.env.PORT!
+const PORT = process.env.PORT || "3000"
 app.listen(PORT, () => {
   logger.info(`Dokugen running on port ${PORT}`)
-    cron.schedule("*/14 * * * *", () => {
+  cron.schedule("*/14 * * * *", () => {
     const keepAliveUrl = `${process.env.BACKEND_DOMAIN}/api/health`
     logger.info(`Performing self-ping to: ${keepAliveUrl}`)
-
     fetch(keepAliveUrl).then(res => logger.info(`Keep-alive ping successful (Status: ${res.status})`)).catch(err => logger.error("Keep-alive ping failed:", err))
   })
-
   logger.info("Self-pinger initialized)")
 })
