@@ -33,7 +33,6 @@
   },
   "dependencies": {
     "@clack/prompts": "^0.10.0",
-    "@google/genai": "^1.11.0",
     "@jaames/iro": "^5.5.2",
     "@types/marked-terminal": "^6.1.1",
     "axios": "^1.8.1",
