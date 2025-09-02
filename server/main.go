@@ -181,7 +181,7 @@ func streamGemini(systemPrompt, userPrompt string) (<-chan string, <-chan error)
 
 		resp, err := client.Models.GenerateContent(ctx, MODEL_NAME, []*genai.Content{
 			{Role: "user", Parts: []*genai.Part{{Text: systemPrompt}}},
-			{Role: "model", Parts: []*genai.Part{{Text: "Understood. I will follow the Dokugen README generation rules strictly."}}},
+			{Role: "model", Parts: []*genai.Part{{Text: "I understand and will follow the instructions."}}},
 			{Role: "user", Parts: []*genai.Part{{Text: userPrompt}}},
 		}, nil)
 		if err != nil {
@@ -190,11 +190,15 @@ func streamGemini(systemPrompt, userPrompt string) (<-chan string, <-chan error)
 			return
 		}
 
-		for _, candidate := range resp.Candidates {
-			for _, part := range candidate.Content.Parts {
-				if text := part.Text; text != "" {
-					ch <- text
+		if len(resp.Candidates) > 0 && len(resp.Candidates[0].Content.Parts) > 0 {
+			cleanText := strings.TrimSpace(strings.ReplaceAll(resp.Candidates[0].Content.Parts[0].Text, "\r\n", "\n"))
+			if cleanText != "" {
+				sseData, err := json.Marshal(map[string]string{"response": cleanText})
+				if err != nil {
+					errCh <- err
+					return
 				}
+				ch <- fmt.Sprintf("data: %s\n\n", string(sseData))
 			}
 		}
 	}()
@@ -217,29 +221,29 @@ func healthHandler(c *gin.Context) {
 
 var startTime = time.Now()
 
+type UserInfo struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	OSInfo   struct {
+		Platform string `json:"platform"`
+		Arch     string `json:"arch"`
+		Release  string `json:"release"`
+	} `json:"osInfo"`
+}
+
+type ReqBody struct {
+	ProjectType        string          `json:"projectType"`
+	ProjectFiles       []string        `json:"projectFiles"`
+	FullCode           string          `json:"fullCode"`
+	UserInfo           UserInfo        `json:"userInfo"`
+	Options            map[string]bool `json:"options"`
+	ExistingReadme     string          `json:"existingReadme"`
+	CustomReadmeFormat string          `json:"customReadmeFormat"`
+	TemplateUrl        string          `json:"templateUrl"`
+	RepoUrl            string          `json:"repoUrl"`
+}
+
 func generateReadmeHandler(c *gin.Context) {
-
-	type UserInfo struct {
-		Username string `json:"username"`
-		Email    string `json:"email"`
-		OSInfo   struct {
-			Platform string `json:"platform"`
-			Arch     string `json:"arch"`
-			Release  string `json:"release"`
-		} `json:"osInfo"`
-	}
-
-	type ReqBody struct {
-		ProjectType        string          `json:"projectType"`
-		ProjectFiles       []string        `json:"projectFiles"`
-		FullCode           string          `json:"fullCode"`
-		UserInfo           UserInfo        `json:"userInfo"`
-		Options            map[string]bool `json:"options"`
-		ExistingReadme     string          `json:"existingReadme"`
-		CustomReadmeFormat string          `json:"customReadmeFormat"`
-		TemplateUrl        string          `json:"templateUrl"`
-		RepoUrl            string          `json:"repoUrl"`
-	}
 	var body ReqBody
 	if err := c.ShouldBindJSON(&body); err != nil {
 		log.Printf("Json bind error: %v", err)
@@ -269,6 +273,12 @@ func generateReadmeHandler(c *gin.Context) {
 		osInfo := fmt.Sprintf("%s %s %s", body.UserInfo.OSInfo.Platform, body.UserInfo.OSInfo.Arch, body.UserInfo.OSInfo.Release)
 		go updateSupabaseUser(email, username, osInfo)
 	}
+
+	// Set SSE headers
+	c.Writer.Header().Set("Content-Type", "text/event-stream")
+	c.Writer.Header().Set("Cache-Control", "no-cache")
+	c.Writer.Header().Set("Connection", "keep-alive")
+	c.Writer.Header().Set("Transfer-Encoding", "chunked")
 
 	systemInstruction := `
 # Dokugen Backend Documentation Specialist
@@ -426,21 +436,62 @@ Below is the actual and complete source code. So I believe you have 100%% of the
 Generate the README.md content directly, without any additional explanations or wrapping.
 `, body.ProjectType, strings.Join(body.ProjectFiles, "\n"), body.FullCode, includeSetup, body.RepoUrl, includeContribution)
 	}
-	stream, errCh := streamGemini(systemInstruction, userPrompt)
+	c.Header("Content-Type", "text/event-stream")
+	c.Header("Cache-Control", "no-cache")
+	c.Header("Connection", "keep-alive")
+	c.Header("Transfer-Encoding", "chunked")
+
+	msgChan := make(chan []byte)
+	done := make(chan bool)
+
+	go func() {
+		defer close(msgChan)
+		defer close(done)
+
+		responseChan, errChan := streamGemini(systemInstruction, userPrompt)
+		for {
+			select {
+			case text, ok := <-responseChan:
+				if !ok {
+					return
+				}
+				jsonData, _ := json.Marshal(map[string]string{"response": text})
+				msgChan <- []byte(fmt.Sprintf("data: %s\n\n", string(jsonData)))
+			case err := <-errChan:
+				if err != nil {
+					log.Printf("Gemini error: %v", err)
+					errorBytes, _ := json.Marshal(map[string]string{"error": err.Error()})
+					msgChan <- []byte(fmt.Sprintf("data: %s\n\n", string(errorBytes)))
+				}
+				return
+			}
+		}
+	}()
+
 	c.Stream(func(w io.Writer) bool {
 		select {
-		case text, ok := <-stream:
+		case msg, ok := <-msgChan:
 			if !ok {
 				return false
 			}
-			data, _ := json.Marshal(map[string]string{"response": text})
-			c.SSEvent("", string(data))
+			c.Writer.Write(msg)
+			c.Writer.Flush()
 			return true
-		case err := <-errCh:
-			log.Printf("Gemini error: %v", err)
+		case <-c.Request.Context().Done():
 			return false
 		}
 	})
+}
+
+func writeSSEData(c *gin.Context, text string) bool {
+	data, _ := json.Marshal(map[string]string{"response": text})
+	c.SSEvent("", string(data))
+	return true
+}
+
+func handleGeminiError(err error) bool {
+	log.Printf("Gemini error: %v", err)
+	return false
 }
 
 func min(a, b int) int {
