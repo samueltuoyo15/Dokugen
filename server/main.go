@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -18,6 +18,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/unrolled/secure"
 	"golang.org/x/time/rate"
+	"google.golang.org/genai"
 )
 
 var (
@@ -52,7 +53,7 @@ func init() {
 		PORT = "3000"
 	}
 	if MODEL_NAME == "" {
-		MODEL_NAME = "gemini-1.5-flash"
+		MODEL_NAME = "gemini-2.5-flash"
 	}
 }
 
@@ -161,66 +162,43 @@ func updateSupabaseUser(email, username, osInfo string) {
 }
 
 func streamGemini(systemPrompt, userPrompt string) (<-chan string, <-chan error) {
-	url := fmt.Sprintf("https://generativelanguage.googleapis.com/v1beta/models/%s:streamGenerateContent?key=%s", MODEL_NAME, GEMINI_API_KEY)
-	type Part struct{ Text string }
-	type Content struct {
-		Role  string
-		Parts []Part
-	}
-	type RequestBody struct{ Contents []Content }
-	reqBody := RequestBody{
-		Contents: []Content{
-			{Role: "user", Parts: []Part{{Text: systemPrompt}}},
-			{Role: "model", Parts: []Part{{Text: "Understood. I will follow the Dokugen README generation rules strictly."}}},
-			{Role: "user", Parts: []Part{{Text: userPrompt}}},
-		},
-	}
-	body, _ := json.Marshal(reqBody)
-	httpReq, _ := http.NewRequest("POST", url, bytes.NewBuffer(body))
-	httpReq.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
-	resp, err := client.Do(httpReq)
-	if err != nil {
-		log.Printf("Gemini API request failed: %v", err)
-		errCh := make(chan error, 1)
-		errCh <- err
-		close(errCh)
-		return nil, errCh
-	}
 	ch := make(chan string)
 	errCh := make(chan error, 1)
+
 	go func() {
 		defer close(ch)
 		defer close(errCh)
-		defer resp.Body.Close()
-		scanner := bufio.NewScanner(resp.Body)
-		for scanner.Scan() {
-			line := scanner.Text()
-			if len(line) > 6 && strings.HasPrefix(line, "data: ") {
-				var data struct {
-					Candidates []struct {
-						Content struct {
-							Parts []struct {
-								Text string `json:"text"`
-							} `json:"parts"`
-						} `json:"content"`
-					} `json:"candidates"`
-				}
-				if json.Unmarshal([]byte(line[6:]), &data) == nil {
-					for _, c := range data.Candidates {
-						for _, p := range c.Content.Parts {
-							if p.Text != "" {
-								ch <- p.Text
-							}
-						}
-					}
+
+		ctx := context.Background()
+		client, err := genai.NewClient(ctx, &genai.ClientConfig{
+			APIKey: GEMINI_API_KEY,
+		})
+		if err != nil {
+			log.Printf("Failed to create Gemini client: %v", err)
+			errCh <- err
+			return
+		}
+
+		resp, err := client.Models.GenerateContent(ctx, MODEL_NAME, []*genai.Content{
+			{Parts: []*genai.Part{{Text: systemPrompt}}},
+			{Parts: []*genai.Part{{Text: "Understood. I will follow the Dokugen README generation rules strictly."}}},
+			{Parts: []*genai.Part{{Text: userPrompt}}},
+		}, nil)
+		if err != nil {
+			log.Printf("Generate content error: %v", err)
+			errCh <- err
+			return
+		}
+
+		for _, candidate := range resp.Candidates {
+			for _, part := range candidate.Content.Parts {
+				if text := part.Text; text != "" {
+					ch <- text
 				}
 			}
 		}
-		if err := scanner.Err(); err != nil && err != io.EOF {
-			errCh <- err
-		}
 	}()
+
 	return ch, errCh
 }
 
