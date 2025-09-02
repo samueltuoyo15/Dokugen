@@ -28,6 +28,25 @@ var (
 	PORT              = os.Getenv("PORT")
 )
 
+func globalErrorHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				log.Printf("PANIC: %v", err)
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+				c.Abort()
+			}
+		}()
+		c.Next()
+
+		if len(c.Errors) > 0 {
+			for _, e := range c.Errors {
+				log.Printf("ERROR: %v", e.Error())
+			}
+		}
+	}
+}
+
 func init() {
 	if PORT == "" {
 		PORT = "3000"
@@ -69,6 +88,11 @@ func securityMiddleware() gin.HandlerFunc {
 	}
 }
 
+func sizeLimitMiddleware(c *gin.Context) {
+	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, 500<<20)
+	c.Next()
+}
+
 func fetchGitHubReadme(url string) (string, error) {
 	rawURL := strings.ReplaceAll(url, "github.com", "raw.githubusercontent.com")
 	rawURL = strings.ReplaceAll(rawURL, "/blob/", "/")
@@ -86,6 +110,7 @@ func fetchGitHubReadme(url string) (string, error) {
 
 func updateSupabaseUser(email, username, osInfo string) {
 	if email == "" || SUPABASE_URL == "" || SUPABASE_ANON_KEY == "" {
+		log.Printf("Skipping Supabase update - missing credentials")
 		return
 	}
 	getURL := fmt.Sprintf("%s/rest/v1/active_users?email=eq.%s&select=id,usage_count", SUPABASE_URL, email)
@@ -156,6 +181,7 @@ func streamGemini(systemPrompt, userPrompt string) (<-chan string, <-chan error)
 	client := &http.Client{}
 	resp, err := client.Do(httpReq)
 	if err != nil {
+		log.Printf("Gemini API request failed: %v", err)
 		errCh := make(chan error, 1)
 		errCh <- err
 		close(errCh)
@@ -214,33 +240,45 @@ func healthHandler(c *gin.Context) {
 var startTime = time.Now()
 
 func generateReadmeHandler(c *gin.Context) {
+
+	type UserInfo struct {
+		Username string `json:"username"`
+		Email    string `json:"email"`
+		OSInfo   struct {
+			Platform string `json:"platform"`
+			Arch     string `json:"arch"`
+			Release  string `json:"release"`
+		} `json:"osInfo"`
+	}
+
 	type ReqBody struct {
-		ProjectType        string            `json:"projectType"`
-		ProjectFiles       []string          `json:"projectFiles"`
-		FullCode           string            `json:"fullCode"`
-		UserInfo           map[string]string `json:"userInfo"`
-		Options            map[string]bool   `json:"options"`
-		ExistingReadme     string            `json:"existingReadme"`
-		CustomReadmeFormat string            `json:"customReadmeFormat"`
-		RepoUrl            string            `json:"repoUrl"`
+		ProjectType        string          `json:"projectType"`
+		ProjectFiles       []string        `json:"projectFiles"`
+		FullCode           string          `json:"fullCode"`
+		UserInfo           UserInfo        `json:"userInfo"`
+		Options            map[string]bool `json:"options"`
+		ExistingReadme     string          `json:"existingReadme"`
+		CustomReadmeFormat string          `json:"customReadmeFormat"`
+		TemplateUrl        string          `json:"templateUrl"`
+		RepoUrl            string          `json:"repoUrl"`
 	}
 	var body ReqBody
 	if err := c.ShouldBindJSON(&body); err != nil {
+		log.Printf("Json bind error: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
 	}
 	if body.ProjectType == "" || len(body.ProjectFiles) == 0 || body.FullCode == "" {
+		log.Printf("Bad request: missing fields projectType=%q files=%d fullCodeLen=%d", body.ProjectType, len(body.ProjectFiles), len(body.FullCode))
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing required fields"})
 		return
 	}
-	if body.UserInfo == nil && runtime.GOOS != "linux" {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Missing userInfo on non-Linux"})
-		return
+	if body.CustomReadmeFormat == "" && body.TemplateUrl != "" {
+		body.CustomReadmeFormat = body.TemplateUrl
 	}
-	username := body.UserInfo["username"]
+	username := strings.TrimSpace(body.UserInfo.Username)
 	if username == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Missing OS username"})
-		return
+		username = "anonymous"
 	}
 	var formatTemplate string
 	if body.CustomReadmeFormat != "" {
@@ -249,8 +287,9 @@ func generateReadmeHandler(c *gin.Context) {
 			formatTemplate = tmp
 		}
 	}
-	if email := body.UserInfo["email"]; email != "" {
-		go updateSupabaseUser(email, username, body.UserInfo["osInfo"])
+	if email := body.UserInfo.Email; email != "" {
+		osInfo := fmt.Sprintf("%s %s %s", body.UserInfo.OSInfo.Platform, body.UserInfo.OSInfo.Arch, body.UserInfo.OSInfo.Release)
+		go updateSupabaseUser(email, username, osInfo)
 	}
 
 	systemInstruction := `
@@ -436,18 +475,19 @@ func min(a, b int) int {
 func main() {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
-	r.Use(gin.Recovery())
-	r.Use(rateLimitMiddleware)
-	r.Use(securityMiddleware())
-
+	r.Use(gin.Logger())
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "OPTIONS"},
 		AllowHeaders:     []string{"*"},
 		AllowCredentials: true,
 	}))
+	r.Use(globalErrorHandler())
+	r.Use(gin.Recovery())
+	r.Use(sizeLimitMiddleware)
+	r.Use(rateLimitMiddleware)
+	r.Use(securityMiddleware())
 
-	r.Use(gin.Logger())
 	r.GET("/api/health", healthHandler)
 	r.POST("/api/generate-readme", generateReadmeHandler)
 	log.Printf("Dokugen running on port %s", PORT)

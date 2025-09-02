@@ -5,7 +5,6 @@ import fs from "fs-extra"
 import * as path from "path"
 import { select } from "@clack/prompts"
 import figlet from "figlet"
-import gradient from "gradient-string"
 import { createSpinner } from "nanospinner"
 import { setTimeout as sleep } from "timers/promises"
 import axios from "axios"
@@ -217,7 +216,8 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
 
      const getBackendDomain = await axios.get<{ domain: string }>("https://dokugen-readme.vercel.app/api/get-server-url")
      const backendDomain = getBackendDomain.data.domain
-    const response = await axios.post(`${backendDomain}/api/generate-readme`, {
+
+    const response = await axios.post(`http://localhost:3000/api/generate-readme`, {
       projectType,
       projectFiles,
       fullCode,
@@ -277,8 +277,8 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
         reject(restoredContent || err)
       })
     })
-  } catch(error) {
-    console.error("\n Error Generating Readme", error)
+  } catch(error: unknown) {
+    console.error("\n Error Generating Readme", (error as any).response?.data || (error as any).message)
     const restoredContent = await restoreReadme()
     return restoredContent || null
   }
