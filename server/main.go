@@ -180,9 +180,9 @@ func streamGemini(systemPrompt, userPrompt string) (<-chan string, <-chan error)
 		}
 
 		resp, err := client.Models.GenerateContent(ctx, MODEL_NAME, []*genai.Content{
-			{Parts: []*genai.Part{{Text: systemPrompt}}},
-			{Parts: []*genai.Part{{Text: "Understood. I will follow the Dokugen README generation rules strictly."}}},
-			{Parts: []*genai.Part{{Text: userPrompt}}},
+			{Role: "user", Parts: []*genai.Part{{Text: systemPrompt}}},
+			{Role: "model", Parts: []*genai.Part{{Text: "Understood. I will follow the Dokugen README generation rules strictly."}}},
+			{Role: "user", Parts: []*genai.Part{{Text: userPrompt}}},
 		}, nil)
 		if err != nil {
 			log.Printf("Generate content error: %v", err)
