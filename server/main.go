@@ -456,12 +456,12 @@ Generate the README.md content directly, without any additional explanations or 
 					return
 				}
 				jsonData, _ := json.Marshal(map[string]string{"response": text})
-				msgChan <- []byte(fmt.Sprintf("data: %s\n\n", string(jsonData)))
+				msgChan <- jsonData
 			case err := <-errChan:
 				if err != nil {
 					log.Printf("Gemini error: %v", err)
 					errorBytes, _ := json.Marshal(map[string]string{"error": err.Error()})
-					msgChan <- []byte(fmt.Sprintf("data: %s\n\n", string(errorBytes)))
+					msgChan <- errorBytes
 				}
 				return
 			}
@@ -474,7 +474,7 @@ Generate the README.md content directly, without any additional explanations or 
 			if !ok {
 				return false
 			}
-			c.Writer.Write(msg)
+			c.Writer.Write([]byte(fmt.Sprintf("data: %s\n\n", msg)))
 			c.Writer.Flush()
 			return true
 		case <-c.Request.Context().Done():
