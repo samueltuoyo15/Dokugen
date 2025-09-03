@@ -174,33 +174,31 @@ func streamGemini(systemPrompt, userPrompt string) (<-chan string, <-chan error)
 			APIKey: GEMINI_API_KEY,
 		})
 		if err != nil {
-			log.Printf("Failed to create Gemini client: %v", err)
 			errCh <- err
 			return
 		}
 
-		resp, err := client.Models.GenerateContent(ctx, MODEL_NAME, []*genai.Content{
+		processResponse := func(resp *genai.GenerateContentResponse, err error) bool {
+			if err != nil {
+				errCh <- err
+				return false
+			}
+			if len(resp.Candidates) > 0 && len(resp.Candidates[0].Content.Parts) > 0 {
+				text := resp.Candidates[0].Content.Parts[0].Text
+				if text != "" {
+					ch <- text
+				}
+			}
+			return true
+		}
+
+		iter := client.Models.GenerateContentStream(ctx, MODEL_NAME, []*genai.Content{
 			{Role: "user", Parts: []*genai.Part{{Text: systemPrompt}}},
 			{Role: "model", Parts: []*genai.Part{{Text: "I understand and will follow the instructions."}}},
 			{Role: "user", Parts: []*genai.Part{{Text: userPrompt}}},
 		}, nil)
-		if err != nil {
-			log.Printf("Generate content error: %v", err)
-			errCh <- err
-			return
-		}
 
-		if len(resp.Candidates) > 0 && len(resp.Candidates[0].Content.Parts) > 0 {
-			cleanText := strings.TrimSpace(strings.ReplaceAll(resp.Candidates[0].Content.Parts[0].Text, "\r\n", "\n"))
-			if cleanText != "" {
-				sseData, err := json.Marshal(map[string]string{"response": cleanText})
-				if err != nil {
-					errCh <- err
-					return
-				}
-				ch <- fmt.Sprintf("data: %s\n\n", string(sseData))
-			}
-		}
+		iter(processResponse)
 	}()
 
 	return ch, errCh
@@ -455,13 +453,13 @@ Generate the README.md content directly, without any additional explanations or 
 				if !ok {
 					return
 				}
-				jsonData, _ := json.Marshal(map[string]string{"response": text})
-				msgChan <- jsonData
+				jsonData, _ := json.Marshal(map[string]interface{}{"response": text})
+				msgChan <- []byte(string(jsonData))
 			case err := <-errChan:
 				if err != nil {
 					log.Printf("Gemini error: %v", err)
-					errorBytes, _ := json.Marshal(map[string]string{"error": err.Error()})
-					msgChan <- errorBytes
+					errorBytes, _ := json.Marshal(map[string]interface{}{"error": err.Error()})
+					msgChan <- []byte(string(errorBytes))
 				}
 				return
 			}
@@ -474,7 +472,7 @@ Generate the README.md content directly, without any additional explanations or 
 			if !ok {
 				return false
 			}
-			c.Writer.Write([]byte(fmt.Sprintf("data: %s\n\n", msg)))
+			c.Writer.Write([]byte(fmt.Sprintf("data: %s\n\n", string(msg))))
 			c.Writer.Flush()
 			return true
 		case <-c.Request.Context().Done():
