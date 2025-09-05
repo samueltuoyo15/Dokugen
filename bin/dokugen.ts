@@ -121,10 +121,35 @@ const matchesIgnorePattern = (filename: string, pattern: string): boolean => {
   return filename === pattern
 }
 
+const loadGitignorePatterns = async (projectDir: string, ignoreDirs: Set<string>, ignoreFiles: Set<string>) => {
+  const gitignorePath = path.join(projectDir, ".gitignore")
+
+  if (!(await fs.pathExists(gitignorePath))) return
+
+  const content = await fs.readFile(gitignorePath, "utf-8")
+  const lines = content.split("\n")
+
+  for (const line of lines) {
+    const rule = line.trim()
+    if (!rule || rule.startsWith("#")) continue 
+
+    if (rule.endsWith("/")) {
+      ignoreDirs.add(rule.replace(/\/$/, ""))
+    } else if (rule.startsWith("*.")) {
+      ignoreFiles.add(rule)
+    } else {
+      ignoreFiles.add(rule)
+    }
+  }
+
+  console.log(chalk.gray(`📄 Parsed .gitignore → ${ignoreDirs.size} dirs, ${ignoreFiles.size} files will be ignored`))
+}
+
+
 const scanFiles = async (dir: string): Promise<string[]> => {
 const ignoreDirs = new Set(["node_modules", "dependencies", "ajax", "public", "android", "ios", ".expo",".next", ".nuxt", ".svelte-kit", ".vercel", ".serverless", ".cache", "tests", "_tests_", "_test_", "__tests__", "coverage", "test", "spec", "cypress", "e2e", "dist", "build", "out", "bin", "obj", "lib", "target", "release", "debug", "artifacts", "generated", ".git", ".svn", ".hg", ".vscode", ".idea", ".vs", "venv", ".venv", "env", ".env", "virtualenv", "envs", "docs", "javadoc", "logs", "android", "ios", "windows", "linux", "macos", "web", ".dart_tool", ".gradle", ".mvn", ".npm", ".yarn", "tmp", "temp", "uploads", "public", "static", "assets", "images", "media", "migrations", "data", "db", "database", ".github", ".circleci", ".husky", "storage", "vendor", "cmake-build-debug", "packages", "plugins"])
 const ignoreFiles = new Set(["*.exe", "*.mp4", "*.mp3", "*.bin", "*.so", "*.a", "*.dll", "*.pyc", "*.class", "*.o", "*.jar", "*.war", "*.ear", "*.apk", "*.ipa", "*.dylib", "*.lock", "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "Gemfile.lock", "CHANGELOG.md", "style.css", "main.css", "output.css", ".gitignore", ".npmignore", "tsconfig.json", "jest.config.js", "README.md", ".DS_Store", ".env", "Thumbs.db", "tsconfig.*", "*.iml", ".editorconfig", ".prettierrc*", ".eslintrc*", "*.log", "*.min.js", "*.min.css", "*.pdf", "*.jpg", "*.png", "*.gif", "*.svg", "*.ico", "*.woff", "*.woff2", "*.ttf", "*.eot", "*.mp3", "*.mp4", "*.zip", "*.tar", "*.gz", "*.rar", "*.7z", "*.sqlite", "*.db", "*.sublime-workspace", "*.sublime-project", "*.bak", "*.swp", "*.swo", "*.pid", "*.seed", "*.pid.lock"])
-
+await loadGitignorePatterns(dir, ignoreDirs, ignoreFiles)
   const files: string[] = []
   const queue: string[] = [dir]
 
@@ -284,7 +309,7 @@ const generateReadme = async (projectType: string, projectFiles: string[], proje
   }
 }
 
-program.name("dokugen").version("3.8.0").description("Automatically generate high-quality README for your application")
+program.name("dokugen").version("3.9.0").description("Automatically generate high-quality README for your application")
 program.command("generate").description("Scan project and generate a README.md").option("--no-overwrite", "Do not overwrite existing README.md, append new features instead").option("--template <url>", "use a custom GitHub repo readme file as a template to generate a concise and strict readme for your project").action(async (options) => {
      await sleep(50)
     console.log('\n\n' + chalk.hex('#000080')(figlet.textSync('DOKUGEN', { font: 'Small Slant', horizontalLayout: 'fitted' })) + '\n\n')

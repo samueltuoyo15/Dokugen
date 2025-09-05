@@ -22,6 +22,64 @@ type ProjectType = {
 }
 
 const detectionPatterns: Record<string, DetectionPattern> = {
+  "Qwik": {
+    files: ["vite.config.ts"],
+    packageJson: {
+      dependencies: ["@builder.io/qwik"]
+    }
+  },
+  "Analog": {
+    packageJson: {
+      dependencies: ["@analogjs/platform"]
+    }
+  },
+  "SvelteKit": {
+    files: ["svelte.config.js"],
+    packageJson: {
+      dependencies: ["@sveltejs/kit"]
+    }
+  },
+  "Fresh": {
+    files: ["fresh.gen.ts", "deno.json"],
+    contents: [{
+      file: "deno.json",
+      keywords: ["fresh"]
+    }]
+  },
+  "Hono": {
+    packageJson: {
+      dependencies: ["hono"]
+    }
+  },
+  "tRPC": {
+    packageJson: {
+      dependencies: ["@trpc/server"]
+    }
+  },
+  "Prisma": {
+    files: ["prisma/schema.prisma"],
+    packageJson: {
+      dependencies: ["@prisma/client"]
+    }
+  },
+  "DrizzleORM": {
+    packageJson: {
+      dependencies: ["drizzle-orm"]
+    }
+  },
+  "TypeORM": {
+    packageJson: {
+      dependencies: ["typeorm"]
+    }
+  },
+  "Sequelize": {
+    packageJson: {
+      dependencies: ["sequelize"]
+    }
+  },
+  "PocketBase": {
+    files: ["pb_data", "pb_migrations"],
+  },
   // JavaScript Frameworks
   "React": {
     files: ["src/App.jsx", "src/App.tsx", "src/index.jsx", "src/index.tsx"],
@@ -585,16 +643,82 @@ const detectionPatterns: Record<string, DetectionPattern> = {
 
 export const detectProjectType = async (projectDir: string): Promise<string> => {
   const detectedTypes: ProjectType[] = []
- 
+  
   const goModPath = path.join(projectDir, "go.mod")
   const goFiles = await fs.readdir(projectDir).catch(() => [])
   const hasGoFiles = goFiles.some(file => file.endsWith(".go"))
   
   if (await fs.pathExists(goModPath) || hasGoFiles) {
+    const goModContent = await fs.readFile(goModPath, 'utf-8').catch(() => '')
+    const mainGoContent = await fs.readFile(path.join(projectDir, 'main.go'), 'utf-8').catch(() => '')
+    
+    let goType = "Go"
+    if (mainGoContent.includes('github.com/gin-gonic/gin')) {
+      goType = "Go Gin"
+    } else if (mainGoContent.includes('github.com/gorilla/mux')) {
+      goType = "Go Gorilla Mux"
+    } else if (mainGoContent.includes('github.com/labstack/echo')) {
+      goType = "Go Echo"
+    } else if (goModContent.includes('fiber') || mainGoContent.includes('github.com/gofiber/fiber')) {
+      goType = "Go Fiber"
+    } else if (mainGoContent.includes('github.com/go-chi/chi')) {
+      goType = "Go Chi"
+    }
+    
     detectedTypes.push({
-      type: "Go",
+      type: goType,
       category: "backend",
       confidence: 100
+    })
+  }
+  
+  // Enhanced Node.js detection
+  const packageJsonPath = path.join(projectDir, "package.json")
+  if (await fs.pathExists(packageJsonPath)) {
+    const packageJson = await fs.readJson(packageJsonPath)
+    const deps = { ...packageJson.dependencies, ...packageJson.devDependencies }
+    
+    let nodeType = "Node.js"
+    if (deps["typescript"]) {
+      nodeType = "TypeScript Node.js"
+    }
+    
+    // Add frameworks to node type
+    if (deps["express"]) {
+      nodeType += " Express"
+    } else if (deps["@nestjs/core"]) {
+      nodeType += " NestJS"
+    } else if (deps["fastify"]) {
+      nodeType += " Fastify"
+    } else if (deps["koa"]) {
+      nodeType += " Koa"
+    } else if (deps["hono"]) {
+      nodeType += " Hono"
+    } else if (deps["@trpc/server"]) {
+      nodeType += " tRPC"
+    }
+
+    // Add ORM detection
+    if (deps["@prisma/client"]) {
+      nodeType += " + Prisma"
+    }
+    if (deps["typeorm"]) {
+      nodeType += " + TypeORM"
+    }
+    if (deps["sequelize"]) {
+      nodeType += " + Sequelize"
+    }
+    if (deps["drizzle-orm"]) {
+      nodeType += " + DrizzleORM"
+    }
+    if (deps["mongoose"]) {
+      nodeType += " + Mongoose"
+    }
+    
+    detectedTypes.push({
+      type: nodeType,
+      category: "backend",
+      confidence: 95
     })
   }
   
@@ -685,7 +809,133 @@ export const detectProjectType = async (projectDir: string): Promise<string> => 
     }
   }
   
+  // Enhanced Python detection
+  const requirementsPath = path.join(projectDir, "requirements.txt")
+  const pipfilePath = path.join(projectDir, "Pipfile")
+  const pythonFiles = goFiles.filter(f => f.endsWith(".py"))
+  
+  if (pythonFiles.length > 0 || await fs.pathExists(requirementsPath) || await fs.pathExists(pipfilePath)) {
+    let pythonType = "Python"
+    
+    // Check for Python frameworks
+    const requirements = await fs.readFile(requirementsPath, 'utf-8').catch(() => '')
+    const mainPyContent = await fs.readFile(path.join(projectDir, 'main.py'), 'utf-8').catch(() => '')
+    
+    if (requirements.includes('django') || await fs.pathExists(path.join(projectDir, 'manage.py'))) {
+      pythonType = "Python Django"
+    } else if (requirements.includes('fastapi') || mainPyContent.includes('from fastapi import FastAPI')) {
+      pythonType = "Python FastAPI"
+    } else if (requirements.includes('flask') || mainPyContent.includes('from flask import Flask')) {
+      pythonType = "Python Flask"
+    }
+    
+    detectedTypes.push({
+      type: pythonType,
+      category: "backend",
+      confidence: 90
+    })
+  }
+
+  // Enhanced React detection
+  if (await fs.pathExists(packageJsonPath)) {
+    const packageJson = await fs.readJson(packageJsonPath)
+    const deps = { ...packageJson.dependencies, ...packageJson.devDependencies }
+    
+    if (deps["react"]) {
+      let reactType = "React"
+      
+      if (deps["@types/react"] || deps["typescript"]) {
+        reactType = "TypeScript React"
+      }
+      
+      if (deps["next"]) {
+        reactType += " Next.js"
+      } else if (deps["gatsby"]) {
+        reactType += " Gatsby"
+      } else if (deps["remix"]) {
+        reactType += " Remix"
+      }
+      
+      // Add major UI libraries
+      if (deps["@mui/material"]) {
+        reactType += " Material-UI"
+      } else if (deps["@chakra-ui/react"]) {
+        reactType += " Chakra UI"
+      } else if (deps["antd"]) {
+        reactType += " Ant Design"
+      } else if (deps["@tailwindcss/react"]) {
+        reactType += " Tailwind"
+      }
+      
+      detectedTypes.push({
+        type: reactType,
+        category: "frontend",
+        confidence: 95
+      })
+    }
+  }
+
   // To Sort by confidence and return the most likely type
+  // Check for monorepo structure
+  const hasClientDir = await fs.pathExists(path.join(projectDir, "client"))
+  const hasServerDir = await fs.pathExists(path.join(projectDir, "server"))
+  const hasAppsDir = await fs.pathExists(path.join(projectDir, "apps"))
+  const hasPackagesDir = await fs.pathExists(path.join(projectDir, "packages"))
+
+  if ((hasClientDir && hasServerDir) || (hasAppsDir && hasPackagesDir)) {
+    const clientTypes = []
+    const serverTypes = []
+    let isMonorepo = false
+
+    if (hasClientDir && hasServerDir) {
+      isMonorepo = true
+      const clientResult = await detectProjectType(path.join(projectDir, "client"))
+      const serverResult = await detectProjectType(path.join(projectDir, "server"))
+      clientTypes.push(clientResult)
+      serverTypes.push(serverResult)
+    }
+
+    if (hasAppsDir) {
+      isMonorepo = true
+      const appsDir = await fs.readdir(path.join(projectDir, "apps"))
+      for (const app of appsDir) {
+        const appType = await detectProjectType(path.join(projectDir, "apps", app))
+        if (appType.toLowerCase().includes("react") || appType.toLowerCase().includes("vue") || 
+            appType.toLowerCase().includes("angular") || appType.toLowerCase().includes("front")) {
+          clientTypes.push(appType)
+        } else {
+          serverTypes.push(appType)
+        }
+      }
+    }
+
+    if (hasPackagesDir) {
+      isMonorepo = true
+      const packagesDir = await fs.readdir(path.join(projectDir, "packages"))
+      for (const pkg of packagesDir) {
+        const pkgType = await detectProjectType(path.join(projectDir, "packages", pkg))
+        if (pkgType !== "Unknown") {
+          if (pkgType.toLowerCase().includes("react") || pkgType.toLowerCase().includes("vue") || 
+              pkgType.toLowerCase().includes("angular") || pkgType.toLowerCase().includes("front")) {
+            clientTypes.push(pkgType)
+          } else {
+            serverTypes.push(pkgType)
+          }
+        }
+      }
+    }
+
+    if (isMonorepo) {
+      const uniqueClientTypes = [...new Set(clientTypes)].filter(t => t !== "Unknown")
+      const uniqueServerTypes = [...new Set(serverTypes)].filter(t => t !== "Unknown")
+      
+      const clientStr = uniqueClientTypes.length ? `Client: ${uniqueClientTypes.join(" + ")}` : ""
+      const serverStr = uniqueServerTypes.length ? `Server: ${uniqueServerTypes.join(" + ")}` : ""
+      
+      return `Monorepo [${[clientStr, serverStr].filter(Boolean).join(" | ")}]`
+    }
+  }
+
   if (detectedTypes.length > 0) {
     detectedTypes.sort((a, b) => b.confidence - a.confidence)
     return detectedTypes[0].type
