@@ -1,0 +1,45 @@
+{
+  "name": "dokugen server",
+  "version": "3.2.0",
+  "private": false,
+  "main": "server.ts",
+  "scripts": {
+    "start": "ts-node server.ts"
+  },
+  "keywords": [
+    "open source",
+    "readme generator",
+    "cli tool",
+    "OritseWeyinmi samuel Tuoyo"
+  ],
+  "author": "OritseWeyinmi Samuel Tuoyo",
+  "license": "ISC",
+  "description": "Open source readme generator command line tool.",
+  "dependencies": {
+    "@google/genai": "^1.11.0",
+    "@supabase/supabase-js": "^2.48.1",
+    "@types/express": "^5.0.1",
+    "axios": "^1.8.4",
+    "compression": "^1.8.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.1.0",
+    "node-cron": "^4.2.0",
+    "pino": "^9.7.0",
+    "pino-pretty": "^13.0.0",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.9.36",
+    "@types/compression": "^1.7.5",
+    "@types/cors": "^2.8.17",
+    "@types/fs-extra": "^11.0.4",
+    "@types/helmet": "^0.0.48",
+    "@types/node": "^22.13.4",
+    "@types/node-cron": "^3.0.11",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}
