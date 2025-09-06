@@ -80,7 +80,6 @@ const detectionPatterns: Record<string, DetectionPattern> = {
   "PocketBase": {
     files: ["pb_data", "pb_migrations"],
   },
-  // JavaScript Frameworks
   "React": {
     files: ["src/App.jsx", "src/App.tsx", "src/index.jsx", "src/index.tsx"],
     folders: ["src/components"],
@@ -136,7 +135,6 @@ const detectionPatterns: Record<string, DetectionPattern> = {
     }
   },
   
-  // Mobile Frameworks
   "React Native": {
     files: ["metro.config.js", "App.js", "App.tsx", "index.js", "index.tsx"],
     packageJson: {
@@ -173,7 +171,6 @@ const detectionPatterns: Record<string, DetectionPattern> = {
     files: [".sln", ".csproj"]
   },
   
-  // Backend Frameworks
   "Express.js": {
     files: ["app.js", "server.js", "index.js", "express.js"],
     packageJson: {
@@ -261,7 +258,6 @@ const detectionPatterns: Record<string, DetectionPattern> = {
     files: ["pom.xml", "src/main/resources/application.properties"]
   },
   
-  // Programming Languages
   "JavaScript": {
     files: ["package.json", "index.js"]
   },
@@ -363,7 +359,6 @@ const detectionPatterns: Record<string, DetectionPattern> = {
     files: ["v.mod", "*.v"]
   },
   
-  // Build Tools 
   "Docker": {
     files: ["Dockerfile", "docker-compose.yml"]
   },
@@ -442,7 +437,6 @@ const detectionPatterns: Record<string, DetectionPattern> = {
     }
   },
   
-  // Desktop Frameworks
   "Electron": {
     files: ["electron-builder.json", "main.js"],
     packageJson: {
@@ -465,7 +459,6 @@ const detectionPatterns: Record<string, DetectionPattern> = {
     files: ["*.wxcp"]
   },
   
-  // Testing Frameworks
   "Jest": {
     files: ["jest.config.js"],
     packageJson: {
@@ -513,7 +506,6 @@ const detectionPatterns: Record<string, DetectionPattern> = {
     }
   },
   
-  // Static Site Generators
   "Gatsby": {
     files: ["gatsby-config.js"],
     packageJson: {
@@ -539,7 +531,6 @@ const detectionPatterns: Record<string, DetectionPattern> = {
     }
   },
   
-  // CMS
   "WordPress": {
     files: ["wp-config.php", "wp-content"]
   },
@@ -564,7 +555,6 @@ const detectionPatterns: Record<string, DetectionPattern> = {
     }
   },
   
-  // Database
   "PostgreSQL": {
     files: ["init.sql", "*.pgsql"]
   },
@@ -593,7 +583,6 @@ const detectionPatterns: Record<string, DetectionPattern> = {
     }
   },
   
-  // GraphQL
   "GraphQL": {
     files: ["schema.graphql"],
     packageJson: {
@@ -609,7 +598,6 @@ const detectionPatterns: Record<string, DetectionPattern> = {
     files: ["metadata"]
   },
   
-  // WebAssembly
   "Wasm": {
     files: ["*.wasm"]
   },
@@ -617,7 +605,6 @@ const detectionPatterns: Record<string, DetectionPattern> = {
     files: ["emcc"]
   },
   
-  // AI/ML
   "TensorFlow": {
     files: ["requirements.txt"],
     contents: [{
@@ -644,6 +631,7 @@ const detectionPatterns: Record<string, DetectionPattern> = {
 export const detectProjectType = async (projectDir: string): Promise<string> => {
   const detectedTypes: ProjectType[] = []
   
+  // Check for Go projects via go.mod and source files
   const goModPath = path.join(projectDir, "go.mod")
   const goFiles = await fs.readdir(projectDir).catch(() => [])
   const hasGoFiles = goFiles.some(file => file.endsWith(".go"))
@@ -653,22 +641,31 @@ export const detectProjectType = async (projectDir: string): Promise<string> => 
     const mainGoContent = await fs.readFile(path.join(projectDir, 'main.go'), 'utf-8').catch(() => '')
     
     let goType = "Go"
-    if (mainGoContent.includes('github.com/gin-gonic/gin')) {
-      goType = "Go Gin"
-    } else if (mainGoContent.includes('github.com/gorilla/mux')) {
-      goType = "Go Gorilla Mux"
-    } else if (mainGoContent.includes('github.com/labstack/echo')) {
-      goType = "Go Echo"
-    } else if (goModContent.includes('fiber') || mainGoContent.includes('github.com/gofiber/fiber')) {
-      goType = "Go Fiber"
-    } else if (mainGoContent.includes('github.com/go-chi/chi')) {
-      goType = "Go Chi"
+    let confidence = await fs.pathExists(goModPath) ? 100 : 80
+    
+    // Detect Go frameworks from imports and go.mod
+    const frameworks = {
+      'github.com/gin-gonic/gin': 'Gin',
+      'github.com/gorilla/mux': 'Gorilla Mux',
+      'github.com/labstack/echo': 'Echo',
+      'github.com/gofiber/fiber': 'Fiber',
+      'github.com/go-chi/chi': 'Chi',
+      'github.com/graphql-go/graphql': 'GraphQL',
+      'github.com/grpc/grpc-go': 'gRPC',
+      'gorm.io/gorm': 'GORM',
+    }
+    
+    for (const [pkg, framework] of Object.entries(frameworks)) {
+      if (goModContent.includes(pkg) || mainGoContent.includes(pkg)) {
+        goType = `Go ${framework}`
+        confidence += 10
+      }
     }
     
     detectedTypes.push({
       type: goType,
       category: "backend",
-      confidence: 100
+      confidence: Math.min(confidence, 100)
     })
   }
   
@@ -678,48 +675,88 @@ export const detectProjectType = async (projectDir: string): Promise<string> => 
     const packageJson = await fs.readJson(packageJsonPath)
     const deps = { ...packageJson.dependencies, ...packageJson.devDependencies }
     
-    let nodeType = "Node.js"
-    if (deps["typescript"]) {
-      nodeType = "TypeScript Node.js"
-    }
+    // Only detect Node.js if it's not a React app and has backend characteristics
+    const isReactApp = deps["react"] || deps["next"] || deps["gatsby"] || deps["remix"];
+    const isBackend = deps["express"] || deps["@nestjs/core"] || deps["fastify"] || 
+                     deps["koa"] || deps["hono"] || deps["@trpc/server"] ||
+                     packageJson.type === "module" || await fs.pathExists(path.join(projectDir, "server.js")) ||
+                     await fs.pathExists(path.join(projectDir, "app.js")) ||
+                     await fs.pathExists(path.join(projectDir, "index.js")) ||
+                     await fs.pathExists(path.join(projectDir, "src/server")) ||
+                     await fs.pathExists(path.join(projectDir, "src/api"));
     
-    // Add frameworks to node type
-    if (deps["express"]) {
-      nodeType += " Express"
-    } else if (deps["@nestjs/core"]) {
-      nodeType += " NestJS"
-    } else if (deps["fastify"]) {
-      nodeType += " Fastify"
-    } else if (deps["koa"]) {
-      nodeType += " Koa"
-    } else if (deps["hono"]) {
-      nodeType += " Hono"
-    } else if (deps["@trpc/server"]) {
-      nodeType += " tRPC"
+    if (!isReactApp && isBackend) {
+      let nodeType = "Node.js"
+      if (deps["typescript"]) {
+        nodeType = "TypeScript Node.js"
+      }
+      
+      // Add frameworks to node type
+      if (deps["express"]) {
+        nodeType += " Express"
+      } else if (deps["@nestjs/core"]) {
+        nodeType += " NestJS"
+      } else if (deps["fastify"]) {
+        nodeType += " Fastify"
+      } else if (deps["koa"]) {
+        nodeType += " Koa"
+      } else if (deps["hono"]) {
+        nodeType += " Hono"
+      } else if (deps["@trpc/server"]) {
+        nodeType += " tRPC"
+      }
+      
+      detectedTypes.push({
+        type: nodeType,
+        category: "backend",
+        confidence: 95
+      })
     }
 
-    // Add ORM detection
-    if (deps["@prisma/client"]) {
-      nodeType += " + Prisma"
+    if (!isReactApp && isBackend) {
+      let nodeType = "Node.js"
+      if (deps["typescript"]) {
+        nodeType = "TypeScript Node.js"
+      }
+      
+      // Add frameworks to node type
+      if (deps["express"]) {
+        nodeType += " Express"
+      } else if (deps["@nestjs/core"]) {
+        nodeType += " NestJS"
+      } else if (deps["fastify"]) {
+        nodeType += " Fastify"
+      } else if (deps["koa"]) {
+        nodeType += " Koa"
+      } else if (deps["hono"]) {
+        nodeType += " Hono"
+      } else if (deps["@trpc/server"]) {
+        nodeType += " tRPC"
+      }
+      
+      // Add ORM detection
+      if (deps["@prisma/client"]) {
+        nodeType += " + Prisma"
+      }
+      if (deps["typeorm"]) {
+        nodeType += " + TypeORM"
+      }
+      if (deps["sequelize"]) {
+        nodeType += " + Sequelize"
+      }
+      if (deps["drizzle-orm"]) {
+        nodeType += " + DrizzleORM"
+      }
+      if (deps["mongoose"]) {
+        nodeType += " + Mongoose"
+      }
+      
+      detectedTypes.push({
+        type: nodeType,
+        category: "backend",
+        confidence: 95
+      })
     }
-    if (deps["typeorm"]) {
-      nodeType += " + TypeORM"
-    }
-    if (deps["sequelize"]) {
-      nodeType += " + Sequelize"
-    }
-    if (deps["drizzle-orm"]) {
-      nodeType += " + DrizzleORM"
-    }
-    if (deps["mongoose"]) {
-      nodeType += " + Mongoose"
-    }
-    
-    detectedTypes.push({
-      type: nodeType,
-      category: "backend",
-      confidence: 95
-    })
   }
   
  
@@ -809,30 +846,220 @@ export const detectProjectType = async (projectDir: string): Promise<string> => 
     }
   }
   
-  // Enhanced Python detection
+  // Enhanced Python detection with dependency analysis
   const requirementsPath = path.join(projectDir, "requirements.txt")
   const pipfilePath = path.join(projectDir, "Pipfile")
-  const pythonFiles = goFiles.filter(f => f.endsWith(".py"))
+  const poetryPath = path.join(projectDir, "pyproject.toml")
+  const condaPath = path.join(projectDir, "environment.yml")
+  const pythonFiles = await fs.readdir(projectDir).catch(() => []).then(files => files.filter(f => f.endsWith(".py")))
   
-  if (pythonFiles.length > 0 || await fs.pathExists(requirementsPath) || await fs.pathExists(pipfilePath)) {
+  const isPythonProject = pythonFiles.length > 0 || 
+                         await fs.pathExists(requirementsPath) || 
+                         await fs.pathExists(pipfilePath) ||
+                         await fs.pathExists(poetryPath) ||
+                         await fs.pathExists(condaPath)
+  
+  if (isPythonProject) {
     let pythonType = "Python"
+    let confidence = 90
+    let frameworks: string[] = []
     
-    // Check for Python frameworks
+    // Read all possible dependency files
     const requirements = await fs.readFile(requirementsPath, 'utf-8').catch(() => '')
-    const mainPyContent = await fs.readFile(path.join(projectDir, 'main.py'), 'utf-8').catch(() => '')
+    const pipfile = await fs.readFile(pipfilePath, 'utf-8').catch(() => '')
+    const pyproject = await fs.readFile(poetryPath, 'utf-8').catch(() => '')
+    const condaEnv = await fs.readFile(condaPath, 'utf-8').catch(() => '')
+    const mainPy = await fs.readFile(path.join(projectDir, 'main.py'), 'utf-8').catch(() => '')
+    const appPy = await fs.readFile(path.join(projectDir, 'app.py'), 'utf-8').catch(() => '')
     
-    if (requirements.includes('django') || await fs.pathExists(path.join(projectDir, 'manage.py'))) {
-      pythonType = "Python Django"
-    } else if (requirements.includes('fastapi') || mainPyContent.includes('from fastapi import FastAPI')) {
-      pythonType = "Python FastAPI"
-    } else if (requirements.includes('flask') || mainPyContent.includes('from flask import Flask')) {
-      pythonType = "Python Flask"
+    const allDeps = requirements + pipfile + pyproject + condaEnv + mainPy + appPy
+    
+    // Framework detection with confidence scoring
+    type FrameworkPattern = {
+      name: string;
+      score: number;
+      files?: string[];
+      imports?: string[];
+    }
+
+    const frameworkPatterns: Record<string, FrameworkPattern> = {
+      'django': { name: 'Django', score: 15, files: ['manage.py', 'wsgi.py', 'asgi.py'] },
+      'fastapi': { name: 'FastAPI', score: 15, imports: ['from fastapi import'] },
+      'flask': { name: 'Flask', score: 15, imports: ['from flask import'] },
+      'tornado': { name: 'Tornado', score: 15, imports: ['import tornado'] },
+      'pyramid': { name: 'Pyramid', score: 15, imports: ['from pyramid.config import'] },
+      'aiohttp': { name: 'AIOHTTP', score: 15, imports: ['import aiohttp'] },
+      'sanic': { name: 'Sanic', score: 15, imports: ['from sanic import'] },
+      'dash': { name: 'Dash', score: 10, imports: ['import dash'] },
+      'streamlit': { name: 'Streamlit', score: 10, imports: ['import streamlit'] }
+    }
+    
+    // Check framework dependencies and imports
+    for (const [key, framework] of Object.entries(frameworkPatterns)) {
+      if (allDeps.toLowerCase().includes(key)) {
+        frameworks.push(framework.name)
+        confidence += framework.score
+        
+        // Check for framework-specific files
+        if (framework.files) {
+          for (const file of framework.files) {
+            if (await fs.pathExists(path.join(projectDir, file))) {
+              confidence += 5
+            }
+          }
+        }
+        
+        // Check for specific imports
+        if (framework.imports) {
+          for (const importStr of framework.imports) {
+            if (allDeps.includes(importStr)) {
+              confidence += 5
+            }
+          }
+        }
+      }
+    }
+    
+    // Check for ORMs and other major libraries
+    const libraries = {
+      'sqlalchemy': 'SQLAlchemy',
+      'peewee': 'Peewee',
+      'tortoise': 'TortoiseORM',
+      'mongoengine': 'MongoEngine',
+      'pydantic': 'Pydantic',
+      'celery': 'Celery',
+      'pytest': 'PyTest',
+      'numpy': 'NumPy',
+      'pandas': 'Pandas',
+      'tensorflow': 'TensorFlow',
+      'torch': 'PyTorch'
+    }
+    
+    for (const [lib, name] of Object.entries(libraries)) {
+      if (allDeps.toLowerCase().includes(lib)) {
+        frameworks.push(name)
+        confidence += 5
+      }
+    }
+    
+    // Build final type string
+    if (frameworks.length > 0) {
+      pythonType = `Python ${frameworks.join(" + ")}`
     }
     
     detectedTypes.push({
       type: pythonType,
+      category: frameworks.some(f => ['Django', 'FastAPI', 'Flask', 'Tornado', 'Pyramid', 'AIOHTTP', 'Sanic'].includes(f)) ? "backend" : "other",
+      confidence: Math.min(confidence, 100)
+    })
+  }
+  
+  // Enhanced Ruby detection with Gemfile analysis
+  const gemfilePath = path.join(projectDir, "Gemfile")
+  const rubyFiles = await fs.readdir(projectDir).catch(() => []).then(files => files.filter(f => f.endsWith(".rb")))
+  
+  if (await fs.pathExists(gemfilePath) || rubyFiles.length > 0) {
+    let rubyType = "Ruby"
+    let confidence = 90
+    let frameworks: string[] = []
+    
+    const gemfile = await fs.readFile(gemfilePath, 'utf-8').catch(() => '')
+    const gemfileLock = await fs.readFile(path.join(projectDir, 'Gemfile.lock'), 'utf-8').catch(() => '')
+    const configRu = await fs.readFile(path.join(projectDir, 'config.ru'), 'utf-8').catch(() => '')
+    
+    const allGems = gemfile + gemfileLock + configRu
+    
+    // Framework detection with confidence scoring
+    type GemPattern = {
+      name: string;
+      score: number;
+      files?: string[];
+      requires?: string[];
+    }
+    
+    const gemPatterns: Record<string, GemPattern> = {
+      'rails': { 
+        name: 'Rails', 
+        score: 20,
+        files: ['config/routes.rb', 'config/application.rb', 'app/controllers/application_controller.rb']
+      },
+      'sinatra': {
+        name: 'Sinatra',
+        score: 15,
+        requires: ['require "sinatra"', "require 'sinatra'"]
+      },
+      'hanami': {
+        name: 'Hanami',
+        score: 15,
+        files: ['config/environment.rb', 'apps/web/application.rb']
+      },
+      'grape': {
+        name: 'Grape',
+        score: 15,
+        requires: ['require "grape"', "require 'grape'"]
+      },
+      'roda': {
+        name: 'Roda',
+        score: 15,
+        requires: ['require "roda"', "require 'roda'"]
+      }
+    }
+    
+    // Check gem dependencies and files
+    for (const [key, pattern] of Object.entries(gemPatterns)) {
+      if (allGems.toLowerCase().includes(key)) {
+        frameworks.push(pattern.name)
+        confidence += pattern.score
+        
+        if (pattern.files) {
+          for (const file of pattern.files) {
+            if (await fs.pathExists(path.join(projectDir, file))) {
+              confidence += 5
+            }
+          }
+        }
+        
+        if (pattern.requires) {
+          for (const req of pattern.requires) {
+            if (allGems.includes(req)) {
+              confidence += 5
+            }
+          }
+        }
+      }
+    }
+    
+    // Check for popular Ruby gems
+    const gems = {
+      'devise': 'Devise',
+      'activerecord': 'ActiveRecord',
+      'sequel': 'Sequel',
+      'mongoid': 'Mongoid',
+      'sidekiq': 'Sidekiq',
+      'rspec': 'RSpec',
+      'minitest': 'Minitest',
+      'capybara': 'Capybara',
+      'webpacker': 'Webpacker',
+      'stimulus': 'Stimulus',
+      'turbo-rails': 'Turbo'
+    }
+    
+    for (const [gem, name] of Object.entries(gems)) {
+      if (allGems.toLowerCase().includes(gem)) {
+        frameworks.push(name)
+        confidence += 5
+      }
+    }
+    
+    // Build final type string
+    if (frameworks.length > 0) {
+      rubyType = `Ruby ${frameworks.join(" + ")}`
+    }
+    
+    detectedTypes.push({
+      type: rubyType,
       category: "backend",
-      confidence: 90
+      confidence: Math.min(confidence, 100)
     })
   }
 
