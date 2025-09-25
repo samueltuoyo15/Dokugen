@@ -4,9 +4,7 @@
   "private": false,
   "main": "server.ts",
   "scripts": {
-    "dev": "ts-node server.ts",
-    "start": "node server.js",
-    "build": "tsc"
+    "start": "ts-node server.ts"
   },
   "keywords": [
     "open source",
