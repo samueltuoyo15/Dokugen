@@ -58,18 +58,8 @@ dokugen --version
 
 ![Generate Readme - Language & Framework agnostic](./public/Generate%20Readme%20-%20Language%20&%20Framework%20agnostic.png)
 
-## Technologies Used
-
-| Technology   | Description                                           | Link                                                                                 |
-| :----------- | :---------------------------------------------------- | :----------------------------------------------------------------------------------- |
-| Node.js      | JavaScript runtime environment                        | [https://nodejs.org/](https://nodejs.org/)                                           |
-| TypeScript   | Typed superset of JavaScript                          | [https://www.typescriptlang.org/](https://www.typescriptlang.org/)                   |
-| Commander.js | Node.js command-line interfaces                       | [https://github.com/tj/commander.js](https://github.com/tj/commander.js)             |
-| Inquirer.js  | Interactive command line prompt toolkit               | [https://github.com/SBoudrias/Inquirer.js](https://github.com/SBoudrias/Inquirer.js) |
-| Axios        | Promise-based HTTP client for the browser and Node.js | [https://github.com/axios/axios](https://github.com/axios/axios)                     |
-| Chalk        | Terminal string styling done right                    | [https://github.com/chalk/chalk](https://github.com/chalk/chalk)                     |
-| Esbuild      | An extremely fast JavaScript bundler and minifier     | [https://github.com/evanw/esbuild](https://github.com/evanw/esbuild)                 |
-
+![Review from Github Projects Community](./public/reviews.png)
+             |
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
