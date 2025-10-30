@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
 
@@ -12,11 +13,18 @@ interface UserMetrics {
 
 interface ApiResponse {
   activeUsers: UserMetrics[]
+  pagination: {
+    currentPage: number
+    totalPages: number
+    totalUsers: number
+    hasNext: boolean
+    hasPrev: boolean
+  }
 }
 
-const fetchMetrics = async (): Promise<ApiResponse> => {
+const fetchMetrics = async (page: number): Promise<ApiResponse> => {
   try {
-    const response = await fetch("https://dokugen-readme.vercel.app/api/active-users")
+    const response = await fetch(`https://dokugen-readme.vercel.app/api/active-users?page=${page}&limit=10`)
     if (!response.ok) {
       throw new Error(`Failed to fetch metrics: ${response.statusText}`)
     }
@@ -44,9 +52,11 @@ const GitHubUserLink = ({ username }: { username: string }) => (
 )
 
 export default function MetricsSection() {
+  const [currentPage, setCurrentPage] = useState(1)
+
   const { data, error, isLoading } = useQuery<ApiResponse>({
-    queryKey: ["metrics"], 
-    queryFn: fetchMetrics, 
+    queryKey: ["metrics", currentPage], 
+    queryFn: () => fetchMetrics(currentPage), 
     staleTime: 1000 * 60 * 5,
   })
 
@@ -84,6 +94,28 @@ export default function MetricsSection() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        <div className="flex justify-between items-center mt-4">
+          <button 
+            onClick={() => setCurrentPage(prev => prev - 1)}
+            disabled={!data?.pagination.hasPrev}
+            className="px-4 py-2 bg-blue-600 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Previous
+          </button>
+          
+          <span className="text-gray-300">
+            Page {data?.pagination.currentPage} of {data?.pagination.totalPages}
+          </span>
+          
+          <button 
+            onClick={() => setCurrentPage(prev => prev + 1)}
+            disabled={!data?.pagination.hasNext}
+            className="px-4 py-2 bg-blue-600 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
         </div>
       </div>
 
