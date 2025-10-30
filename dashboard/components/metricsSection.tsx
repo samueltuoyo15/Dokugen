@@ -57,7 +57,7 @@ export default function MetricsSection() {
 
       {/* User Metrics Table */}
       <div className="bg-gray-800 p-6 rounded-lg mb-8">
-        <h3 className="text-2xl font-bold mb-4">Active Users</h3>
+        <h3 className="text-2xl font-bold mb-4">Leaderboard</h3>
         <div className="overflow-x-auto">
           <table className="min-w-full bg-gray-700">
             <thead>
