@@ -290,7 +290,7 @@ export default function DocsPage() {
           transition={{ duration: 0.8, delay: 1 }}
           className="mt-16 text-center"
         >
-          <p className="text-gray-300">Need help? Check out our <a href="https://github.com/samueltuoyo15/Dokugen" className="text-blue-500 hover:underline">GitHub</a> or <a href="https://github.com/samueltuoyo15/Dokugen" className="text-blue-500 hover:underline">support page</a>.</p>
+          <p className="text-gray-300">Need help? Check out our <a href="https://github.com/samueltuoyo15/Dokugen" className="text-blue-500 hover:underline">GitHub</a> or <a href="https://github.com/sponsors/samueltuoyo15" className="text-blue-500 hover:underline">support page</a>.</p>
         </motion.div>
       </div>
     </div>
