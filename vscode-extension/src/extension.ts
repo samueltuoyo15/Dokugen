@@ -1,26 +1,50 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from 'vscode'
+import { exec } from 'child_process'
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+const checkAndRunDokugen = async (folderPath: string) => {
+  const terminal = vscode.window.createTerminal({
+    name: 'DokuGen',
+    cwd: folderPath
+  })
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "vscode-extension" is now active!');
+  terminal.show()
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('vscode-extension.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from dokugen!');
-	});
+  exec('dokugen --version', async (error) => {
+    if (error) {
+   
+      terminal.sendText('npm install -g dokugen')
+      await new Promise(resolve => setTimeout(resolve, 3000)) 
+ 
+      terminal.sendText('dokugen generate')
+    } else {
 
-	context.subscriptions.push(disposable);
+      terminal.sendText('dokugen generate')
+    }
+  })
 }
 
-// This method is called when your extension is deactivated
+export function activate(context: vscode.ExtensionContext) {
+
+  let disposable = vscode.commands.registerCommand('dokugen.generate', (folderUri: vscode.Uri) => {
+    let workspaceFolder: vscode.WorkspaceFolder | undefined
+
+    if (folderUri) {
+      workspaceFolder = vscode.workspace.getWorkspaceFolder(folderUri)
+    } else {
+      workspaceFolder = vscode.workspace.workspaceFolders?.[0]
+    }
+
+    if (!workspaceFolder) {
+      vscode.window.showErrorMessage('Please open a folder in your workspace to run DokuGen')
+      return
+    }
+
+    const folderPath = workspaceFolder.uri.fsPath
+
+    checkAndRunDokugen(folderPath)
+  })
+
+  context.subscriptions.push(disposable)
+}
+
 export function deactivate() {}

@@ -9,15 +9,26 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onCommand:dokugen.generate"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "vscode-extension.helloWorld",
-        "title": "Hello World"
+        "command": "dokugen.generate",
+        "title": "DokuGen: Generate README"
       }
-    ]
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "dokugen.generate",
+          "when": "explorerResourceIsFolder",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
