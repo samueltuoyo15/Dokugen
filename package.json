@@ -1,5 +1,5 @@
 {
-  "name": "my-turborepo",
+  "name": "Dokugen",
   "private": true,
   "scripts": {
     "build": "turbo run build",
