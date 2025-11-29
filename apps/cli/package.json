@@ -1,0 +1,59 @@
+{
+  "name": "dokugen",
+  "version": "3.9.0",
+  "private": false,
+  "main": "dist/bin/dokugen.mjs",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "postinstall": "node dist/scripts/postinstall.mjs",
+    "test": "vitest",
+    "postbuild": "node --no-warnings --loader ts-node/esm lib/rename.ts"
+  },
+  "bin": {
+    "dokugen": "dist/bin/dokugen.mjs"
+  },
+  "keywords": [
+    "open source",
+    "readme generator",
+    "readme.md generator",
+    "readme generation",
+    "dokugen",
+    "cli tool"
+  ],
+  "author": "OritseWeyinmi Samuel Tuoyo",
+  "license": "ISC",
+  "description": "Readme generator command line tool.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samueltuoyo15/Dokugen.git"
+  },
+  "bugs": {
+    "url": "git+https://github.com/samueltuoyo15/Dokugen/issues"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.10.0",
+    "@jaames/iro": "^5.5.2",
+    "@types/marked-terminal": "^6.1.1",
+    "axios": "^1.8.1",
+    "chalk": "^5.4.1",
+    "cli-md": "^1.2.0",
+    "commander": "^13.1.0",
+    "esbuild": "^0.25.1",
+    "figlet": "^1.8.1",
+    "fs": "^0.0.1-security",
+    "fs-extra": "^11.3.0",
+    "gradient-string": "^3.0.0",
+    "nanospinner": "^1.2.2"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.9.36",
+    "@types/figlet": "^1.7.0",
+    "@types/fs-extra": "^11.0.4",
+    "@types/marked": "^5.0.2",
+    "@types/node": "^22.13.4",
+    "supertest": "^7.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "NodeNext",
+    "rootDir": ".",
+    "allowJs": true,
+    "moduleResolution": "NodeNext",
+    "outDir": "dist",
+    "downlevelIteration": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["bin/**/*", "_tests_/**/*", "scripts/**/*"],
+  "exclude": ["dashboard", "lib", "dist", "node_modules"]
+}
