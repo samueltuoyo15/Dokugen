@@ -62,7 +62,7 @@ const backupReadme = async (readmePath: string): Promise<void> => {
       );
     }
   } catch (error) {
-    console.error(chalk.red("❌ Failed to backup README:"), error);
+    console.error(chalk.red("Failed to backup README:"), error);
   }
 };
 
@@ -73,7 +73,7 @@ const restoreReadme = async (): Promise<string | null> => {
       console.log(chalk.green("Original README content restored successfully"));
       return readmeBackup;
     } catch (error) {
-      console.error(chalk.red("❌ Failed to restore README:"), error);
+      console.error(chalk.red("Failed to restore README:"), error);
       return null;
     } finally {
       readmeBackup = null;
@@ -121,7 +121,7 @@ const extractFullCode = async (
 
             return `### ${file}\n- **Path:** ${file}\n- **Size:** ${(stats.size / 1024).toFixed(2)} KB\n\`\`\`${path.extname(file).slice(1) || "txt"}\n${content}\n\`\`\`\n`;
           } catch (error) {
-            console.error(chalk.red(`❌ Failed to read file: ${file}`));
+            console.error(chalk.red(`Failed to read file: ${file}`));
             console.error(error);
             return null;
           }
@@ -453,7 +453,7 @@ const generateReadme = async (
       });
 
       fileStream.on("error", async (err) => {
-        console.log(chalk.red("\n❌ Failed to write README"));
+        console.log(chalk.red("\nFailed to write README"));
         spinner.error({ text: chalk.red("Failed to generate README") });
         const restoredContent = await restoreReadme();
         fileStream.end();
@@ -461,7 +461,7 @@ const generateReadme = async (
       });
 
       responseStream.on("error", async (err: Error) => {
-        console.log(chalk.red("\n❌ Error receiving stream data"));
+        console.log(chalk.red("\nError receiving stream data"));
         spinner.error({ text: chalk.red("Failed to generate README") });
         const restoredContent = await restoreReadme();
         reject(restoredContent || err);
@@ -530,7 +530,7 @@ program
       if (options.template && !options.template.includes("github.com")) {
         console.log(
           chalk.red(
-            "❌ Invalid GitHub URL. Use format: https://github.com/user/repo/blob/main/README.md",
+            "Invalid GitHub URL. Use format: https://github.com/user/repo/blob/main/README.md",
           ),
         );
         process.exit(1);

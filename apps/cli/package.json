@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "postinstall": "node dist/scripts/postinstall.mjs",
+    "postinstall": "pnpm run build && node dist/scripts/postinstall.mjs",
     "test": "vitest",
     "postbuild": "node --no-warnings --loader ts-node/esm lib/rename.ts"
   },

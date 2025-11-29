@@ -1,11 +1,12 @@
 {
-  "name": "dokugen server",
+  "name": "dokugen-server",
   "version": "3.2.0",
   "private": false,
   "main": "server.ts",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "postinstall": "tsc"
   },
   "keywords": [
     "open source",
