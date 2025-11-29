@@ -1,0 +1,13 @@
+# *
+User-agent: *
+Allow: /
+
+# *
+User-agent: *
+Disallow: /api/*
+
+# Host
+Host: https://dokugen-readme.vercel.app
+
+# Sitemaps
+Sitemap: https://dokugen-readme.vercel.app/sitemap.xml
