@@ -1,0 +1,6 @@
+.env
+dashboard/
+lib/
+node_modules/
+_tests_
+server/
