@@ -48,8 +48,8 @@ const GitHubUserLink = ({ username }: { username: string }) => {
     >
       <div className="relative w-8 h-8 rounded-full overflow-hidden border border-zinc-700 group-hover:border-zinc-500 transition-colors">
         <Image
-          src={`https://github.com/${username}.png?size=40`}
-          alt={`${username}'s avatar`}
+          src={`https://avatars.githubusercontent.com/${username}?size=40`}
+          alt={`${username}`}
           fill
           className="object-cover"
           sizes="32px"
