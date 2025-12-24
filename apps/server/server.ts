@@ -50,6 +50,23 @@ const generateCacheKey = (projectType: string, projectFiles: string[], fullCode:
 }
 */
 
+/*
+TODO
+export async function retryAsync<T>(
+  fn: () => Promise<T>,
+  retries = 3,
+  delay = 1000
+): Promise<T> {
+  try {
+    return await fn();
+  } catch (err) {
+    if (retries <= 0) throw err;
+    await new Promise((resolve) => setTimeout(resolve, delay));
+    return retryAsync(fn, retries - 1, delay * 2);
+  }
+}
+*/
+
 app.get("/api/health", (_req: Request, res: Response) => {
   res.status(200).json({
     status: "Ok",
