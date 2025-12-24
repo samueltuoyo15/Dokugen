@@ -146,22 +146,22 @@ export default function DocsPage() {
               </div>
 
               <div className="group bg-zinc-900/30 p-8 rounded-2xl border border-zinc-900 hover:border-zinc-800 transition-all">
-                <h3 className="text-xl font-semibold mb-3 text-zinc-100">2. Navigate to Project</h3>
+                <h3 className="text-xl font-semibold mb-3 text-zinc-100">2. Install Globally</h3>
+                <p className="text-zinc-400 mb-6 leading-relaxed">
+                  Install Dokugen globally once, and use it forever across any project on your machine:
+                </p>
+                <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-900">
+                  <code className="text-zinc-300 font-mono text-sm">npm install -g dokugen</code>
+                </div>
+              </div>
+
+              <div className="group bg-zinc-900/30 p-8 rounded-2xl border border-zinc-900 hover:border-zinc-800 transition-all">
+                <h3 className="text-xl font-semibold mb-3 text-zinc-100">3. Navigate to Project</h3>
                 <p className="text-zinc-400 mb-6 leading-relaxed">
                   Open your terminal and navigate to your project directory:
                 </p>
                 <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-900">
                   <code className="text-zinc-300 font-mono text-sm">cd your-project</code>
-                </div>
-              </div>
-
-              <div className="group bg-zinc-900/30 p-8 rounded-2xl border border-zinc-900 hover:border-zinc-800 transition-all">
-                <h3 className="text-xl font-semibold mb-3 text-zinc-100">3. Install Globally</h3>
-                <p className="text-zinc-400 mb-6 leading-relaxed">
-                  Install Dokugen globally using npm for quick access anywhere:
-                </p>
-                <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-900">
-                  <code className="text-zinc-300 font-mono text-sm">npm install -g dokugen</code>
                 </div>
               </div>
 

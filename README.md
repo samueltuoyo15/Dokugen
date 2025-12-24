@@ -6,7 +6,7 @@ Dokugen is a lightweight README.md file Generator Command Line Interface Tool. I
 
 ## Usage
 
-### Install Dokugen globally (Recommended)
+### Install Dokugen globally once, and use forever (Recommended)
 
 ```bash
 npm install -g dokugen
