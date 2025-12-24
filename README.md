@@ -9,7 +9,11 @@ Dokugen is a lightweight README.md file Generator Command Line Interface Tool. I
 ### Install Dokugen globally (Recommended)
 
 ```bash
-npm install -g dokugen #or yarn global add dokugen or# pnpm install -g dokugen
+npm install -g dokugen
+# or
+yarn global add dokugen
+# or
+pnpm install -g dokugen
 ```
 
 ### Navigate to the project you want to work with
@@ -68,7 +72,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contributing
 
-Contributions are welcome! Please first open an issue with your feature request before submitting a pull request. [Read the contribution guide here.](https://github.com/samueltuoyo15/Dokugen/blob/main/CONTRIBUTION.md)
+Contributions are welcome! [Read the contribution guide here.](https://github.com/samueltuoyo15/Dokugen/blob/main/CONTRIBUTION.md)
 
 ## Author
 

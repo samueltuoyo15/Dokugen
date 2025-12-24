@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.9.0] - 2025-12-24
+### Added
+- **Updated Contribution Guidelines**: Explicitly defined contribution areas and workflows for CLI, Server, Docs, and VSCode Extension.
+- **Server Documentation**: Added detailed environment variable configuration for the server.
+
+### Changed
+- **Documentation**: Refined README installation instructions for clarity.
+
 ## [3.8.0] - 2025-07-03
 ### Fixed
 - Feature to generate docker compose coming soon!!!
