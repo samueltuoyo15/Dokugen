@@ -41,10 +41,15 @@
     "lint": "eslint src",
     "test": "vscode-test"
   },
+  "dependencies": {
+    "dokugen": "workspace:*",
+    "fs-extra": "^11.3.0"
+  },
   "devDependencies": {
     "@types/vscode": "^1.105.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
+    "@types/fs-extra": "^11.0.4",
     "@typescript-eslint/eslint-plugin": "^8.45.0",
     "@typescript-eslint/parser": "^8.45.0",
     "eslint": "^9.36.0",

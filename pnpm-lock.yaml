@@ -253,7 +253,17 @@ importers:
         version: 5.9.3
 
   apps/vscode-extension:
+    dependencies:
+      dokugen:
+        specifier: workspace:*
+        version: link:../cli
+      fs-extra:
+        specifier: ^11.3.0
+        version: 11.3.2
     devDependencies:
+      '@types/fs-extra':
+        specifier: ^11.0.4
+        version: 11.0.4
       '@types/mocha':
         specifier: ^10.0.10
         version: 10.0.10
