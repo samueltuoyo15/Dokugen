@@ -2,16 +2,16 @@
   "name": "dokugen",
   "version": "3.9.0",
   "private": false,
-  "main": "dist/bin/dokugen.mjs",
+  "main": "dist/bin/index.js",
+  "types": "dist/bin/index.d.ts",
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "postinstall": "pnpm run build && node dist/scripts/postinstall.mjs",
-    "test": "vitest",
-    "postbuild": "node --no-warnings --loader ts-node/esm lib/rename.ts"
+    "postinstall": "pnpm run build",
+    "test": "vitest"
   },
   "bin": {
-    "dokugen": "dist/bin/dokugen.mjs"
+    "dokugen": "dist/bin/dokugen.js"
   },
   "keywords": [
     "open source",
