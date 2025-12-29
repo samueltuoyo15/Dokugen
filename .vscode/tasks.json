@@ -6,7 +6,7 @@
             "type": "shell",
             "command": "pnpm run --filter vscode-extension compile",
             "group": "build",
-            "problemMatcher": "$ts-webpack-watch"
+            "problemMatcher": "$tsc"
         }
     ]
 }
