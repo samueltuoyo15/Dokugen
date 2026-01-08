@@ -7,48 +7,12 @@ import { select } from "@clack/prompts";
 import figlet from "figlet";
 import { createSpinner } from "nanospinner";
 import { setTimeout as sleep } from "timers/promises";
-import axios from "axios";
-import { Readable } from "stream";
-import { execSync } from "child_process";
-import os from "os";
-//@ts-ignore
-import { detectProjectType } from "./projectDetect.mjs";
+import { detectProjectType } from "./projectDetect.js";
+import { getUserInfo, getGitRepoUrl, scanFiles, checkInternetConnection } from "./utils.js";
+import { generateReadmeCore } from "./generator.js";
 
-const API_TIMEOUT = 300000;
 let readmeBackup: string | null = null;
 let currentReadmePath: string = "";
-
-const getUserInfo = (): {
-  username: string;
-  email?: string;
-  osInfo: { platform: string; arch: string; release: string };
-} => {
-  let gitName = "";
-  let gitEmail = "";
-  try {
-    gitName =
-      execSync("git config --get user.name", { encoding: "utf-8" }).trim() ??
-      "";
-    gitEmail =
-      execSync("git config --get user.email", { encoding: "utf-8" }).trim() ??
-      "";
-    const osInfo = {
-      platform: os.platform() || "unknown",
-      arch: os.arch() || "unknown",
-      release: os.release() || "unknown",
-    };
-    if (gitName && gitEmail && osInfo)
-      return { username: gitName, email: gitEmail, osInfo };
-  } catch {
-    console.log(chalk.yellow("Git User Info not found. Using Defaults......"));
-  }
-
-  return {
-    username: os.userInfo().username || "",
-    email: process.env.USER || "",
-    osInfo: { platform: "Unknown", arch: "Unknown", release: "Unknown" },
-  };
-};
 
 const backupReadme = async (readmePath: string): Promise<void> => {
   try {
@@ -85,250 +49,6 @@ const restoreReadme = async (): Promise<string | null> => {
   }
 };
 
-const getGitRepoUrl = (): string | null => {
-  try {
-    const repoUrl = execSync("git config --get remote.origin.url", {
-      encoding: "utf-8",
-    }).trim();
-    return repoUrl || null;
-  } catch {
-    return null;
-  }
-};
-
-const extractFullCode = async (
-  projectFiles: string[],
-  projectDir: string,
-): Promise<string> => {
-  const fileGroups: Record<string, string[]> = {};
-
-  projectFiles.forEach((file) => {
-    const dir = path.dirname(file);
-    if (!fileGroups[dir]) fileGroups[dir] = [];
-    fileGroups[dir].push(file);
-  });
-
-  const snippets = await Promise.all(
-    Object.entries(fileGroups).map(async ([dir, files]) => {
-      const dirSnippets = await Promise.all(
-        files.map(async (file) => {
-          try {
-            const filePath = path.resolve(projectDir, file);
-            const stats = await fs.stat(filePath);
-            const contentStream = fs.createReadStream(filePath, "utf-8");
-            let content = "";
-            for await (const chunk of contentStream) content += chunk;
-
-            return `### ${file}\n- **Path:** ${file}\n- **Size:** ${(stats.size / 1024).toFixed(2)} KB\n\`\`\`${path.extname(file).slice(1) || "txt"}\n${content}\n\`\`\`\n`;
-          } catch (error) {
-            console.error(chalk.red(`Failed to read file: ${file}`));
-            console.error(error);
-            return null;
-          }
-        }),
-      );
-
-      return `## ${dir}\n${dirSnippets.filter(Boolean).join("")}`;
-    }),
-  );
-  return snippets.filter(Boolean).join("") || "No code snippets available";
-};
-
-const matchesIgnorePattern = (filename: string, pattern: string): boolean => {
-  if (pattern.startsWith("*.")) {
-    const ext = pattern.slice(1);
-    return filename.endsWith(ext);
-  }
-  return filename === pattern;
-};
-
-const scanFiles = async (dir: string): Promise<string[]> => {
-  const ignoreDirs = new Set([
-    "node_modules",
-    "dependencies",
-    "ajax",
-    "public",
-    "android",
-    "ios",
-    ".expo",
-    ".next",
-    ".nuxt",
-    ".svelte-kit",
-    ".vercel",
-    ".serverless",
-    ".cache",
-    "tests",
-    "_tests_",
-    "_test_",
-    "__tests__",
-    "coverage",
-    "test",
-    "spec",
-    "cypress",
-    "e2e",
-    "dist",
-    "build",
-    "out",
-    "bin",
-    "obj",
-    "lib",
-    "target",
-    "release",
-    "debug",
-    "artifacts",
-    "generated",
-    ".git",
-    ".svn",
-    ".hg",
-    ".vscode",
-    ".idea",
-    ".vs",
-    "venv",
-    ".venv",
-    "env",
-    ".env",
-    "virtualenv",
-    "envs",
-    "docs",
-    "javadoc",
-    "logs",
-    "android",
-    "ios",
-    "windows",
-    "linux",
-    "macos",
-    "web",
-    ".dart_tool",
-    ".gradle",
-    ".mvn",
-    ".npm",
-    ".yarn",
-    "tmp",
-    "temp",
-    "uploads",
-    "public",
-    "static",
-    "assets",
-    "images",
-    "media",
-    "migrations",
-    "data",
-    "db",
-    "database",
-    ".github",
-    ".circleci",
-    ".husky",
-    "storage",
-    "vendor",
-    "cmake-build-debug",
-    "packages",
-    "plugins",
-  ]);
-  const ignoreFiles = new Set([
-    "*.exe",
-    "*.mp4",
-    "*.iso",
-    "*.mp3",
-    "*.bin",
-    "*.so",
-    "*.a",
-    "*.dll",
-    "*.pyc",
-    "*.class",
-    "*.o",
-    "*.jar",
-    "*.war",
-    "*.ear",
-    "*.apk",
-    "*.ipa",
-    "*.dylib",
-    "*.lock",
-    "package-lock.json",
-    "yarn.lock",
-    "pnpm-lock.yaml",
-    "Gemfile.lock",
-    "CHANGELOG.md",
-    "style.css",
-    "main.css",
-    "output.css",
-    ".gitignore",
-    ".npmignore",
-    "tsconfig.json",
-    "jest.config.js",
-    "README.md",
-    ".DS_Store",
-    ".env",
-    "Thumbs.db",
-    "tsconfig.*",
-    "*.iml",
-    ".editorconfig",
-    ".prettierrc*",
-    ".eslintrc*",
-    "*.log",
-    "*.min.js",
-    "*.min.css",
-    "*.pdf",
-    "*.jpg",
-    "*.png",
-    "*.gif",
-    "*.svg",
-    "*.ico",
-    "*.woff",
-    "*.woff2",
-    "*.ttf",
-    "*.eot",
-    "*.mp3",
-    "*.mp4",
-    "*.zip",
-    "*.tar",
-    "*.gz",
-    "*.rar",
-    "*.7z",
-    "*.sqlite",
-    "*.db",
-    "*.sublime-workspace",
-    "*.sublime-project",
-    "*.bak",
-    "*.swp",
-    "*.swo",
-    "*.pid",
-    "*.seed",
-    "*.pid.lock",
-  ]);
-
-  const files: string[] = [];
-  const queue: string[] = [dir];
-
-  while (queue.length) {
-    const folder = queue.shift();
-    if (!folder) continue;
-
-    try {
-      const dirContents = await fs.readdir(folder, { withFileTypes: true });
-      for (const file of dirContents) {
-        const fullPath = path.join(folder, file.name);
-        if (file.isDirectory()) {
-          if (!ignoreDirs.has(file.name)) {
-            queue.push(fullPath);
-          }
-        } else {
-          const shouldIgnore = [...ignoreFiles].some((pattern) =>
-            matchesIgnorePattern(file.name, pattern),
-          );
-
-          if (!shouldIgnore) {
-            files.push(fullPath.replace(`${dir}/`, ""));
-          }
-        }
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  return files;
-};
-
 const askYesNo = async (message: string): Promise<boolean | "cancel"> => {
   try {
     const response = await select({
@@ -351,15 +71,6 @@ const askYesNo = async (message: string): Promise<boolean | "cancel"> => {
   }
 };
 
-const checkInternetConnection = async (): Promise<boolean> => {
-  try {
-    await axios.get("https://www.google.com", { timeout: 5000 });
-    return true;
-  } catch {
-    return false;
-  }
-};
-
 const generateReadme = async (
   projectType: string,
   projectFiles: string[],
@@ -369,7 +80,6 @@ const generateReadme = async (
 ): Promise<string | null> => {
   try {
     console.log(chalk.blue("Analyzing project files..."));
-    const projectDir = process.cwd();
     const readmePath = path.join(projectDir, "README.md");
 
     let includeSetup = false;
@@ -389,84 +99,34 @@ const generateReadme = async (
       includeContributionGuideLine = contributionAnswer;
     }
 
-    const fullCode = await extractFullCode(projectFiles, projectDir);
     const userInfo = getUserInfo();
     const repoUrl = getGitRepoUrl();
 
     const spinner = createSpinner(chalk.blue("Generating README...")).start();
-    const fileStream = fs.createWriteStream(readmePath);
 
-    const getBackendDomain = await axios.get<{ domain: string }>(
-      "https://dokugen-readme.vercel.app/api/get-server-url",
-    );
-    const backendDomain = getBackendDomain.data.domain;
-
-    const response = await axios.post(
-      `${backendDomain}/api/generate-readme`,
+    return await generateReadmeCore(
       {
         projectType,
         projectFiles,
-        fullCode,
+        projectDir,
         userInfo,
+        repoUrl,
         options: { includeSetup, includeContributionGuideLine },
         existingReadme,
-        repoUrl,
         templateUrl,
       },
+      readmePath,
       {
-        responseType: "stream",
-        timeout: API_TIMEOUT,
-      },
-    );
-
-    const responseStream = response.data as Readable;
-    return new Promise((resolve, reject) => {
-      let buffer = "";
-
-      responseStream.on("data", (chunk: Buffer) => {
-        buffer += chunk.toString();
-
-        const lines = buffer.split("\n");
-        buffer = lines.pop() || "";
-        lines.forEach((line) => {
-          if (line.startsWith("data:")) {
-            try {
-              const json = JSON.parse(line.replace("data: ", "").trim());
-              if (json.response && typeof json.response === "string") {
-                fileStream.write(json.response);
-              }
-            } catch (error) {
-              console.error("Skipping invalid event data:", line);
-            }
-          }
-        });
-      });
-
-      responseStream.on("end", () => {
-        fileStream.end(async () => {
-          spinner.success({
-            text: chalk.green("\nREADME.md created successfully"),
-          });
+        onSuccess: (text: string) => {
+          spinner.success({ text: chalk.green(`\n${text}`) });
           readmeBackup = null;
-          resolve(readmePath);
-        });
-      });
-
-      fileStream.on("error", async (err) => {
-        console.log(chalk.red("\nFailed to write README"));
-        spinner.error({ text: chalk.red("Failed to generate README") });
-        const restoredContent = await restoreReadme();
-        fileStream.end();
-        reject(restoredContent || err);
-      });
-
-      responseStream.on("error", async (err: Error) => {
-        console.log(chalk.red("\nError receiving stream data"));
-        spinner.error({ text: chalk.red("Failed to generate README") });
-        const restoredContent = await restoreReadme();
-        reject(restoredContent || err);
-      });
-    });
+        },
+        onError: (text: string, err: any) => {
+          console.log(chalk.red(`\n${text}`));
+          spinner.error({ text: chalk.red("Failed to generate README") });
+        }
+      }
+    );
   } catch (error: unknown) {
     console.error(
       "\n Error Generating Readme",
@@ -498,13 +158,13 @@ program
     await sleep(50);
     console.log(
       "\n\n" +
-        chalk.hex("#000080")(
-          figlet.textSync("DOKUGEN", {
-            font: "Small Slant",
-            horizontalLayout: "fitted",
-          }),
-        ) +
-        "\n\n",
+      chalk.hex("#000080")(
+        figlet.textSync("DOKUGEN", {
+          font: "Small Slant",
+          horizontalLayout: "fitted",
+        }),
+      ) +
+      "\n\n",
     );
     const projectDir = process.cwd();
     const readmePath = path.join(projectDir, "README.md");
