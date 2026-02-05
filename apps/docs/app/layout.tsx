@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteMetadata.siteUrl),
   title: {
     template: `%s | ${siteMetadata.title}`,
-    default: siteMetadata.title, 
+    default: siteMetadata.title,
   },
   description: siteMetadata.description,
   openGraph: {
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     title: siteMetadata.title,
   },
   other: {
-    "google-site-verification": "pcNkCr96GgxHUdk4V5-hzhdy0OH_EcNsvVzTQERObHo",
+    "google-site-verification": process.env.GOOGLE_SITE_VERIFICATION_TOKEN!,
   },
 };
 
