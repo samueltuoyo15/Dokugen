@@ -253,9 +253,8 @@ app.post(
          - Write a **short and engaging description** of the project that will make it stand out and attract potential users and contributors.
 
       3. **Installation**:
-        ${
-          options.includeSetup
-            ? `
+        ${options.includeSetup
+              ? `
         - **Clone the Repository**:
          \`\`\`bash
          git clone ${repoUrl || "<repository-url>"}
@@ -263,8 +262,8 @@ app.post(
         - Include **step-by-step instructions** for setting up the project locally.
         - Use **bullet points** and **code blocks** for clarity.
         `
-            : "<!-- SKIP SECTION: User opted out of Installation Instructions -->"
-        }
+              : "<!-- SKIP SECTION: User opted out of Installation Instructions -->"
+            }
 
       4. **Usage**:
          - Include **examples**, **screenshots**, and if theres not screenshot dont add please, you can actually check if theres any file like screenshot png file or something realted iin the project files, u can add it.
@@ -277,14 +276,13 @@ app.post(
          - Display a **table** or **grid** of technologies with **links**.
 
       7. **Contributing**:
-         ${
-           options.includeContributionGuideLine
-             ? `
+         ${options.includeContributionGuideLine
+              ? `
          - Include **guidelines** for contributing to the project.
          - Use **modern formatting** with **emoji bullet points**.
          `
-             : "<!-- SKIP SECTION: User Opted out of contributions guidelines -->"
-         }
+              : "<!-- SKIP SECTION: User Opted out of contributions guidelines -->"
+            }
 
       8. **License**:
          - Include a **license section** with a **link**, please if the user does not have a LISCENSE file in the project files dont add a liscense link in the readme.
@@ -314,7 +312,7 @@ app.post(
       `;
 
           const response = ai.models.generateContentStream({
-            model: process.env.MODEL_NAME || "gemini-2.0-flash-001",
+            model: process.env.MODEL_NAME || "gemini-3-pro-preview",
             contents: [
               {
                 role: "user",
