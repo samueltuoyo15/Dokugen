@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.10.0] - 2026-02-10
+### Added
+- **Auto-Update System**: Dokugen now automatically checks for updates and installs the latest version when you run any command.
+- **Smart README Update Command**: New `dokugen update` command that intelligently updates only auto-generated sections while preserving your custom content.
+- **Compression for Scalability**: Implemented gzip compression for large codebases, reducing payload sizes by 70-90% for faster uploads.
+- **Real-Time File Streaming**: README files now update in real-time as content is generated, so you can watch the magic happen.
+
+### Changed
+- Removed all unnecessary comments and emojis from codebase for cleaner production code.
+- Improved backend to handle compressed payloads for better performance.
+
+### Fixed
+- File streaming now properly flushes to disk for real-time visibility.
+
 ## [3.9.0] - 2025-12-24
 ### Added
 - **Updated Contribution Guidelines**: Explicitly defined contribution areas and workflows for CLI, Server, Docs, and VSCode Extension.

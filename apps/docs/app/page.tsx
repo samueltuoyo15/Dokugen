@@ -291,9 +291,13 @@ export default function DocsPage() {
           transition={{ duration: 0.8, delay: 1 }}
           className="mt-32 pb-16 text-center border-t border-zinc-900 pt-16"
         >
-          <p className="text-zinc-500">
+          <p className="text-zinc-500 mb-8">
             Need help? Check out our <a href="https://github.com/samueltuoyo15/Dokugen" className="text-white hover:underline decoration-zinc-700 underline-offset-4">GitHub</a> or <a href="https://github.com/sponsors/samueltuoyo15" className="text-white hover:underline decoration-zinc-700 underline-offset-4">support page</a>.
           </p>
+          <div className="flex justify-center gap-8 text-sm">
+            <Link href="/terms" className="text-zinc-600 hover:text-white transition-colors">Terms of Service</Link>
+            <Link href="/privacy" className="text-zinc-600 hover:text-white transition-colors">Privacy Policy</Link>
+          </div>
         </motion.div>
       </div>
     </div>

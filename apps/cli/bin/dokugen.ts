@@ -3,7 +3,7 @@ import { program } from "commander";
 import chalk from "chalk";
 import fs from "fs-extra";
 import * as path from "path";
-import { select } from "@clack/prompts";
+import { select, text, isCancel } from "@clack/prompts";
 import figlet from "figlet";
 import { createSpinner } from "nanospinner";
 import { setTimeout as sleep } from "timers/promises";
@@ -11,12 +11,55 @@ import axios from "axios";
 import { Readable } from "stream";
 import { execSync } from "child_process";
 import os from "os";
+import { gzip, gunzip } from "zlib";
+import { promisify } from "util";
 //@ts-ignore
 import { detectProjectType } from "./projectDetect.mjs";
+
+const gzipAsync = promisify(gzip);
 
 const API_TIMEOUT = 300000;
 let readmeBackup: string | null = null;
 let currentReadmePath: string = "";
+
+const checkAndUpdate = async (): Promise<void> => {
+  try {
+    const currentVersion = execSync("dokugen --version", {
+      stdio: "pipe",
+      timeout: 8000,
+      encoding: "utf-8"
+    }).trim();
+
+    const response = await axios.get<{ version: string }>("https://registry.npmjs.org/dokugen/latest", {
+      timeout: 3000,
+    });
+    const latestVersion = response.data.version;
+
+    if (latestVersion !== currentVersion) {
+      console.log(chalk.cyan(`\nNew version available: ${latestVersion} (current: ${currentVersion})`));
+      const updateSpinner = createSpinner(chalk.blue("Updating dokugen...")).start();
+
+      try {
+        execSync("npm install -g dokugen@latest", {
+          stdio: "pipe",
+          timeout: 60000
+        });
+        updateSpinner.success({
+          text: chalk.green(`Successfully updated to v${latestVersion}!`)
+        });
+        console.log(chalk.yellow("Please re-run your command to use the new version.\n"));
+        process.exit(0);
+      } catch (error) {
+        updateSpinner.error({
+          text: chalk.yellow("Auto-update failed. Please run: npm install -g dokugen@latest")
+        });
+      }
+    }
+  } catch (error) {
+    return;
+  }
+};
+
 
 const getUserInfo = (): {
   username: string;
@@ -96,6 +139,12 @@ const getGitRepoUrl = (): string | null => {
   }
 };
 
+const compressData = async (data: string): Promise<string> => {
+  const compressed = await gzipAsync(Buffer.from(data, "utf-8"));
+  return compressed.toString("base64");
+};
+
+
 const extractFullCode = async (
   projectFiles: string[],
   projectDir: string,
@@ -144,156 +193,44 @@ const matchesIgnorePattern = (filename: string, pattern: string): boolean => {
 
 const scanFiles = async (dir: string): Promise<string[]> => {
   const ignoreDirs = new Set([
-    "node_modules",
-    "dependencies",
-    "ajax",
-    "public",
-    "android",
-    "ios",
-    ".expo",
-    ".next",
-    ".nuxt",
-    ".svelte-kit",
-    ".vercel",
-    ".serverless",
-    ".cache",
-    "tests",
-    "_tests_",
-    "_test_",
-    "__tests__",
-    "coverage",
-    "test",
-    "spec",
-    "cypress",
-    "e2e",
-    "dist",
-    "build",
-    "out",
-    "bin",
-    "obj",
-    "lib",
-    "target",
-    "release",
-    "debug",
-    "artifacts",
-    "generated",
-    ".git",
-    ".svn",
-    ".hg",
-    ".vscode",
-    ".idea",
-    ".vs",
-    "venv",
-    ".venv",
-    "env",
-    ".env",
-    "virtualenv",
-    "envs",
-    "docs",
-    "javadoc",
-    "logs",
-    "android",
-    "ios",
-    "windows",
-    "linux",
-    "macos",
-    "web",
-    ".dart_tool",
-    ".gradle",
-    ".mvn",
-    ".npm",
-    ".yarn",
-    "tmp",
-    "temp",
-    "uploads",
-    "public",
-    "static",
-    "assets",
-    "images",
-    "media",
-    "migrations",
-    "data",
-    "db",
-    "database",
-    ".github",
-    ".circleci",
-    ".husky",
-    "storage",
-    "vendor",
-    "cmake-build-debug",
-    "packages",
-    "plugins",
+    "node_modules", "bower_components", "jspm_packages", "web_modules",
+    "dist", "build", "out", "target", "bin", "obj", "lib", "release", "debug",
+    "artifacts", "generated", "temp", "tmp", "cache", ".cache", ".temp",
+    ".next", ".nuxt", ".svelte-kit", ".vercel", ".serverless", ".expo", ".output",
+    "dist-electron", "release-builds", ".parcel-cache",
+    "android", "ios", "windows", "linux", "macos", "web",
+    ".dart_tool", ".pub-cache", ".pub", "Pods", ".bundle",
+    "venv", ".venv", "env", ".env", "virtualenv", "envs", "__pycache__",
+    ".pytest_cache", ".mypy_cache", ".tox", "htmlcov", "site-packages",
+    "vendor", "var", "storage",
+    ".gradle", ".mvn", ".idea",
+    "tests", "_tests_", "_test_", "__tests__", "coverage", "test", "spec",
+    "cypress", "e2e", "reports",
+    ".git", ".svn", ".hg", ".vscode", ".vs", ".history", ".github", ".gitlab",
+    "public", "static", "assets", "images", "media", "uploads", "fonts", "icons",
+    "migrations", "data", "db", "database", "logs", "log", "dump", "backups",
+    "docs", "javadoc", "tools", "scripts", "config", "settings",
+    "cmake-build-debug", "packages", "plugins", "examples", "samples"
   ]);
   const ignoreFiles = new Set([
-    "*.exe",
-    "*.mp4",
-    "*.iso",
-    "*.mp3",
-    "*.bin",
-    "*.so",
-    "*.a",
-    "*.dll",
-    "*.pyc",
-    "*.class",
-    "*.o",
-    "*.jar",
-    "*.war",
-    "*.ear",
-    "*.apk",
-    "*.ipa",
-    "*.dylib",
-    "*.lock",
-    "package-lock.json",
-    "yarn.lock",
-    "pnpm-lock.yaml",
-    "Gemfile.lock",
-    "CHANGELOG.md",
-    "style.css",
-    "main.css",
-    "output.css",
-    ".gitignore",
-    ".npmignore",
-    "tsconfig.json",
-    "jest.config.js",
-    "README.md",
-    ".DS_Store",
-    ".env",
-    "Thumbs.db",
-    "tsconfig.*",
-    "*.iml",
-    ".editorconfig",
-    ".prettierrc*",
-    ".eslintrc*",
-    "*.log",
-    "*.min.js",
-    "*.min.css",
-    "*.pdf",
-    "*.jpg",
-    "*.png",
-    "*.gif",
-    "*.svg",
-    "*.ico",
-    "*.woff",
-    "*.woff2",
-    "*.ttf",
-    "*.eot",
-    "*.mp3",
-    "*.mp4",
-    "*.zip",
-    "*.tar",
-    "*.gz",
-    "*.rar",
-    "*.7z",
-    "*.sqlite",
-    "*.db",
-    "*.sublime-workspace",
-    "*.sublime-project",
-    "*.bak",
-    "*.swp",
-    "*.swo",
-    "*.pid",
-    "*.seed",
-    "*.pid.lock",
+    "*.exe", "*.dll", "*.so", "*.dylib", "*.bin", "*.iso", "*.img", "*.dmg",
+    "*.zip", "*.tar", "*.gz", "*.rar", "*.7z", "*.bz2", "*.xz",
+    "*.mp4", "*.mkv", "*.avi", "*.mov", "*.wmv", "*.flv", "*.webm",
+    "*.mp3", "*.wav", "*.flac", "*.aac", "*.ogg", "*.wma",
+    "*.jpg", "*.jpeg", "*.png", "*.gif", "*.bmp", "*.ico", "*.svg", "*.webp", "*.tiff",
+    "*.pdf", "*.doc", "*.docx", "*.ppt", "*.pptx", "*.xls", "*.xlsx", "*.csv",
+    "*.ttf", "*.otf", "*.woff", "*.woff2", "*.eot",
+    "*.pyc", "*.pyo", "*.pyd",
+    "*.class", "*.jar", "*.war", "*.ear",
+    "*.o", "*.obj", "*.a", "*.lib",
+    "*.lock", "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "Gemfile.lock", "composer.lock", "mix.lock", "pubspec.lock", "Cargo.lock",
+    "*.log", "*.tmp", "*.temp", "*.swp", "*.swo", "*.bak", "*.old", "*.orig",
+    ".DS_Store", "Thumbs.db", "desktop.ini",
+    ".env", ".env.local", ".env.development", ".env.test", ".env.production",
+    "Dockerfile", "docker-compose.yml", "Makefile", "CMakeLists.txt",
+    "LICENSE", "CHANGELOG.md", "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "README.md",
+    ".gitignore", ".npmignore", ".dockerignore", ".eslintrc*", ".prettierrc*", "tsconfig.json",
+    "*.min.js", "*.min.css", "*.map", "*.d.ts", "*.apk", "*.aab", "*.ipa", "*.hap"
   ]);
 
   const files: string[] = [];
@@ -360,12 +297,45 @@ const checkInternetConnection = async (): Promise<boolean> => {
   }
 };
 
+const askForGeminiKey = async (): Promise<string | null> => {
+  const hasKey = await select({
+    message: "Do you have a Google Gemini API Key?",
+    options: [
+      { value: "yes", label: "Yes" },
+      { value: "no", label: "No (Use Dokugen's shared key)" },
+    ],
+  });
+
+  if (isCancel(hasKey)) {
+    console.log(chalk.yellow("Operation cancelled"));
+    process.exit(0);
+  }
+
+  if (hasKey === "yes") {
+    const key = await text({
+      message: "Enter your Google Gemini API Key:",
+      placeholder: "AIzaSy...",
+      validate(value) {
+        if (value.length === 0) return "Value is required!";
+      },
+    });
+
+    if (isCancel(key)) {
+      console.log(chalk.yellow("Operation cancelled"));
+      process.exit(0);
+    }
+    return key as string;
+  }
+  return null;
+};
+
 const generateReadme = async (
   projectType: string,
   projectFiles: string[],
   projectDir: string,
   existingReadme?: string,
   templateUrl?: string,
+  geminiApiKey?: string | null,
 ): Promise<string | null> => {
   try {
     console.log(chalk.blue("Analyzing project files..."));
@@ -401,17 +371,24 @@ const generateReadme = async (
     );
     const backendDomain = getBackendDomain.data.domain;
 
+    const compressedFullCode = await compressData(fullCode);
+    const compressedExistingReadme = existingReadme
+      ? await compressData(existingReadme)
+      : undefined;
+
     const response = await axios.post(
       `${backendDomain}/api/generate-readme`,
       {
         projectType,
         projectFiles,
-        fullCode,
+        fullCode: compressedFullCode,
         userInfo,
         options: { includeSetup, includeContributionGuideLine },
-        existingReadme,
+        existingReadme: compressedExistingReadme,
         repoUrl,
         templateUrl,
+        compressed: true,
+        geminiApiKey,
       },
       {
         responseType: "stream",
@@ -434,6 +411,7 @@ const generateReadme = async (
               const json = JSON.parse(line.replace("data: ", "").trim());
               if (json.response && typeof json.response === "string") {
                 fileStream.write(json.response);
+                fileStream.uncork();
               }
             } catch (error) {
               console.error("Skipping invalid event data:", line);
@@ -479,7 +457,7 @@ const generateReadme = async (
 
 program
   .name("dokugen")
-  .version("3.9.0")
+  .version("3.10.0")
   .description(
     "Automatically generate high-quality README for your application",
   );
@@ -495,16 +473,17 @@ program
     "use a custom GitHub repo readme file as a template to generate a concise and strict readme for your project",
   )
   .action(async (options) => {
+    await checkAndUpdate();
     await sleep(50);
     console.log(
       "\n\n" +
-        chalk.hex("#000080")(
-          figlet.textSync("DOKUGEN", {
-            font: "Small Slant",
-            horizontalLayout: "fitted",
-          }),
-        ) +
-        "\n\n",
+      chalk.hex("#000080")(
+        figlet.textSync("DOKUGEN", {
+          font: "Small Slant",
+          horizontalLayout: "fitted",
+        }),
+      ) +
+      "\n\n",
     );
     const projectDir = process.cwd();
     const readmePath = path.join(projectDir, "README.md");
@@ -546,6 +525,7 @@ program
       });
 
       console.log(chalk.blue(`Detected project type: ${projectType}`));
+      const geminiApiKey = await askForGeminiKey();
 
       if (options.template) {
         if (readmeExists && !options.overwrite) {
@@ -556,6 +536,7 @@ program
             projectDir,
             existingContent,
             options.template,
+            geminiApiKey,
           );
         } else {
           await generateReadme(
@@ -564,6 +545,7 @@ program
             projectDir,
             undefined,
             options.template,
+            geminiApiKey,
           );
         }
         console.log(chalk.green("README.md generated from template!"));
@@ -578,12 +560,21 @@ program
             projectFiles,
             projectDir,
             existingContent,
+            undefined,
+            geminiApiKey,
           );
         } else {
           const overwrite = await askYesNo("README.md exists. Overwrite?");
 
           if (overwrite === true) {
-            await generateReadme(projectType, projectFiles, projectDir);
+            await generateReadme(
+              projectType,
+              projectFiles,
+              projectDir,
+              undefined,
+              undefined,
+              geminiApiKey,
+            );
           } else if (overwrite === false) {
             console.log(
               chalk.yellow("README update skipped (user selected No)"),
@@ -596,7 +587,14 @@ program
           }
         }
       } else {
-        await generateReadme(projectType, projectFiles, projectDir);
+        await generateReadme(
+          projectType,
+          projectFiles,
+          projectDir,
+          undefined,
+          undefined,
+          geminiApiKey,
+        );
       }
     } catch (error) {
       console.error(error);
@@ -612,6 +610,145 @@ program
   )
   .action(() => {
     console.log("testing coming soon.....");
+  });
+
+program
+  .command("update")
+  .description("Update auto-generated sections of README while preserving custom content")
+  .option(
+    "--template <url>",
+    "use a custom GitHub repo readme file as a template",
+  )
+  .action(async (options) => {
+    await checkAndUpdate();
+    await sleep(50);
+    console.log(
+      "\n\n" +
+      chalk.hex("#000080")(
+        figlet.textSync("DOKUGEN", {
+          font: "Small Slant",
+          horizontalLayout: "fitted",
+        }),
+      ) +
+      "\n\n",
+    );
+
+    const projectDir = process.cwd();
+    const readmePath = path.join(projectDir, "README.md");
+    const readmeExists = await fs.pathExists(readmePath);
+
+    if (!readmeExists) {
+      console.log(
+        chalk.red(
+          "No README.md found. Use 'dokugen generate' to create one first.",
+        ),
+      );
+      process.exit(1);
+    }
+
+    const connectionSpinner = createSpinner("Checking internet...").start();
+    const hasGoodInternetConnection = await checkInternetConnection();
+    connectionSpinner.stop();
+
+    if (!hasGoodInternetConnection) {
+      const username = getUserInfo()?.username;
+      return console.log(
+        chalk.red(
+          `Opps... ${username} kindly check your device or pc internet connection and try again.`,
+        ),
+      );
+    }
+
+    try {
+      await backupReadme(readmePath);
+
+      const geminiApiKey = await askForGeminiKey();
+
+      if (options.template && !options.template.includes("github.com")) {
+        console.log(
+          chalk.red(
+            "Invalid GitHub URL. Use format: https://github.com/user/repo/blob/main/README.md",
+          ),
+        );
+        process.exit(1);
+      }
+
+      const existingContent = await fs.readFile(readmePath, "utf-8");
+
+      const hasDokugenMarkers = existingContent.includes("<!-- DOKUGEN:") ||
+        existingContent.includes("[![Readme was generated by Dokugen]");
+
+      if (!hasDokugenMarkers) {
+        console.log(
+          chalk.yellow(
+            "This README doesn't appear to be generated by Dokugen.",
+          ),
+        );
+        const proceed = await askYesNo(
+          "Do you want to regenerate the entire README?",
+        );
+
+        if (proceed === true) {
+          const projectType = await detectProjectType(projectDir);
+          const scanSpinner = createSpinner("Scanning project files...").start();
+          const projectFiles = await scanFiles(projectDir);
+          scanSpinner.success({
+            text: chalk.yellow(
+              `Found: ${projectFiles.length} files in the project`,
+            ),
+          });
+
+          await generateReadme(
+            projectType,
+            projectFiles,
+            projectDir,
+            undefined,
+            options.template,
+            geminiApiKey,
+          );
+          console.log(chalk.green("README.md regenerated successfully!"));
+          return;
+        } else {
+          console.log(chalk.yellow("Update cancelled."));
+          await restoreReadme();
+          return;
+        }
+      }
+
+      console.log(chalk.blue("Analyzing README structure..."));
+
+      const projectType = await detectProjectType(projectDir);
+      const scanSpinner = createSpinner("Scanning project files...").start();
+      const projectFiles = await scanFiles(projectDir);
+      scanSpinner.success({
+        text: chalk.yellow(
+          `Found: ${projectFiles.length} files in the project`,
+        ),
+      });
+
+      console.log(chalk.blue(`Detected project type: ${projectType}`));
+      console.log(chalk.blue("Updating auto-generated sections..."));
+
+      // Generate new content
+      await generateReadme(
+        projectType,
+        projectFiles,
+        projectDir,
+        existingContent,
+        options.template,
+        geminiApiKey,
+      );
+
+      console.log(
+        chalk.green(
+          "README.md updated successfully! Custom sections preserved.",
+        ),
+      );
+    } catch (error) {
+      console.error(chalk.red("Error updating README:"), error);
+      await restoreReadme();
+      process.exit(1);
+    }
   });
 
 program.parse(process.argv);

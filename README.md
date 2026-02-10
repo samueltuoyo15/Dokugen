@@ -42,17 +42,43 @@ dokugen generate --template https://raw.githubusercontent.com/username/repo-name
 
 ---
 
+### Update Existing README (Smart Update)
+
+```bash
+dokugen update
+```
+
+> **NEW!** Intelligently updates only auto-generated sections of your README while preserving all your custom content. Perfect for keeping your README fresh as your project evolves without losing your personal touch.
+
+**What gets updated:**
+- Tech stack and dependencies
+- API documentation
+- Installation instructions
+- Features list
+
+**What stays safe:**
+- Your custom introductions
+- Personal badges and links
+- Custom examples
+- Manual sections you've added
+
+---
+
 ### Check Version
 
 ```bash
 dokugen --version
 ```
 
-> Displays Current Version (3.9.0)
+> Displays Current Version (3.10.0)
 
 ## Features
 
+- **Auto-Update System**: Dokugen automatically checks for new versions and updates itself when you run any command. Always stay current!
+- **Smart README Updates**: Update your README without losing custom content. Only auto-generated sections get refreshed.
 - **Automated Generation**: Automatically analyzes your project and generates a comprehensive README.
+- **Real-Time Streaming**: Watch your README populate in real-time as it's being generated.
+- **Compression Technology**: Handles large codebases efficiently with 70-90% payload size reduction.
 - **Easy to Use**: Simple command-line interface for quick and easy README creation.
 - **Cross-Platform**: Works seamlessly on Windows, macOS, and Linux.
 - **Programming Language and Framework Agnostic**: Works with any language (e.g., Python, JavaScript, Go, C#, C, Rust, etc.)
