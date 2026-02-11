@@ -1,6 +1,5 @@
 import { execSync } from "child_process";
 import fs from "fs";
-import path from "path";
 
 const targets = [
     { name: "dokugen-windows-x64.exe", target: "bun-windows-x64" },
@@ -13,14 +12,26 @@ if (!fs.existsSync("dist/binaries")) {
     fs.mkdirSync("dist/binaries", { recursive: true });
 }
 
-for (const { name, target } of targets) {
-    console.log(`📦 Compiling for ${target}...`);
-    try {
-        const cmd = `bun build --compile --minify --target=${target} ./bin/dokugen.ts --outfile ./dist/binaries/${name}`;
-        console.log(`> ${cmd}`);
-        execSync(cmd, { stdio: "inherit" });
-        console.log(`✅ Built ${name}`);
-    } catch (error) {
-        console.error(`❌ Failed to build ${name}`);
+console.log("Building binaries...");
+
+try {
+    const initial = fs.readFileSync("bin/dokugen.ts", "utf-8");
+    let content = initial.replace('from "./projectDetect.mjs"', 'from "./projectDetect.ts"');
+    content = content.replace('from "./projectDetect.mjs";', 'from "./projectDetect.ts";');
+
+    fs.writeFileSync("bin/dokugen-bun.ts", content);
+
+    for (const { name, target } of targets) {
+        console.log(`Compiling ${target}...`);
+        try {
+            execSync(`bun build --compile --minify --target=${target} ./bin/dokugen-bun.ts --outfile ./dist/binaries/${name}`, { stdio: "inherit" });
+            console.log(`Built ${name}`);
+        } catch (e) {
+            console.error(`Failed ${name}`);
+        }
     }
+} catch (e) {
+    console.error(e);
+} finally {
+    if (fs.existsSync("bin/dokugen-bun.ts")) fs.unlinkSync("bin/dokugen-bun.ts");
 }

@@ -16,6 +16,21 @@ yarn global add dokugen
 pnpm install -g dokugen
 ```
 
+### Or Download Standalone Binary (No Node.js Required)
+
+Grab the executable for your OS from the [Releases page](https://github.com/samueltuoyo15/Dokugen/releases).
+
+**Windows:**
+Download `dokugen-windows-x64.exe` and run it from your command prompt.
+
+**macOS / Linux:**
+```bash
+# Example for Linux
+curl -L -o dokugen https://github.com/samueltuoyo15/Dokugen/releases/latest/download/dokugen-linux-x64
+chmod +x dokugen
+./dokugen --version
+```
+
 ### Navigate to the project you want to work with
 
 ```bash
@@ -70,7 +85,7 @@ dokugen update
 dokugen --version
 ```
 
-> Displays Current Version (3.10.0)
+> Displays Current Version (3.11.0)
 
 ## Features
 

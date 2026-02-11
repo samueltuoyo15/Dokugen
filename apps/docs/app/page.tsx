@@ -154,12 +154,49 @@ export default function DocsPage() {
                 </div>
               </div>
 
+
+              <div className="group bg-zinc-900/10 p-8 rounded-2xl border border-dashed border-zinc-800 hover:border-zinc-700 transition-all">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-xl font-semibold text-zinc-300">Alternative: Standalone Binary</h3>
+                  <span className="bg-zinc-800 text-zinc-400 text-xs px-2 py-1 rounded border border-zinc-700 font-mono">No Node.js</span>
+                </div>
+                <p className="text-zinc-500 mb-6 text-sm leading-relaxed">
+                  Avoid installing Node.js entirely. Download the single executable file for your OS:
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                  <a href="https://github.com/samueltuoyo15/Dokugen/releases/latest/download/dokugen-windows-x64.exe" className="bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 rounded-lg p-3 text-center transition-colors group/btn block no-underline">
+                    <span className="block text-zinc-300 font-medium text-sm group-hover/btn:text-white">Windows</span>
+                    <span className="text-zinc-600 text-xs">.exe (x64)</span>
+                  </a>
+                  <a href="https://github.com/samueltuoyo15/Dokugen/releases/latest/download/dokugen-macos-arm64" className="bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 rounded-lg p-3 text-center transition-colors group/btn block no-underline">
+                    <span className="block text-zinc-300 font-medium text-sm group-hover/btn:text-white">macOS</span>
+                    <span className="text-zinc-600 text-xs">Silicon (M1/M2)</span>
+                  </a>
+                  <a href="https://github.com/samueltuoyo15/Dokugen/releases/latest/download/dokugen-macos-x64" className="bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 rounded-lg p-3 text-center transition-colors group/btn block no-underline">
+                    <span className="block text-zinc-300 font-medium text-sm group-hover/btn:text-white">macOS</span>
+                    <span className="text-zinc-600 text-xs">Intel (x64)</span>
+                  </a>
+                  <a href="https://github.com/samueltuoyo15/Dokugen/releases/latest/download/dokugen-linux-x64" className="bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 rounded-lg p-3 text-center transition-colors group/btn block no-underline">
+                    <span className="block text-zinc-300 font-medium text-sm group-hover/btn:text-white">Linux</span>
+                    <span className="text-zinc-600 text-xs">x64</span>
+                  </a>
+                </div>
+
+                <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-900 overflow-x-auto">
+                  <p className="text-zinc-500 text-xs mb-2 font-mono"># Linux/macOS Quick Install:</p>
+                  <code className="text-zinc-400 font-mono text-xs whitespace-pre block overflow-x-auto">
+                    curl -L -o dokugen https://github.com/samueltuoyo15/Dokugen/releases/latest/download/dokugen-linux-x64 && chmod +x dokugen
+                  </code>
+                </div>
+              </div>
+
               <div className="group bg-zinc-900/30 p-8 rounded-2xl border border-zinc-900 hover:border-zinc-800 transition-all">
                 <h3 className="text-xl font-semibold mb-3 text-zinc-100">2. Install Globally</h3>
                 <p className="text-zinc-400 mb-6 leading-relaxed">
                   Install Dokugen globally once, and use it forever across any project on your machine:
                 </p>
-                <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-900">
+                <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-900 mb-2">
                   <code className="text-zinc-300 font-mono text-sm">npm install -g dokugen</code>
                 </div>
               </div>
@@ -180,7 +217,7 @@ export default function DocsPage() {
                   Run the CLI command to interactively generate your README:
                 </p>
                 <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-900">
-                  <code className="text-zinc-300 font-mono text-sm">npx dokugen generate</code>
+                  <code className="text-zinc-300 font-mono text-sm">dokugen generate</code>
                 </div>
               </div>
 
