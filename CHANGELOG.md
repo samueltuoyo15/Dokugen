@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.11.0] - 2026-02-11
+### Added
+- **Standalone Binaries**: Introduced support for compiling Dokugen into standalone executables using Bun, allowing users to run the tool without installing Node.js.
+
+### Fixed
+- **Auto-Update Reliability**: Added `--ignore-scripts` to the auto-update command to prevent permission issues and script failures during updates.
+
 ## [3.10.0] - 2026-02-10
 ### Added
 - **Auto-Update System**: Dokugen now automatically checks for updates and installs the latest version when you run any command.

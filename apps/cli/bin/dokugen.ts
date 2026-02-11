@@ -457,7 +457,7 @@ const generateReadme = async (
 
 program
   .name("dokugen")
-  .version("3.10.0")
+  .version("3.11.0")
   .description(
     "Automatically generate high-quality README for your application",
   );
