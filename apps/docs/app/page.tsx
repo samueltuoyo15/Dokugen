@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Terminal, Code, FileText, Search, Github } from "lucide-react"
+import { Terminal, Code, FileText, Search, Github, RefreshCw } from "lucide-react"
 import { motion } from "framer-motion"
 import { useState } from "react"
 import MetricsSection from "@/components/metricsSection"
@@ -43,6 +43,12 @@ const searchableContent = [
     id: 6,
     title: "Easy Integration",
     content: "Integrate with GitHub, GitLab, and VS Code.",
+    type: "feature",
+  },
+  {
+    id: 7,
+    title: "Intelligent Updates",
+    content: "Updates only auto-generated sections while preserving all your custom edits.",
     type: "feature",
   },
 ]
@@ -135,13 +141,16 @@ export default function DocsPage() {
               <div className="group bg-zinc-900/30 p-8 rounded-2xl border border-zinc-900 hover:border-zinc-800 transition-all">
                 <h3 className="text-xl font-semibold mb-3 text-zinc-100">1. Prerequisites</h3>
                 <p className="text-zinc-400 mb-6 leading-relaxed">
-                  Ensure you have <strong>Node.js</strong> installed. If not, download it from{" "}
-                  <a href="https://nodejs.org" className="text-white underline decoration-zinc-600 underline-offset-4 hover:decoration-white transition-all" target="_blank" rel="noopener noreferrer">
-                    nodejs.org
-                  </a>.
+                  Dokugen works with <strong>any programming language or framework</strong> (Python, Go, Rust, PHP, etc.).
+                  <br /><br />
+                  To get started, you simply need <strong>Node.js</strong> installed <em>once</em> on your machine.
                 </p>
-                <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-900">
-                  <code className="text-zinc-300 font-mono text-sm">node -v</code>
+                <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-900 flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="text-zinc-500">$</span>
+                    <code className="text-zinc-300 font-mono text-sm">node -v</code>
+                  </div>
+                  <span className="text-zinc-600 text-xs font-mono">Check if installed</span>
                 </div>
               </div>
 
@@ -193,36 +202,46 @@ export default function DocsPage() {
             className="mt-32"
           >
             <h2 className="text-3xl font-bold mb-10 text-white tracking-tight">Features</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-zinc-900/20 p-8 rounded-2xl border border-zinc-800/50 hover:border-zinc-700 transition-all">
-                <div className="w-12 h-12 mb-6 rounded-lg bg-zinc-900 flex items-center justify-center border border-zinc-800">
-                  <FileText className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="text-xl font-bold mb-3 text-zinc-100">Modern READMEs</h3>
-                <p className="text-zinc-400 leading-relaxed">
-                  Generate professional READMEs with emojis, badges, and modern formatting standards automatically.
-                </p>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                {
+                  icon: FileText,
+                  title: "Modern READMEs",
+                  desc: "Generate professional READMEs with emojis, badges, and modern formatting standards automatically."
+                },
+                {
+                  icon: Terminal,
+                  title: "Cross-Platform",
+                  desc: "Built to work on any OS and supports any programming language or framework."
+                },
+                {
+                  icon: Code,
+                  title: "Easy Integration",
+                  desc: "Designed for seamless integration with GitHub, GitLab, and VS Code workflows."
+                },
+                {
+                  icon: RefreshCw,
+                  title: "Intelligent Updates",
+                  desc: "Smartly updates only the auto-generated parts of your README, keeping your custom edits safe."
+                }
+              ].map((feature, i) => (
+                <div key={i} className="group relative bg-zinc-950/50 p-8 rounded-2xl border border-zinc-800/50 hover:border-zinc-500/50 hover:bg-zinc-900/50 transition-all duration-500 flex flex-col h-full overflow-hidden">
+                  <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-100 transition-opacity duration-500">
+                    <span className="font-mono text-xs text-zinc-500">0{i + 1}</span>
+                  </div>
 
-              <div className="bg-zinc-900/20 p-8 rounded-2xl border border-zinc-800/50 hover:border-zinc-700 transition-all">
-                <div className="w-12 h-12 mb-6 rounded-lg bg-zinc-900 flex items-center justify-center border border-zinc-800">
-                  <Terminal className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="text-xl font-bold mb-3 text-zinc-100">Cross-Platform</h3>
-                <p className="text-zinc-400 leading-relaxed">
-                  Built to work on any OS and supports any programming language or framework.
-                </p>
-              </div>
+                  <div className="mb-8">
+                    <feature.icon className="w-8 h-8 text-zinc-500 group-hover:text-white transition-colors duration-300 stroke-[1.5]" />
+                  </div>
 
-              <div className="bg-zinc-900/20 p-8 rounded-2xl border border-zinc-800/50 hover:border-zinc-700 transition-all">
-                <div className="w-12 h-12 mb-6 rounded-lg bg-zinc-900 flex items-center justify-center border border-zinc-800">
-                  <Code className="w-6 h-6 text-white" />
+                  <div className="mt-auto">
+                    <h3 className="text-lg font-semibold mb-3 text-zinc-100 tracking-tight">{feature.title}</h3>
+                    <p className="text-sm text-zinc-400 leading-relaxed font-light group-hover:text-zinc-300 transition-colors">
+                      {feature.desc}
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-zinc-100">Easy Integration</h3>
-                <p className="text-zinc-400 leading-relaxed">
-                  Designed for seamless integration with GitHub, GitLab, and VS Code workflows.
-                </p>
-              </div>
+              ))}
             </div>
           </motion.div>
         )}
@@ -236,23 +255,23 @@ export default function DocsPage() {
           >
             <h2 className="text-3xl font-bold mb-10 text-white tracking-tight">FAQs</h2>
             <div className="space-y-6">
-              <div className="bg-zinc-900/30 p-8 rounded-2xl border border-zinc-800/50">
+              <div className="bg-zinc-900/30 p-8 rounded-2xl border border-zinc-800/50 hover:bg-zinc-900/50 transition-colors">
                 <h3 className="text-lg font-semibold mb-2 text-zinc-100">How do I install Dokugen?</h3>
                 <p className="text-zinc-400">
-                  Run <code className="text-zinc-300 bg-zinc-900 px-1.5 py-0.5 rounded text-sm font-mono">npm install -g dokugen</code> to install Dokugen globally.
+                  Run <code className="text-zinc-300 bg-zinc-900 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-800">npm install -g dokugen</code> to install Dokugen globally.
                 </p>
               </div>
-              <div className="bg-zinc-900/30 p-8 rounded-2xl border border-zinc-800/50">
+              <div className="bg-zinc-900/30 p-8 rounded-2xl border border-zinc-800/50 hover:bg-zinc-900/50 transition-colors">
                 <h3 className="text-lg font-semibold mb-2 text-zinc-100">Can I use custom templates?</h3>
                 <p className="text-zinc-400">
-                  Yes. Use the <code className="text-zinc-300 bg-zinc-900 px-1.5 py-0.5 rounded text-sm font-mono">--template</code> flag to specify a custom template URL.
+                  Yes. Use the <code className="text-zinc-300 bg-zinc-900 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-800">--template</code> flag to specify a custom template URL.
                   <br />Example: <span className="text-sm font-mono opacity-70">dokugen --template https://raw.github.../README.md</span>
                 </p>
               </div>
-              <div className="bg-zinc-900/30 p-8 rounded-2xl border border-zinc-800/50">
+              <div className="bg-zinc-900/30 p-8 rounded-2xl border border-zinc-800/50 hover:bg-zinc-900/50 transition-colors">
                 <h3 className="text-lg font-semibold mb-2 text-zinc-100">Can I auto generate my readme using the --live flag?</h3>
                 <p className="text-zinc-400">
-                  Coming Soon. You will be able to use the <code className="text-zinc-300 bg-zinc-900 px-1.5 py-0.5 rounded text-sm font-mono">--live</code> flag to watch and auto-generate your README in upcoming Dokugen versions.
+                  Coming Soon. You will be able to use the <code className="text-zinc-300 bg-zinc-900 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-800">--live</code> flag to watch and auto-generate your README in upcoming Dokugen versions.
                 </p>
               </div>
             </div>
@@ -265,14 +284,14 @@ export default function DocsPage() {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="mt-32"
         >
-          <div className="bg-zinc-900 p-2 rounded-2xl border border-zinc-800">
+          <div className="bg-zinc-900 p-2 rounded-2xl border border-zinc-800 shadow-2xl shadow-zinc-900/50">
             <div className="bg-zinc-950 rounded-xl overflow-hidden relative">
-              <video src="/Demo.mp4" muted autoPlay loop playsInline className="w-full h-full object-cover opacity-90">
+              <video src="/Demo.mp4" muted autoPlay loop playsInline className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-500">
                 Your browser does not support the video tag.
               </video>
-              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/50 to-transparent pointer-events-none"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/50 via-transparent to-transparent pointer-events-none"></div>
             </div>
-            <p className="text-center text-zinc-500 mt-4 mb-2 text-sm uppercase tracking-widest font-medium">Dokugen in Action</p>
+            <p className="text-center text-zinc-500 mt-4 mb-2 text-xs md:text-sm uppercase tracking-widest font-medium">Dokugen in Action</p>
           </div>
         </motion.div>
 
@@ -289,14 +308,22 @@ export default function DocsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1 }}
-          className="mt-32 pb-16 text-center border-t border-zinc-900 pt-16"
+          className="mt-32 pb-8 border-t border-zinc-900 pt-16"
         >
-          <p className="text-zinc-500 mb-8">
-            Need help? Check out our <a href="https://github.com/samueltuoyo15/Dokugen" className="text-white hover:underline decoration-zinc-700 underline-offset-4">GitHub</a> or <a href="https://github.com/sponsors/samueltuoyo15" className="text-white hover:underline decoration-zinc-700 underline-offset-4">support page</a>.
-          </p>
-          <div className="flex justify-center gap-8 text-sm">
-            <Link href="/terms" className="text-zinc-600 hover:text-white transition-colors">Terms of Service</Link>
-            <Link href="/privacy" className="text-zinc-600 hover:text-white transition-colors">Privacy Policy</Link>
+          <div className="flex flex-col items-center">
+            <p className="text-zinc-500 mb-6 text-center max-w-lg mx-auto">
+              Need help? Check out our <a href="https://github.com/samueltuoyo15/Dokugen" className="text-white hover:underline decoration-zinc-700 underline-offset-4 font-medium transition-colors">GitHub</a> or <a href="https://github.com/sponsors/samueltuoyo15" className="text-white hover:underline decoration-zinc-700 underline-offset-4 font-medium transition-colors">support page</a>.
+            </p>
+
+            <div className="flex items-center gap-6 mb-8">
+              <Link href="/terms" className="text-sm text-zinc-500 hover:text-white transition-colors duration-200 font-medium">Terms of Service</Link>
+              <span className="w-1 h-1 bg-zinc-800 rounded-full"></span>
+              <Link href="/privacy" className="text-sm text-zinc-500 hover:text-white transition-colors duration-200 font-medium">Privacy Policy</Link>
+            </div>
+
+            <p className="text-zinc-600 text-sm font-mono">
+              &copy; {new Date().getFullYear()} Dokugen. All rights reserved.
+            </p>
           </div>
         </motion.div>
       </div>
