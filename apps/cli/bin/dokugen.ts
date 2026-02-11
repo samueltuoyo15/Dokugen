@@ -40,7 +40,7 @@ const checkAndUpdate = async (): Promise<void> => {
       const updateSpinner = createSpinner(chalk.blue("Updating dokugen...")).start();
 
       try {
-        execSync("npm install -g dokugen@latest", {
+        execSync("npm install -g dokugen@latest --ignore-scripts", {
           stdio: "pipe",
           timeout: 60000
         });
@@ -51,7 +51,7 @@ const checkAndUpdate = async (): Promise<void> => {
         process.exit(0);
       } catch (error) {
         updateSpinner.error({
-          text: chalk.yellow("Auto-update failed. Please run: npm install -g dokugen@latest")
+          text: chalk.yellow("Auto-update failed. Please run: npm install -g dokugen@latest --ignore-scriptst")
         });
       }
     }
