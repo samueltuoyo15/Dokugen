@@ -165,19 +165,19 @@ export default function DocsPage() {
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                  <a href="https://github.com/samueltuoyo15/Dokugen/releases/latest/download/dokugen-windows-x64.exe" className="bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 rounded-lg p-3 text-center transition-colors group/btn block no-underline">
+                  <a href="https://github.com/samueltuoyo15/Dokugen/releases/download/v3.11.0/dokugen-windows-x64.exe" className="bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 rounded-lg p-3 text-center transition-colors group/btn block no-underline">
                     <span className="block text-zinc-300 font-medium text-sm group-hover/btn:text-white">Windows</span>
                     <span className="text-zinc-600 text-xs">.exe (x64)</span>
                   </a>
-                  <a href="https://github.com/samueltuoyo15/Dokugen/releases/latest/download/dokugen-macos-arm64" className="bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 rounded-lg p-3 text-center transition-colors group/btn block no-underline">
+                  <a href="https://github.com/samueltuoyo15/Dokugen/releases/download/v3.11.0/dokugen-macos-arm64" className="bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 rounded-lg p-3 text-center transition-colors group/btn block no-underline">
                     <span className="block text-zinc-300 font-medium text-sm group-hover/btn:text-white">macOS</span>
                     <span className="text-zinc-600 text-xs">Silicon (M1/M2)</span>
                   </a>
-                  <a href="https://github.com/samueltuoyo15/Dokugen/releases/latest/download/dokugen-macos-x64" className="bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 rounded-lg p-3 text-center transition-colors group/btn block no-underline">
+                  <a href="https://github.com/samueltuoyo15/Dokugen/releases/download/v3.11.0/dokugen-macos-x64" className="bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 rounded-lg p-3 text-center transition-colors group/btn block no-underline">
                     <span className="block text-zinc-300 font-medium text-sm group-hover/btn:text-white">macOS</span>
                     <span className="text-zinc-600 text-xs">Intel (x64)</span>
                   </a>
-                  <a href="https://github.com/samueltuoyo15/Dokugen/releases/latest/download/dokugen-linux-x64" className="bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 rounded-lg p-3 text-center transition-colors group/btn block no-underline">
+                  <a href="https://github.com/samueltuoyo15/Dokugen/releases/download/v3.11.0/dokugen-linux-x64" className="bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 rounded-lg p-3 text-center transition-colors group/btn block no-underline">
                     <span className="block text-zinc-300 font-medium text-sm group-hover/btn:text-white">Linux</span>
                     <span className="text-zinc-600 text-xs">x64</span>
                   </a>
@@ -186,7 +186,7 @@ export default function DocsPage() {
                 <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-900 overflow-x-auto">
                   <p className="text-zinc-500 text-xs mb-2 font-mono"># Linux/macOS Quick Install:</p>
                   <code className="text-zinc-400 font-mono text-xs whitespace-pre block overflow-x-auto">
-                    curl -L -o dokugen https://github.com/samueltuoyo15/Dokugen/releases/latest/download/dokugen-linux-x64 && chmod +x dokugen
+                    curl -L -o dokugen https://github.com/samueltuoyo15/Dokugen/releases/download/v3.11.0/dokugen-linux-x64 && chmod +x dokugen
                   </code>
                 </div>
               </div>
