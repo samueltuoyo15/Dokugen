@@ -36,3 +36,7 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# Bun build artifacts
+*.bun-build
+dist/binaries/

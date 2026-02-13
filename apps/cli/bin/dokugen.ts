@@ -4,7 +4,14 @@ import chalk from "chalk";
 import fs from "fs-extra";
 import * as path from "path";
 import { select, text, isCancel } from "@clack/prompts";
-import figlet from "figlet";
+const DOKUGEN_BANNER = `
+   ___   ____  __ ____  _____________  __
+  / _ \ / __ \/ //_/ / / / ____/ ____/ / /
+ / / / / / / / ,< / / / / / __/ __/ / /_ 
+/ /_/ / /_/ / /| / /_/ / /_/ / /___/ / / 
+\____/\____/_/ |_\____/\____/_____/_/ /  
+                                  /_/   
+`;
 import { createSpinner } from "nanospinner";
 import { setTimeout as sleep } from "timers/promises";
 import axios from "axios";
@@ -475,16 +482,7 @@ program
   .action(async (options) => {
     await checkAndUpdate();
     await sleep(50);
-    console.log(
-      "\n\n" +
-      chalk.hex("#000080")(
-        figlet.textSync("DOKUGEN", {
-          font: "Small Slant",
-          horizontalLayout: "fitted",
-        }),
-      ) +
-      "\n\n",
-    );
+    console.log("\n" + chalk.hex("#000080")(DOKUGEN_BANNER) + "\n");
     const projectDir = process.cwd();
     const readmePath = path.join(projectDir, "README.md");
     const readmeExists = await fs.pathExists(readmePath);
@@ -622,16 +620,7 @@ program
   .action(async (options) => {
     await checkAndUpdate();
     await sleep(50);
-    console.log(
-      "\n\n" +
-      chalk.hex("#000080")(
-        figlet.textSync("DOKUGEN", {
-          font: "Small Slant",
-          horizontalLayout: "fitted",
-        }),
-      ) +
-      "\n\n",
-    );
+    console.log("\n" + chalk.hex("#000080")(DOKUGEN_BANNER) + "\n");
 
     const projectDir = process.cwd();
     const readmePath = path.join(projectDir, "README.md");
@@ -751,7 +740,70 @@ program
     }
   });
 
-program.parse(process.argv);
+const waitForKeypress = async (): Promise<void> => {
+  console.log(chalk.dim("\nPress Enter to exit..."));
+  return new Promise((resolve) => {
+    process.stdin.setRawMode?.(true);
+    process.stdin.resume();
+    process.stdin.once("data", () => {
+      process.stdin.setRawMode?.(false);
+      resolve();
+    });
+  });
+};
+
+const isRunAsStandaloneBinary = (): boolean => {
+  const execPath = process.execPath.toLowerCase();
+  return execPath.includes("dokugen-windows") ||
+    execPath.includes("dokugen-linux") ||
+    execPath.includes("dokugen-macos") ||
+    execPath.endsWith(".exe") && !execPath.includes("node") && !execPath.includes("bun");
+};
+
+const runInteractiveMenu = async (): Promise<void> => {
+  console.log("\n" + chalk.hex("#000080")(DOKUGEN_BANNER) + "\n");
+
+  console.log(chalk.blue("Welcome to Dokugen - Automatic README Generator\n"));
+
+  const action = await select({
+    message: "What would you like to do?",
+    options: [
+      { value: "generate", label: "Generate README", hint: "Scan project and create a new README.md" },
+      { value: "update", label: "Update README", hint: "Update an existing Dokugen-generated README" },
+      { value: "exit", label: "Exit" },
+    ],
+  });
+
+  if (isCancel(action) || action === "exit") {
+    console.log(chalk.yellow("Goodbye!"));
+    return;
+  }
+
+
+  process.argv = [process.argv[0], process.argv[1], action as string];
+  program.parse(process.argv);
+};
+
+const main = async (): Promise<void> => {
+  try {
+    const args = process.argv.slice(2);
+    const hasSubcommand = args.length > 0 && !args[0].startsWith("-");
+
+    if (hasSubcommand) {
+      program.parse(process.argv);
+    } else {
+      await runInteractiveMenu();
+    }
+  } catch (error) {
+    console.error(chalk.red("An unexpected error occurred:"), error);
+  } finally {
+    if (isRunAsStandaloneBinary()) {
+      await waitForKeypress();
+    }
+  }
+};
+
+main();
 
 process.on("SIGINT", () => {
   console.log(chalk.yellow("\nProcess interrupted. Changes discarded"));

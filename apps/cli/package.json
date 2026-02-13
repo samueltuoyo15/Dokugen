@@ -40,7 +40,6 @@
     "cli-md": "^1.2.0",
     "commander": "^13.1.0",
     "esbuild": "^0.25.1",
-    "figlet": "^1.8.1",
     "fs": "^0.0.1-security",
     "fs-extra": "^11.3.0",
     "gradient-string": "^3.0.0",
@@ -48,7 +47,6 @@
   },
   "devDependencies": {
     "@types/axios": "^0.9.36",
-    "@types/figlet": "^1.7.0",
     "@types/fs-extra": "^11.0.4",
     "@types/marked": "^5.0.2",
     "@types/node": "^22.13.4",
