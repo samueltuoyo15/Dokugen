@@ -138,19 +138,29 @@ export default function DocsPage() {
           >
             <h2 className="text-3xl font-bold mb-10 text-white tracking-tight">Getting Started</h2>
             <div className="space-y-6">
-              <div className="group bg-zinc-900/30 p-8 rounded-2xl border border-zinc-900 hover:border-zinc-800 transition-all">
-                <h3 className="text-xl font-semibold mb-3 text-zinc-100">1. Prerequisites</h3>
-                <p className="text-zinc-400 mb-6 leading-relaxed">
-                  Dokugen works with <strong>any programming language or framework</strong> (Python, Go, Rust, PHP, etc.).
-                  <br /><br />
-                  To get started, you simply need <strong>Node.js</strong> installed <em>once</em> on your machine.
-                </p>
-                <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-900 flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <span className="text-zinc-500">$</span>
-                    <code className="text-zinc-300 font-mono text-sm">node -v</code>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="group bg-zinc-900/30 p-8 rounded-2xl border border-zinc-900 hover:border-zinc-800 transition-all flex flex-col">
+                  <h3 className="text-xl font-semibold mb-3 text-zinc-100">Method 1: Node.js</h3>
+                  <p className="text-zinc-400 mb-6 leading-relaxed flex-grow">
+                    Install via npm, yarn, or pnpm if you have Node.js installed.
+                  </p>
+                  <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-900 flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <code className="text-zinc-300 font-mono text-xs">npm install -g dokugen</code>
+                    </div>
                   </div>
-                  <span className="text-zinc-600 text-xs font-mono">Check if installed</span>
+                </div>
+
+                <div className="group bg-zinc-900/30 p-8 rounded-2xl border border-zinc-900 hover:border-zinc-800 transition-all flex flex-col">
+                  <h3 className="text-xl font-semibold mb-3 text-zinc-100">Method 2: Python</h3>
+                  <p className="text-zinc-400 mb-6 leading-relaxed flex-grow">
+                    Install via uv (recommended) or pip if you prefer Python.
+                  </p>
+                  <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-900 flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <code className="text-zinc-300 font-mono text-xs">uv tool install dokugen</code>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -160,6 +170,14 @@ export default function DocsPage() {
                   <h3 className="text-xl font-semibold text-zinc-300">Alternative: Standalone Binary</h3>
                   <span className="bg-zinc-800 text-zinc-400 text-xs px-2 py-1 rounded border border-zinc-700 font-mono">No Node.js</span>
                 </div>
+
+                <div className="mb-6 p-4 bg-yellow-900/20 border border-yellow-800/50 rounded-xl">
+                  <p className="text-yellow-500 text-sm font-medium mb-1">⚠️ Experimental Vibes</p>
+                  <p className="text-yellow-500/80 text-xs leading-relaxed">
+                    These standalone binaries are super new and honestly pretty unstable. If you use them, you’ll probably run into issues, that’s just how it is right now. If it breaks, just stick to the Node.js or Python version for now.
+                  </p>
+                </div>
+
                 <p className="text-zinc-500 mb-6 text-sm leading-relaxed">
                   Avoid installing Node.js entirely. Download the single executable file for your OS:
                 </p>

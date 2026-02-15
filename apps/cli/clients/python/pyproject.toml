@@ -1,0 +1,19 @@
+[project]
+name = "dokugen"
+version = "3.11.0"
+description = "Automatically generate high-quality README for your application"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "requests>=2.31.0",
+    "rich>=13.7.0",
+    "pathspec>=0.12.1",
+    "questionary>=2.0.1",
+]
+
+[project.scripts]
+dokugen = "dokugen:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

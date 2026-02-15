@@ -16,20 +16,36 @@ yarn global add dokugen
 pnpm install -g dokugen
 ```
 
-### Or Download Standalone Binary (No Node.js Required)
+> [!WARNING]
+> **Experimental Vibes:** These standalone binaries are super new and honestly pretty unstable. If you use them, you’ll probably run into issues, that’s just how it is right now. If it breaks, just stick to the Node.js and Python version for now.
 
-Grab the executable for your OS from the [Releases page](https://github.com/samueltuoyo15/Dokugen/releases).
+## What's New
 
-**Windows:**
-Download `dokugen-windows-x64.exe` and run it from your command prompt.
+### Standalone Binaries (No Node.js Required)
+You can now run Dokugen without installing Node.js! We've added standalone executables for Windows, macOS, and Linux.
 
-**macOS / Linux:**
-```bash
-# Example for Linux
-curl -L -o dokugen https://github.com/samueltuoyo15/Dokugen/releases/latest/download/dokugen-linux-x64
-chmod +x dokugen
-./dokugen --version
-```
+### Intelligent Updates
+The new `dokugen update` command intelligently updates only the auto-generated sections of your README while preserving your custom edits.
+
+### Fixes & Improvements
+- Improved auto-update mechanism reliability.
+- Optimized performance for large codebases.
+
+---
+
+### Installation via Binary
+
+**Windows**
+[Download dokugen-windows-x64.exe](https://github.com/samueltuoyo15/Dokugen/releases/download/v3.11.0/dokugen-windows-x64.exe)
+
+**macOS (Apple Silicon M1/M2/M3)**
+[Download dokugen-macos-arm64](https://github.com/samueltuoyo15/Dokugen/releases/download/v3.11.0/dokugen-macos-arm64)
+
+**macOS (Intel)**
+[Download dokugen-macos-x64](https://github.com/samueltuoyo15/Dokugen/releases/download/v3.11.0/dokugen-macos-x64)
+
+**Linux**
+[Download dokugen-linux-x64](https://github.com/samueltuoyo15/Dokugen/releases/download/v3.11.0/dokugen-linux-x64)
 
 ### Navigate to the project you want to work with
 

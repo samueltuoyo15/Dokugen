@@ -8,7 +8,8 @@
     "build": "tsc",
     "postinstall": "pnpm run build && node dist/scripts/postinstall.mjs",
     "test": "vitest",
-    "postbuild": "node --no-warnings --loader ts-node/esm lib/rename.ts"
+    "postbuild": "node --no-warnings --loader ts-node/esm lib/rename.ts",
+    "build:binaries": "bun run scripts/build-binaries.ts"
   },
   "bin": {
     "dokugen": "dist/bin/dokugen.mjs"
