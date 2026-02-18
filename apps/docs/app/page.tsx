@@ -7,6 +7,7 @@ import { Terminal, Code, FileText, Search, Github, RefreshCw } from "lucide-reac
 import { motion } from "framer-motion"
 import { useState } from "react"
 import MetricsSection from "@/components/metricsSection"
+import Copy from "@/components/Copy"
 
 const searchableContent = [
   {
@@ -144,11 +145,7 @@ export default function DocsPage() {
                   <p className="text-zinc-400 mb-6 leading-relaxed flex-grow">
                     Install via npm, yarn, or pnpm if you have Node.js installed.
                   </p>
-                  <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-900 flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <code className="text-zinc-300 font-mono text-xs">npm install -g dokugen</code>
-                    </div>
-                  </div>
+                  <Copy code="npm install -g dokugen" />
                 </div>
 
                 <div className="group bg-zinc-900/30 p-8 rounded-2xl border border-zinc-900 hover:border-zinc-800 transition-all flex flex-col">
@@ -156,11 +153,7 @@ export default function DocsPage() {
                   <p className="text-zinc-400 mb-6 leading-relaxed flex-grow">
                     Install via uv (recommended) or pip if you prefer Python.
                   </p>
-                  <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-900 flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <code className="text-zinc-300 font-mono text-xs">uv tool install dokugen</code>
-                    </div>
-                  </div>
+                  <Copy code="uv tool install dokugen" />
                 </div>
               </div>
 
@@ -214,9 +207,7 @@ export default function DocsPage() {
                 <p className="text-zinc-400 mb-6 leading-relaxed">
                   Install Dokugen globally once, and use it forever across any project on your machine:
                 </p>
-                <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-900 mb-2">
-                  <code className="text-zinc-300 font-mono text-sm">npm install -g dokugen</code>
-                </div>
+                <Copy code="npm install -g dokugen" className="text-sm" />
               </div>
 
               <div className="group bg-zinc-900/30 p-8 rounded-2xl border border-zinc-900 hover:border-zinc-800 transition-all">
@@ -224,9 +215,7 @@ export default function DocsPage() {
                 <p className="text-zinc-400 mb-6 leading-relaxed">
                   Open your terminal and navigate to your project directory:
                 </p>
-                <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-900">
-                  <code className="text-zinc-300 font-mono text-sm">cd your-project</code>
-                </div>
+                <Copy code="cd your-project" className="text-sm" />
               </div>
 
               <div className="group bg-zinc-900/30 p-8 rounded-2xl border border-zinc-900 hover:border-zinc-800 transition-all">
@@ -234,9 +223,7 @@ export default function DocsPage() {
                 <p className="text-zinc-400 mb-6 leading-relaxed">
                   Run the CLI command to interactively generate your README:
                 </p>
-                <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-900">
-                  <code className="text-zinc-300 font-mono text-sm">dokugen generate</code>
-                </div>
+                <Copy code="dokugen generate" className="text-sm" />
               </div>
 
               <div className="group bg-zinc-900/30 p-8 rounded-2xl border border-zinc-900 hover:border-zinc-800 transition-all">
