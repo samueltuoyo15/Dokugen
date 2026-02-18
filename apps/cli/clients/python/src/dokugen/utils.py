@@ -17,14 +17,66 @@ console = Console()
 readme_backup = None
 current_readme_path = ""
 
+PACKAGE_NAME = "dokugen"
+PYPI_URL = f"https://pypi.org/pypi/{PACKAGE_NAME}/json"
+
+
 def create_spinner(text):
     return Live(Spinner("dots", text=text), refresh_per_second=10)
+
 
 def sleep(ms):
     time.sleep(ms / 1000.0)
 
+
+def get_installed_version():
+    """Get the currently installed version of dokugen."""
+    try:
+        from importlib.metadata import version as get_version
+        return get_version(PACKAGE_NAME)
+    except Exception:
+        return None
+
+
 def check_and_update():
-    pass
+    """Check PyPI for a newer version and auto-update if available."""
+    try:
+        current_version = get_installed_version()
+        if not current_version:
+            return
+
+        response = requests.get(PYPI_URL, timeout=3)
+        if response.status_code != 200:
+            return
+
+        latest_version = response.json()["info"]["version"]
+
+        if latest_version != current_version:
+            console.print(f"\n[cyan]New version available: {latest_version} (current: {current_version})[/cyan]")
+
+            with create_spinner(f"Updating {PACKAGE_NAME}..."):
+                # Try uv first, fall back to pip
+                try:
+                    subprocess.run(
+                        [sys.executable, "-m", "uv", "pip", "install", "--upgrade", f"{PACKAGE_NAME}=={latest_version}"],
+                        capture_output=True, timeout=60, check=True
+                    )
+                except (subprocess.CalledProcessError, FileNotFoundError):
+                    try:
+                        subprocess.run(
+                            [sys.executable, "-m", "pip", "install", "--upgrade", f"{PACKAGE_NAME}=={latest_version}"],
+                            capture_output=True, timeout=60, check=True
+                        )
+                    except Exception:
+                        console.print(f"[yellow]Auto-update failed. Please run: pip install --upgrade {PACKAGE_NAME}[/yellow]")
+                        return
+
+            console.print(f"[green]Successfully updated to v{latest_version}![/green]")
+            console.print("[yellow]Please re-run your command to use the new version.\n[/yellow]")
+            sys.exit(0)
+    except Exception:
+        return
+
 
 def get_user_info():
     git_name = ""
@@ -34,37 +86,40 @@ def get_user_info():
         git_email = subprocess.check_output(["git", "config", "--get", "user.email"], encoding="utf-8").strip()
     except subprocess.CalledProcessError:
         console.print("[yellow]Git User Info not found. Using Defaults......[/yellow]")
-    
+
     os_info = {
         "platform": platform.system() or "unknown",
         "arch": platform.machine() or "unknown",
         "release": platform.release() or "unknown",
     }
-    
+
     if git_name and git_email:
         return {"username": git_name, "email": git_email, "osInfo": os_info}
-    
+
     try:
         username = os.getlogin()
-    except:
+    except Exception:
         username = "Unknown"
-        
+
     return {
         "username": username,
         "email": os.environ.get("USER", ""),
         "osInfo": os_info
     }
 
+
 def check_internet_connection():
     try:
         requests.get("https://www.google.com", timeout=5)
         return True
-    except:
+    except Exception:
         return False
+
 
 def compress_data(data):
     compressed = gzip.compress(data.encode('utf-8'))
     return base64.b64encode(compressed).decode('utf-8')
+
 
 def backup_readme(readme_path):
     global readme_backup, current_readme_path
@@ -73,6 +128,7 @@ def backup_readme(readme_path):
         with open(readme_path, 'r', encoding='utf-8', errors='ignore') as f:
             readme_backup = f.read()
         console.print(f"[green][{datetime.datetime.now().isoformat()}] Current README backed up in memory[/green]")
+
 
 def restore_readme():
     global readme_backup
@@ -91,12 +147,14 @@ def restore_readme():
         console.print("[yellow]No README backup available to restore[/yellow]")
         return None
 
+
 def get_git_repo_url():
     try:
         url = subprocess.check_output(["git", "config", "--get", "remote.origin.url"], encoding="utf-8").strip()
         return url if url else None
-    except:
+    except Exception:
         return None
+
 
 def matches_ignore_pattern(filename, pattern):
     if pattern.startswith("*."):
@@ -104,10 +162,12 @@ def matches_ignore_pattern(filename, pattern):
         return filename.endswith(ext)
     return filename == pattern
 
+
 def scan_files(root_dir):
     ignore_dirs = {
-        "node_modules", "bower_components", "dist", "build", "out", "target", "bin", "obj", "lib", 
-        "release", "debug", "artifacts", "generated", "temp", "tmp", "cache", ".cache", ".temp",
+        "node_modules", "bower_components", "jspm_packages", "web_modules",
+        "dist", "build", "out", "target", "bin", "obj", "lib", "release", "debug",
+        "artifacts", "generated", "temp", "tmp", "cache", ".cache", ".temp",
         ".next", ".nuxt", ".svelte-kit", ".vercel", ".serverless", ".expo", ".output",
         "dist-electron", "release-builds", ".parcel-cache",
         "android", "ios", "windows", "linux", "macos", "web",
@@ -124,7 +184,7 @@ def scan_files(root_dir):
         "docs", "javadoc", "tools", "scripts", "config", "settings",
         "cmake-build-debug", "packages", "plugins", "examples", "samples"
     }
-    
+
     ignore_files = {
         "*.exe", "*.dll", "*.so", "*.dylib", "*.bin", "*.iso", "*.img", "*.dmg",
         "*.zip", "*.tar", "*.gz", "*.rar", "*.7z", "*.bz2", "*.xz",
@@ -152,19 +212,20 @@ def scan_files(root_dir):
         try:
             with open(gitignore_path, 'r') as f:
                 gitignore_spec = pathspec.PathSpec.from_lines('gitwildmatch', f)
-        except:
+        except Exception:
             pass
 
     found_files = []
-    
+
     for dirpath, dirnames, filenames in os.walk(root_dir):
         dirnames[:] = [d for d in dirnames if d not in ignore_dirs]
-        
+
         rel_dir = os.path.relpath(dirpath, root_dir)
-        if rel_dir == ".": rel_dir = ""
+        if rel_dir == ".":
+            rel_dir = ""
 
         if gitignore_spec and rel_dir and gitignore_spec.match_file(rel_dir):
-            dirnames[:] = [] 
+            dirnames[:] = []
             continue
 
         for filename in filenames:
@@ -173,28 +234,30 @@ def scan_files(root_dir):
                 if matches_ignore_pattern(filename, pattern):
                     should_ignore = True
                     break
-            
+
             if should_ignore:
                 continue
-            
+
             rel_file_path = os.path.join(rel_dir, filename)
-            
+
             if gitignore_spec and gitignore_spec.match_file(rel_file_path):
                 continue
-            
+
             found_files.append(rel_file_path)
-    
+
     return found_files
+
 
 def extract_full_code(project_files, project_dir):
     snippets = []
-    
+
     file_groups = {}
     for f in project_files:
         d = os.path.dirname(f)
-        if d not in file_groups: file_groups[d] = []
+        if d not in file_groups:
+            file_groups[d] = []
         file_groups[d].append(f)
-        
+
     for d, files in file_groups.items():
         dir_snippets = []
         for file in files:
@@ -203,13 +266,13 @@ def extract_full_code(project_files, project_dir):
                 size_kb = os.path.getsize(file_path) / 1024
                 with open(file_path, 'r', encoding='utf-8', errors='replace') as f:
                     content = f.read()
-                
+
                 ext = Path(file).suffix[1:] or "txt"
                 dir_snippets.append(f"### {file}\n- **Path:** {file}\n- **Size:** {size_kb:.2f} KB\n```{ext}\n{content}\n```\n")
             except Exception as e:
                 console.print(f"[red]Failed to read file: {file} - {e}[/red]")
-        
+
         if dir_snippets:
             snippets.append(f"## {d}\n" + "".join(dir_snippets))
-            
+
     return "".join(snippets) or "No code snippets available"

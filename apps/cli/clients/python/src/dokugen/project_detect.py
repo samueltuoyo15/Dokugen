@@ -135,6 +135,7 @@ detection_patterns = {
     "Keras": {"files": ["requirements.txt"], "contents": [{"file": "requirements.txt", "keywords": ["keras"]}]},
 }
 
+
 def detect_project_type(project_dir):
     detected_types = []
     go_mod_path = os.path.join(project_dir, "go.mod")
@@ -142,25 +143,25 @@ def detect_project_type(project_dir):
         go_files = [f for f in os.listdir(project_dir) if f.endswith(".go")]
     except FileNotFoundError:
         go_files = []
-    
+
     has_go_files = len(go_files) > 0
     has_go_mod = os.path.exists(go_mod_path)
 
     if has_go_mod or has_go_files:
         go_type = "Go"
         confidence = 100 if has_go_mod else 80
-        
+
         go_mod_content = ""
         if has_go_mod:
             with open(go_mod_path, 'r', encoding='utf-8') as f:
                 go_mod_content = f.read()
-        
+
         main_go_content = ""
         main_go_path = os.path.join(project_dir, 'main.go')
         if os.path.exists(main_go_path):
             with open(main_go_path, 'r', encoding='utf-8') as f:
                 main_go_content = f.read()
-        
+
         frameworks = {
             'github.com/gin-gonic/gin': 'Gin',
             'github.com/gorilla/mux': 'Gorilla Mux',
@@ -171,12 +172,12 @@ def detect_project_type(project_dir):
             'github.com/grpc/grpc-go': 'gRPC',
             'gorm.io/gorm': 'GORM',
         }
-        
+
         for pkg, framework in frameworks.items():
             if pkg in go_mod_content or pkg in main_go_content:
                 go_type = f"Go {framework}"
                 confidence += 10
-        
+
         detected_types.append({"type": go_type, "category": "backend", "confidence": confidence})
 
     package_json = {}
@@ -185,16 +186,16 @@ def detect_project_type(project_dir):
         try:
             with open(package_json_path, 'r', encoding='utf-8') as f:
                 package_json = json.load(f)
-        except:
+        except Exception:
             pass
-    
+
     dependencies = package_json.get("dependencies", {})
     dev_dependencies = package_json.get("devDependencies", {})
     scripts = package_json.get("scripts", {})
 
     for type_name, pattern in detection_patterns.items():
         confidence = 0
-        
+
         if "files" in pattern:
             for file_pattern in pattern["files"]:
                 if "*" in file_pattern:
@@ -203,12 +204,12 @@ def detect_project_type(project_dir):
                 else:
                     if os.path.exists(os.path.join(project_dir, file_pattern)):
                         confidence += 20
-        
+
         if "folders" in pattern:
             for folder in pattern["folders"]:
                 if os.path.isdir(os.path.join(project_dir, folder)):
                     confidence += 20
-        
+
         if "contents" in pattern:
             for content_check in pattern["contents"]:
                 file_path = os.path.join(project_dir, content_check["file"])
@@ -219,9 +220,9 @@ def detect_project_type(project_dir):
                             for keyword in content_check["keywords"]:
                                 if keyword in content:
                                     confidence += 30
-                    except:
+                    except Exception:
                         pass
-        
+
         if "packageJson" in pattern:
             pj = pattern["packageJson"]
             if "dependencies" in pj:
@@ -236,14 +237,14 @@ def detect_project_type(project_dir):
                 for script in pj["scripts"]:
                     if script in scripts:
                         confidence += 30
-        
+
         if confidence > 0:
             category = "other"
             detected_types.append({"type": type_name, "category": category, "confidence": confidence})
 
     detected_types.sort(key=lambda x: x["confidence"], reverse=True)
-    
+
     if detected_types:
         return detected_types[0]["type"]
-    
+
     return "Unknown"

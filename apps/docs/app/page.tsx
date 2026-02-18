@@ -1,9 +1,9 @@
-"use client"
+﻿﻿﻿"use client"
 
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Terminal, Code, FileText, Search, Github, RefreshCw } from "lucide-react"
+import { Terminal, Code, FileText, Search, Github, RefreshCw, AlertTriangle, Clock } from "lucide-react"
 import { motion } from "framer-motion"
 import { useState } from "react"
 import MetricsSection from "@/components/metricsSection"
@@ -148,12 +148,20 @@ export default function DocsPage() {
                   <Copy code="npm install -g dokugen" />
                 </div>
 
-                <div className="group bg-zinc-900/30 p-8 rounded-2xl border border-zinc-900 hover:border-zinc-800 transition-all flex flex-col">
-                  <h3 className="text-xl font-semibold mb-3 text-zinc-100">Method 2: Python</h3>
-                  <p className="text-zinc-400 mb-6 leading-relaxed flex-grow">
-                    Install via uv (recommended) or pip if you prefer Python.
+                <div className="relative bg-zinc-900/10 p-8 rounded-2xl border border-zinc-800/40 flex flex-col opacity-60 cursor-not-allowed select-none">
+                  <div className="flex justify-between items-start mb-3">
+                    <h3 className="text-xl font-semibold text-zinc-400">Method 2: Python</h3>
+                    <span className="inline-flex items-center gap-1.5 bg-zinc-800/80 text-zinc-400 text-xs px-2.5 py-1 rounded-full border border-zinc-700 font-medium">
+                      <Clock className="w-3 h-3" />
+                      Coming Soon
+                    </span>
+                  </div>
+                  <p className="text-zinc-500 mb-6 leading-relaxed flex-grow">
+                    Install via uv (recommended) or pip if you prefer Python. The Python SDK is not yet available.
                   </p>
-                  <Copy code="uv tool install dokugen" />
+                  <div className="pointer-events-none">
+                    <Copy code="uv tool install dokugen" />
+                  </div>
                 </div>
               </div>
 
@@ -165,9 +173,9 @@ export default function DocsPage() {
                 </div>
 
                 <div className="mb-6 p-4 bg-yellow-900/20 border border-yellow-800/50 rounded-xl">
-                  <p className="text-yellow-500 text-sm font-medium mb-1">⚠️ Experimental Vibes</p>
+                  <p className="text-yellow-500 text-sm font-medium mb-1 flex items-center gap-1.5"><AlertTriangle className="w-4 h-4 shrink-0" />Experimental Vibes</p>
                   <p className="text-yellow-500/80 text-xs leading-relaxed">
-                    These standalone binaries are super new and honestly pretty unstable. If you use them, you’ll probably run into issues, that’s just how it is right now. If it breaks, just stick to the Node.js or Python version for now.
+                    These standalone binaries are super new and honestly pretty unstable. If you use them, you’ll probably run into issues, that’s just how it is right now. If it breaks, just stick to the Node.js version for now.
                   </p>
                 </div>
 

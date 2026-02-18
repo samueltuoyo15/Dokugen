@@ -10,9 +10,26 @@ dependencies = [
     "pathspec>=0.12.1",
     "questionary>=2.0.1",
 ]
+authors = [
+  {name = "Samuel Tuoyo", email = "samueltuoyos@gmail.com"}
+]
+keywords = ["readme", "generator", "ai", "documentation", "cli"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+]
+
+[project.urls]
+Homepage = "https://github.com/samueltuoyo15/Dokugen"
+Repository = "https://github.com/samueltuoyo15/Dokugen"
+Issues = "https://github.com/samueltuoyo15/Dokugen/issues"
 
 [project.scripts]
-dokugen = "dokugen:main"
+dokugen = "dokugen.cli:main"
 
 [build-system]
 requires = ["hatchling"]
