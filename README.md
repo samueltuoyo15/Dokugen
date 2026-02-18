@@ -17,19 +17,20 @@ yarn global add dokugen
 pnpm add -g dokugen
 ```
 
-#### Python (Experimental - uv/pip)
+#### Python (Coming Soon 🚧)
+> **Note:** The Python version is currently under active development. The commands below are a preview of the upcoming release.
+
 ```bash
-# Recommended (using uv)
+# Coming Soon
 uv tool install dokugen
 
-# Or using pip
+# Coming Soon
 pip install dokugen
 ```
 
 ### Or Download Standalone Binary (No Node.js/Python Required)
 
-> [!WARNING]
-> **Experimental Vibes:** These standalone binaries are super new and honestly pretty unstable. If you use them, you’ll probably run into issues, that’s just how it is right now. If it breaks, just stick to the Node.js and Python version for now.
+> **Experimental Vibes:** These standalone binaries are super new and honestly pretty unstable. If you use them, you’ll probably run into issues, that’s just how it is right now. If it breaks, just stick to the Node.js version for now.
 
 ## What's New
 

@@ -1,4 +1,6 @@
-# Dokugen Python Client
+# Dokugen Python Client (Coming Soon 🚧)
+
+> **Note:** The Python packaging and distribution for Dokugen is currently under active development. The installation instructions below are a preview of the upcoming release.
 
 Dokugen is a lightweight README.md file Generator Command Line Interface Tool. It simplifies the process of writing your README.md file from scratch by generating professional README.md files for your projects, saving you time and ensuring consistency using AI.
 
@@ -12,6 +14,7 @@ Dokugen is a lightweight README.md file Generator Command Line Interface Tool. I
 ### Install with uv (Recommended)
 
 ```bash
+# Coming Soon
 uv pip install dokugen
 # or
 uv tool install dokugen
@@ -20,6 +23,7 @@ uv tool install dokugen
 ### Install with pip
 
 ```bash
+# Coming Soon
 pip install dokugen
 ```
 
@@ -34,6 +38,7 @@ cd my-project
 ### Generate a new README interactively
 
 ```bash
+# Coming Soon
 dokugen generate
 # or
 python -m dokugen generate
