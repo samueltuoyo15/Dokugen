@@ -39,7 +39,6 @@ def get_installed_version():
 
 
 def check_and_update():
-    """Check PyPI for a newer version and auto-update if available."""
     try:
         current_version = get_installed_version()
         if not current_version:
@@ -55,7 +54,6 @@ def check_and_update():
             console.print(f"\n[cyan]New version available: {latest_version} (current: {current_version})[/cyan]")
 
             with create_spinner(f"Updating {PACKAGE_NAME}..."):
-                # Try uv first, fall back to pip
                 try:
                     subprocess.run(
                         [sys.executable, "-m", "uv", "pip", "install", "--upgrade", f"{PACKAGE_NAME}=={latest_version}"],
@@ -131,10 +129,10 @@ def backup_readme(readme_path):
 
 
 def restore_readme():
-    global readme_backup
+    global readme_backup, current_readme_path
     if readme_backup and current_readme_path:
         try:
-            with open(current_readme_path, 'w', encoding='utf-8') as f:
+            with open(current_readme_path, "w", encoding="utf-8") as f:
                 f.write(readme_backup)
             console.print("[green]Original README content restored successfully[/green]")
             return readme_backup
@@ -143,6 +141,7 @@ def restore_readme():
             return None
         finally:
             readme_backup = None
+            current_readme_path = ""
     else:
         console.print("[yellow]No README backup available to restore[/yellow]")
         return None

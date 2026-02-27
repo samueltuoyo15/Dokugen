@@ -50,7 +50,10 @@ def ask_for_gemini_key():
         sys.exit(0)
 
     if has_key == "yes":
-        key = questionary.text("Enter your Google Gemini API Key:").ask()
+        key = questionary.text(
+            "Enter your Google Gemini API Key:",
+            validate=lambda val: True if val else "Value is required!"
+        ).ask()
         if key is None:
             console.print("[yellow]Operation cancelled[/yellow]")
             sys.exit(0)
@@ -100,38 +103,47 @@ def generate_readme_remote(project_type, project_files, project_dir, existing_re
             "repoUrl": repo_url,
             "templateUrl": template_url,
             "compressed": True,
-            "geminiApiKey": gemini_api_key
+            "geminiApiKey": gemini_api_key,
         }
 
-        console.print("[blue]Generating README (this may take a while)...[/blue]")
+        spinner = utils.create_spinner("Generating README...")
+        spinner.__enter__()
 
-        with utils.create_spinner("Connecting to Dokugen servers..."):
-            response = requests.post(f"{backend_domain}/api/generate-readme", json=payload, stream=True, timeout=API_TIMEOUT)
+        try:
+            response = requests.post(
+                f"{backend_domain}/api/generate-readme",
+                json=payload,
+                stream=True,
+                timeout=API_TIMEOUT,
+            )
+        finally:
+            spinner.__exit__(None, None, None)
 
         if response.status_code != 200:
             console.print(f"[red]Error {response.status_code}: {response.text}[/red]")
+            utils.restore_readme()
             return None
 
-        with open(readme_path, 'w', encoding='utf-8') as f:
+        with open(readme_path, "w", encoding="utf-8") as f:
             for line in response.iter_lines():
                 if line:
-                    decoded = line.decode('utf-8')
+                    decoded = line.decode("utf-8")
                     if decoded.startswith("data:"):
                         json_str = decoded.replace("data: ", "").strip()
                         try:
                             data = json.loads(json_str)
                             if "response" in data and isinstance(data["response"], str):
-                                chunk = data["response"]
-                                f.write(chunk)
+                                f.write(data["response"])
                                 f.flush()
                         except Exception:
                             pass
 
-        console.print("\n[green]README.md created successfully![/green]")
+        console.print("\n[green]README.md created successfully[/green]")
+        utils.readme_backup = None
         return readme_path
 
     except Exception as e:
-        console.print(f"[red]Error Generating Readme: {e}[/red]")
+        console.print(f"[red]\n Error Generating Readme: {e}[/red]")
         utils.restore_readme()
         return None
 
@@ -145,23 +157,27 @@ def cmd_generate(args):
     readme_exists = os.path.exists(readme_path)
 
     with utils.create_spinner("Checking internet..."):
-        if not utils.check_internet_connection():
-            username = utils.get_user_info().get("username", "Unknown")
-            console.print(f"[red]Opps... {username} kindly check your device or pc internet connection and try again.[/red]")
-            return
+        has_connection = utils.check_internet_connection()
+
+    if not has_connection:
+        username = utils.get_user_info().get("username", "Unknown")
+        console.print(f"[red]Opps... {username} kindly check your device or pc internet connection and try again.[/red]")
+        return
 
     if readme_exists:
         utils.backup_readme(readme_path)
 
     try:
-        template_url = args.template
+        template_url = getattr(args, "template", None)
         if template_url and "github.com" not in template_url:
             console.print("[red]Invalid GitHub URL. Use format: https://github.com/user/repo/blob/main/README.md[/red]")
             sys.exit(1)
 
         project_type = detect_project_type(project_dir)
-        with utils.create_spinner("Scanning project files..."):
+
+        with utils.create_spinner("Scanning project files...") as spinner:
             project_files = utils.scan_files(project_dir)
+
         console.print(f"[yellow]Found: {len(project_files)} files in the project[/yellow]")
         console.print(f"[blue]Detected project type: {project_type}[/blue]")
 
@@ -169,17 +185,16 @@ def cmd_generate(args):
 
         if template_url:
             existing_content = None
-            if readme_exists and not args.overwrite:
-                with open(readme_path, 'r', encoding='utf-8') as f:
+            if readme_exists and not getattr(args, "overwrite", True):
+                with open(readme_path, "r", encoding="utf-8") as f:
                     existing_content = f.read()
-
             generate_readme_remote(project_type, project_files, project_dir, existing_content, template_url, gemini_key)
             console.print("[green]README.md generated from template![/green]")
             return
 
         if readme_exists:
-            if not args.overwrite:
-                with open(readme_path, 'r', encoding='utf-8') as f:
+            if not getattr(args, "overwrite", True):
+                with open(readme_path, "r", encoding="utf-8") as f:
                     existing_content = f.read()
                 generate_readme_remote(project_type, project_files, project_dir, existing_content, None, gemini_key)
             else:
@@ -187,10 +202,12 @@ def cmd_generate(args):
                 if ans == "yes":
                     generate_readme_remote(project_type, project_files, project_dir, None, None, gemini_key)
                 elif ans == "no":
-                    console.print("[yellow]README update skipped[/yellow]")
-                else:
-                    console.print("[yellow]Cancelled[/yellow]")
+                    console.print("[yellow]README update skipped (user selected No)[/yellow]")
+                    return
+                elif ans == "cancel":
+                    console.print("[yellow]README generation cancelled[/yellow]")
                     utils.restore_readme()
+                    return
         else:
             generate_readme_remote(project_type, project_files, project_dir, None, None, gemini_key)
 
@@ -206,25 +223,30 @@ def cmd_update(args):
 
     project_dir = os.getcwd()
     readme_path = os.path.join(project_dir, "README.md")
+
     if not os.path.exists(readme_path):
         console.print("[red]No README.md found. Use 'dokugen generate' to create one first.[/red]")
         sys.exit(1)
 
-    if not utils.check_internet_connection():
-        console.print("[red]No internet connection[/red]")
+    with utils.create_spinner("Checking internet..."):
+        has_connection = utils.check_internet_connection()
+
+    if not has_connection:
+        username = utils.get_user_info().get("username", "Unknown")
+        console.print(f"[red]Opps... {username} kindly check your device or pc internet connection and try again.[/red]")
         return
 
     try:
         utils.backup_readme(readme_path)
         gemini_key = ask_for_gemini_key()
 
-        template_url = getattr(args, 'template', None)
+        template_url = getattr(args, "template", None)
 
         if template_url and "github.com" not in template_url:
             console.print("[red]Invalid GitHub URL. Use format: https://github.com/user/repo/blob/main/README.md[/red]")
             sys.exit(1)
 
-        with open(readme_path, 'r', encoding='utf-8') as f:
+        with open(readme_path, "r", encoding="utf-8") as f:
             existing_content = f.read()
 
         has_markers = "<!-- DOKUGEN:" in existing_content or "[![Readme was generated by Dokugen]" in existing_content
@@ -232,11 +254,12 @@ def cmd_update(args):
         if not has_markers:
             console.print("[yellow]This README doesn't appear to be generated by Dokugen.[/yellow]")
             ans = ask_yes_no("Do you want to regenerate the entire README?")
+
             if ans == "yes":
                 project_type = detect_project_type(project_dir)
                 with utils.create_spinner("Scanning project files..."):
                     project_files = utils.scan_files(project_dir)
-                console.print(f"[yellow]Found: {len(project_files)} files[/yellow]")
+                console.print(f"[yellow]Found: {len(project_files)} files in the project[/yellow]")
 
                 generate_readme_remote(project_type, project_files, project_dir, None, template_url, gemini_key)
                 console.print("[green]README.md regenerated successfully![/green]")
@@ -248,10 +271,11 @@ def cmd_update(args):
 
         console.print("[blue]Analyzing README structure...[/blue]")
         project_type = detect_project_type(project_dir)
+
         with utils.create_spinner("Scanning project files..."):
             project_files = utils.scan_files(project_dir)
 
-        console.print(f"[yellow]Found: {len(project_files)} files[/yellow]")
+        console.print(f"[yellow]Found: {len(project_files)} files in the project[/yellow]")
         console.print(f"[blue]Detected project type: {project_type}[/blue]")
         console.print("[blue]Updating auto-generated sections...[/blue]")
 
@@ -259,7 +283,7 @@ def cmd_update(args):
         console.print("[green]README.md updated successfully! Custom sections preserved.[/green]")
 
     except Exception as e:
-        console.print(f"[red]Error updating: {e}[/red]")
+        console.print(f"[red]Error updating README: {e}[/red]")
         utils.restore_readme()
         sys.exit(1)
 
@@ -271,20 +295,32 @@ def cmd_compose_docker(args):
 def main():
     parser = argparse.ArgumentParser(
         prog="dokugen",
-        description="Automatically generate high-quality README for your application"
+        description="Automatically generate high-quality README for your application",
     )
-    parser.add_argument("--version", "-v", action="version", version="%(prog)s 3.11.0")
+    parser.add_argument("--version", "-v", action="version", version="%(prog)s 3.12.1")
 
     subparsers = parser.add_subparsers(dest="command")
 
     gen_parser = subparsers.add_parser("generate", help="Scan project and generate README.md")
-    gen_parser.add_argument("--no-overwrite", dest='overwrite', action='store_false', default=True, help="Do not overwrite existing README")
-    gen_parser.add_argument("--template", help="Use a custom GitHub repo readme template")
+    gen_parser.add_argument(
+        "--no-overwrite",
+        dest="overwrite",
+        action="store_false",
+        default=True,
+        help="Do not overwrite existing README.md, append new features instead",
+    )
+    gen_parser.add_argument(
+        "--template",
+        help="use a custom GitHub repo readme file as a template to generate a concise and strict readme for your project",
+    )
 
     up_parser = subparsers.add_parser("update", help="Update auto-generated sections of README while preserving custom content")
-    up_parser.add_argument("--template", help="Use a custom GitHub repo readme template")
+    up_parser.add_argument(
+        "--template",
+        help="use a custom GitHub repo readme file as a template",
+    )
 
-    subparsers.add_parser("compose-docker", help="Generate dockerfiles or docker compose for multiple services")
+    subparsers.add_parser("compose-docker", help="Generate dockerfiles or docker compose for multiple services of your project")
 
     if len(sys.argv) == 1:
         console.print(DOKUGEN_BANNER, style="#000080")
@@ -295,8 +331,8 @@ def main():
             choices=[
                 questionary.Choice("Generate README  - Scan project and create a new README.md", value="generate"),
                 questionary.Choice("Update README    - Update an existing Dokugen-generated README", value="update"),
-                questionary.Choice("Exit", value="exit")
-            ]
+                questionary.Choice("Exit", value="exit"),
+            ],
         ).ask()
 
         if action == "exit" or action is None:
@@ -320,6 +356,8 @@ def main():
             cmd_update(args)
         elif args.command == "compose-docker":
             cmd_compose_docker(args)
+        else:
+            parser.print_help()
 
 
 if __name__ == "__main__":

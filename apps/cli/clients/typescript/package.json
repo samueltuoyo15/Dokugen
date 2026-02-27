@@ -1,16 +1,21 @@
 {
   "name": "dokugen",
-  "version": "3.11.0",
+  "version": "3.12.1",
   "private": false,
   "main": "dist/bin/dokugen.mjs",
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "postinstall": "pnpm run build && node dist/scripts/postinstall.mjs",
+    "postinstall": "node dist/scripts/postinstall.mjs",
     "test": "vitest",
     "postbuild": "node --no-warnings --loader ts-node/esm lib/rename.ts",
     "build:binaries": "bun run scripts/build-binaries.ts"
   },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
   "bin": {
     "dokugen": "dist/bin/dokugen.mjs"
   },
