@@ -1,8 +1,6 @@
-# Dokugen Python Client 🆕
+# Dokugen
 
-> **NEW!** Dokugen is now available on PyPI! The Python client is fully featured and production-ready — install it just like any Python package.
-
-Dokugen is a lightweight README.md file Generator Command Line Interface Tool. It simplifies the process of writing your README.md file from scratch by generating professional README.md files for your projects, saving you time and ensuring consistency using AI.
+Dokugen is a lightweight README.md file Generator Command Line Interface Tool. It simplifies the process of writing your README.md file from scratch by generating professional README.md files for your projects, saving you time and ensuring consistency using AI. The idea behind Dokugen is simple but impactful, automate the most neglected part of a repo. The results cleaner projects and happier contributors
 
 ## Installation
 
@@ -64,25 +62,6 @@ dokugen update
 ```bash
 dokugen --version
 ```
-
-## Standalone Binaries (Experimental)
-
-> [!WARNING]
-> **Experimental Vibes:** These standalone binaries are super new and honestly pretty unstable. If you use them, you'll probably run into issues, that's just how it is right now. If it breaks, just stick to the Node.js and Python version for now.
-
-You can also try our standalone binaries if you don't want to install Python or Node.js.
-
-**Windows**
-[Download dokugen-windows-x64.exe](https://github.com/samueltuoyo15/Dokugen/releases/download/v3.11.0/dokugen-windows-x64.exe)
-
-**macOS (Apple Silicon M1/M2/M3)**
-[Download dokugen-macos-arm64](https://github.com/samueltuoyo15/Dokugen/releases/download/v3.11.0/dokugen-macos-arm64)
-
-**macOS (Intel)**
-[Download dokugen-macos-x64](https://github.com/samueltuoyo15/Dokugen/releases/download/v3.11.0/dokugen-macos-x64)
-
-**Linux**
-[Download dokugen-linux-x64](https://github.com/samueltuoyo15/Dokugen/releases/download/v3.11.0/dokugen-linux-x64)
 
 ## Features
 

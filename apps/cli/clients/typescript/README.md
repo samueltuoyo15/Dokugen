@@ -17,32 +17,7 @@ yarn global add dokugen
 pnpm install -g dokugen
 ```
 
-#### Python 🆕
-
-> **NEW!** Dokugen is now available on PyPI! Install it with `pip` or `uv` just like any other Python package.
-
-```bash
-uv tool install dokugen
-# or
-pip install dokugen
-```
-
-> [!WARNING]
-> **Experimental Vibes:** These standalone binaries are super new and honestly pretty unstable. If you use them, you’ll probably run into issues, that’s just how it is right now. If it breaks, just stick to the Node.js and Python version for now.
-
 ## What's New
-
-### 🆕 Python Support (Now Available!)
-Dokugen is now available on PyPI! You can install it directly with `pip` or `uv` — no Node.js required. The Python client is fully featured and production-ready.
-
-```bash
-uv tool install dokugen
-# or
-pip install dokugen
-```
-
-### Standalone Binaries (No Node.js Required)
-You can now run Dokugen without installing Node.js! We've added standalone executables for Windows, macOS, and Linux.
 
 ### Intelligent Updates
 The new `dokugen update` command intelligently updates only the auto-generated sections of your README while preserving your custom edits.
@@ -52,20 +27,6 @@ The new `dokugen update` command intelligently updates only the auto-generated s
 - Optimized performance for large codebases.
 
 ---
-
-### Installation via Binary
-
-**Windows**
-[Download dokugen-windows-x64.exe](https://github.com/samueltuoyo15/Dokugen/releases/download/v3.11.0/dokugen-windows-x64.exe)
-
-**macOS (Apple Silicon M1/M2/M3)**
-[Download dokugen-macos-arm64](https://github.com/samueltuoyo15/Dokugen/releases/download/v3.11.0/dokugen-macos-arm64)
-
-**macOS (Intel)**
-[Download dokugen-macos-x64](https://github.com/samueltuoyo15/Dokugen/releases/download/v3.11.0/dokugen-macos-x64)
-
-**Linux**
-[Download dokugen-linux-x64](https://github.com/samueltuoyo15/Dokugen/releases/download/v3.11.0/dokugen-linux-x64)
 
 ### Navigate to the project you want to work with
 
