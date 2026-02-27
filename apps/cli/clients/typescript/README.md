@@ -8,6 +8,7 @@ Dokugen is a lightweight README.md file Generator Command Line Interface Tool. I
 
 ### Install Dokugen globally once, and use forever (Recommended)
 
+#### Node.js
 ```bash
 npm install -g dokugen
 # or
@@ -16,10 +17,29 @@ yarn global add dokugen
 pnpm install -g dokugen
 ```
 
+#### Python 🆕
+
+> **NEW!** Dokugen is now available on PyPI! Install it with `pip` or `uv` just like any other Python package.
+
+```bash
+uv tool install dokugen
+# or
+pip install dokugen
+```
+
 > [!WARNING]
 > **Experimental Vibes:** These standalone binaries are super new and honestly pretty unstable. If you use them, you’ll probably run into issues, that’s just how it is right now. If it breaks, just stick to the Node.js and Python version for now.
 
 ## What's New
+
+### 🆕 Python Support (Now Available!)
+Dokugen is now available on PyPI! You can install it directly with `pip` or `uv` — no Node.js required. The Python client is fully featured and production-ready.
+
+```bash
+uv tool install dokugen
+# or
+pip install dokugen
+```
 
 ### Standalone Binaries (No Node.js Required)
 You can now run Dokugen without installing Node.js! We've added standalone executables for Windows, macOS, and Linux.

@@ -1,6 +1,6 @@
-# Dokugen Python Client (Coming Soon 🚧)
+# Dokugen Python Client 🆕
 
-> **Note:** The Python packaging and distribution for Dokugen is currently under active development. The installation instructions below are a preview of the upcoming release.
+> **NEW!** Dokugen is now available on PyPI! The Python client is fully featured and production-ready — install it just like any Python package.
 
 Dokugen is a lightweight README.md file Generator Command Line Interface Tool. It simplifies the process of writing your README.md file from scratch by generating professional README.md files for your projects, saving you time and ensuring consistency using AI.
 
@@ -14,16 +14,14 @@ Dokugen is a lightweight README.md file Generator Command Line Interface Tool. I
 ### Install with uv (Recommended)
 
 ```bash
-# Coming Soon
-uv pip install dokugen
-# or
 uv tool install dokugen
+# or
+uv pip install dokugen
 ```
 
 ### Install with pip
 
 ```bash
-# Coming Soon
 pip install dokugen
 ```
 
@@ -38,7 +36,6 @@ cd my-project
 ### Generate a new README interactively
 
 ```bash
-# Coming Soon
 dokugen generate
 # or
 python -m dokugen generate
@@ -46,10 +43,32 @@ python -m dokugen generate
 
 > This command launches an interactive prompt to guide you through creating a professional README file.
 
+### Generate README with template
+
+```bash
+dokugen generate --template https://raw.githubusercontent.com/username/repo-name/blob/main/README.md
+```
+
+> Use a custom GitHub repo readme file as a template to generate a concise and strict readme for your project.
+
+### Update Existing README (Smart Update)
+
+```bash
+dokugen update
+```
+
+> **NEW!** Intelligently updates only auto-generated sections of your README while preserving all your custom content. Perfect for keeping your README fresh as your project evolves without losing your personal touch.
+
+### Check Version
+
+```bash
+dokugen --version
+```
+
 ## Standalone Binaries (Experimental)
 
 > [!WARNING]
-> **Experimental Vibes:** These standalone binaries are super new and honestly pretty unstable. If you use them, you’ll probably run into issues, that’s just how it is right now. If it breaks, just stick to the Node.js and Python version for now.
+> **Experimental Vibes:** These standalone binaries are super new and honestly pretty unstable. If you use them, you'll probably run into issues, that's just how it is right now. If it breaks, just stick to the Node.js and Python version for now.
 
 You can also try our standalone binaries if you don't want to install Python or Node.js.
 
@@ -65,6 +84,36 @@ You can also try our standalone binaries if you don't want to install Python or 
 **Linux**
 [Download dokugen-linux-x64](https://github.com/samueltuoyo15/Dokugen/releases/download/v3.11.0/dokugen-linux-x64)
 
+## Features
+
+- **Auto-Update System**: Dokugen automatically checks for new versions and updates itself when you run any command. Always stay current!
+- **Smart README Updates**: Update your README without losing custom content. Only auto-generated sections get refreshed.
+- **Automated Generation**: Automatically analyzes your project and generates a comprehensive README.
+- **Real-Time Streaming**: Watch your README populate in real-time as it's being generated.
+- **Compression Technology**: Handles large codebases efficiently with 70-90% payload size reduction.
+- **Easy to Use**: Simple command-line interface for quick and easy README creation.
+- **Cross-Platform**: Works seamlessly on Windows, macOS, and Linux.
+- **Programming Language and Framework Agnostic**: Works with any language (e.g., Python, JavaScript, Go, C#, C, Rust, etc.)
+- **Options & Flags**: Supports flags and options like generating from a template, overwriting existing files, etc.
+
+## Contributing
+
+Contributions are welcome! [Read the contribution guide here.](https://github.com/samueltuoyo15/Dokugen/blob/main/CONTRIBUTION.md)
+
+## Author
+
+- **Samuel Tuoyo**
+- [Twitter](https://x.com/TuoyoS26091)
+- [LinkedIn](https://www.linkedin.com/in/samuel-tuoyo-8568b62b6)
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Badges
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://opensource.org/)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
+[![PyPI](https://img.shields.io/pypi/v/dokugen?label=PyPI&color=blue)](https://pypi.org/project/dokugen/)
+[![Made in Nigeria](https://img.shields.io/badge/made%20in-nigeria-008751.svg?style=flat-square)](https://github.com/acekyd/made-in-nigeria)
