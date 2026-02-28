@@ -4,6 +4,9 @@ import chalk from "chalk";
 import fs from "fs-extra";
 import * as path from "path";
 import { select, text, isCancel } from "@clack/prompts";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const { version: CURRENT_VERSION } = require("../../package.json");
 const DOKUGEN_BANNER = `
    ___   ____  __ ____  _____________  __
   / _ \ / __ \/ //_/ / / / ____/ ____/ / /
@@ -31,11 +34,7 @@ let currentReadmePath: string = "";
 
 const checkAndUpdate = async (): Promise<void> => {
   try {
-    const currentVersion = execSync("dokugen --version", {
-      stdio: "pipe",
-      timeout: 8000,
-      encoding: "utf-8"
-    }).trim();
+    const currentVersion = CURRENT_VERSION;
 
     const response = await axios.get<{ version: string }>("https://registry.npmjs.org/dokugen/latest", {
       timeout: 3000,
@@ -58,7 +57,7 @@ const checkAndUpdate = async (): Promise<void> => {
         process.exit(0);
       } catch (error) {
         updateSpinner.error({
-          text: chalk.yellow("Auto-update failed. Please run: npm install -g dokugen@latest --ignore-scriptst")
+          text: chalk.yellow("Auto-update failed. Please run: npm install -g dokugen@latest")
         });
       }
     }
@@ -464,7 +463,7 @@ const generateReadme = async (
 
 program
   .name("dokugen")
-  .version("3.11.0")
+  .version(CURRENT_VERSION)
   .description(
     "Automatically generate high-quality README for your application",
   );
