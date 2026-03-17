@@ -33,8 +33,8 @@ pip install dokugen
 
 ## What's New
 
-### 🆕 Python Support (Now Available!)
-Dokugen is now available on PyPI! You can install it directly with `pip` or `uv` — no Node.js required. The Python client is fully featured and production-ready.
+### Python Support (Now Available!)
+Dokugen is now available on PyPI! You can install it directly with `pip` or `uv`, no Node.js required. The Python client is fully featured and production-ready.
 
 ```bash
 uv tool install dokugen
