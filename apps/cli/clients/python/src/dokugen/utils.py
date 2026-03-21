@@ -129,19 +129,24 @@ def backup_readme(readme_path):
 
 
 def restore_readme():
+    """Restore the backed up README and clear global state."""
     global readme_backup, current_readme_path
     if readme_backup and current_readme_path:
         try:
             with open(current_readme_path, "w", encoding="utf-8") as f:
                 f.write(readme_backup)
             console.print("[green]Original README content restored successfully[/green]")
-            return readme_backup
-        except Exception as e:
-            console.print(f"[red]Failed to restore README: {e}[/red]")
-            return None
-        finally:
+            backup_content = readme_backup
+            # Clear global state immediately after restore
             readme_backup = None
             current_readme_path = ""
+            return backup_content
+        except Exception as e:
+            console.print(f"[red]Failed to restore README: {e}[/red]")
+            # Clear global state even on error
+            readme_backup = None
+            current_readme_path = ""
+            return None
     else:
         console.print("[yellow]No README backup available to restore[/yellow]")
         return None
@@ -248,6 +253,7 @@ def scan_files(root_dir):
 
 
 def extract_full_code(project_files, project_dir):
+    """Extract code from project files with memory-efficient processing."""
     snippets = []
 
     file_groups = {}
@@ -263,15 +269,26 @@ def extract_full_code(project_files, project_dir):
             file_path = os.path.join(project_dir, file)
             try:
                 size_kb = os.path.getsize(file_path) / 1024
+                # Use context manager to ensure file is closed
                 with open(file_path, 'r', encoding='utf-8', errors='replace') as f:
                     content = f.read()
 
                 ext = Path(file).suffix[1:] or "txt"
-                dir_snippets.append(f"### {file}\n- **Path:** {file}\n- **Size:** {size_kb:.2f} KB\n```{ext}\n{content}\n```\n")
+                snippet = f"### {file}\n- **Path:** {file}\n- **Size:** {size_kb:.2f} KB\n```{ext}\n{content}\n```\n"
+                dir_snippets.append(snippet)
+                
+                # Clear content reference to free memory
+                del content
+                
             except Exception as e:
                 console.print(f"[red]Failed to read file: {file} - {e}[/red]")
 
         if dir_snippets:
             snippets.append(f"## {d}\n" + "".join(dir_snippets))
+            # Clear dir_snippets to free memory
+            del dir_snippets
 
-    return "".join(snippets) or "No code snippets available"
+    result = "".join(snippets) or "No code snippets available"
+    # Clear snippets list to free memory
+    del snippets
+    return result

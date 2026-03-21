@@ -120,13 +120,17 @@ const restoreReadme = async (): Promise<string | null> => {
     try {
       await fs.writeFile(currentReadmePath, readmeBackup);
       console.log(chalk.green("Original README content restored successfully"));
-      return readmeBackup;
-    } catch (error) {
-      console.error(chalk.red("Failed to restore README:"), error);
-      return null;
-    } finally {
+      const backup = readmeBackup;
+      // Clear global state immediately
       readmeBackup = null;
       currentReadmePath = "";
+      return backup;
+    } catch (error) {
+      console.error(chalk.red("Failed to restore README:"), error);
+      // Clear global state even on error
+      readmeBackup = null;
+      currentReadmePath = "";
+      return null;
     }
   } else {
     console.log(chalk.yellow("No README backup available to restore"));
@@ -170,11 +174,24 @@ const extractFullCode = async (
           try {
             const filePath = path.resolve(projectDir, file);
             const stats = await fs.stat(filePath);
+            
+            // Use streaming to avoid loading entire file into memory at once
             const contentStream = fs.createReadStream(filePath, "utf-8");
             let content = "";
-            for await (const chunk of contentStream) content += chunk;
+            
+            for await (const chunk of contentStream) {
+              content += chunk;
+            }
+            
+            // Ensure stream is closed
+            contentStream.close();
 
-            return `### ${file}\n- **Path:** ${file}\n- **Size:** ${(stats.size / 1024).toFixed(2)} KB\n\`\`\`${path.extname(file).slice(1) || "txt"}\n${content}\n\`\`\`\n`;
+            const snippet = `### ${file}\n- **Path:** ${file}\n- **Size:** ${(stats.size / 1024).toFixed(2)} KB\n\`\`\`${path.extname(file).slice(1) || "txt"}\n${content}\n\`\`\`\n`;
+            
+            // Clear content reference to free memory
+            content = "";
+            
+            return snippet;
           } catch (error) {
             console.error(chalk.red(`Failed to read file: ${file}`));
             console.error(error);
@@ -183,9 +200,11 @@ const extractFullCode = async (
         }),
       );
 
-      return `## ${dir}\n${dirSnippets.filter(Boolean).join("")}`;
+      const result = `## ${dir}\n${dirSnippets.filter(Boolean).join("")}`;
+      return result;
     }),
   );
+  
   return snippets.filter(Boolean).join("") || "No code snippets available";
 };
 
@@ -350,19 +369,38 @@ const generateReadme = async (
 
     let includeSetup = false;
     let includeContributionGuideLine = false;
+    let includeApiDocs = false;
 
     if (!templateUrl) {
       const setupAnswer = await askYesNo(
         "Do you want to include setup instructions in the README?",
       );
       if (setupAnswer === "cancel") return null;
-      includeSetup = setupAnswer;
+      includeSetup = setupAnswer === true;
 
       const contributionAnswer = await askYesNo(
         "Include contribution guidelines in README?",
       );
       if (contributionAnswer === "cancel") return null;
-      includeContributionGuideLine = contributionAnswer;
+      includeContributionGuideLine = contributionAnswer === true;
+
+      // Check if it's a backend/full-stack project
+      const isBackendProject = projectType.toLowerCase().includes("backend") ||
+        projectType.toLowerCase().includes("api") ||
+        projectType.toLowerCase().includes("express") ||
+        projectType.toLowerCase().includes("fastapi") ||
+        projectType.toLowerCase().includes("django") ||
+        projectType.toLowerCase().includes("flask") ||
+        projectType.toLowerCase().includes("spring") ||
+        projectType.toLowerCase().includes("nest");
+
+      if (isBackendProject) {
+        const apiDocsAnswer = await askYesNo(
+          "Include API documentation in README?",
+        );
+        if (apiDocsAnswer === "cancel") return null;
+        includeApiDocs = apiDocsAnswer === true;
+      }
     }
 
     const fullCode = await extractFullCode(projectFiles, projectDir);
@@ -389,7 +427,11 @@ const generateReadme = async (
         projectFiles,
         fullCode: compressedFullCode,
         userInfo,
-        options: { includeSetup, includeContributionGuideLine },
+        options: { 
+          includeSetup: includeSetup === true, 
+          includeContributionGuideLine: includeContributionGuideLine === true,
+          includeApiDocs: includeApiDocs === true
+        },
         existingReadme: compressedExistingReadme,
         repoUrl,
         templateUrl,
@@ -405,9 +447,46 @@ const generateReadme = async (
     const responseStream = response.data as Readable;
     return new Promise((resolve, reject) => {
       let buffer = "";
+      const MAX_BUFFER_SIZE = 1024 * 1024; // 1MB limit for buffer
+      let isCleanedUp = false;
+
+      const cleanup = async (success: boolean, error?: any) => {
+        if (isCleanedUp) return;
+        isCleanedUp = true;
+
+        // Clean up streams
+        responseStream.removeAllListeners();
+        fileStream.removeAllListeners();
+        
+        if (!fileStream.closed) {
+          fileStream.end();
+        }
+
+        // Clear buffer
+        buffer = "";
+
+        if (success) {
+          spinner.success({
+            text: chalk.green("\nREADME.md created successfully"),
+          });
+          readmeBackup = null;
+          resolve(readmePath);
+        } else {
+          console.log(chalk.red("\nFailed to generate README"));
+          spinner.error({ text: chalk.red("Failed to generate README") });
+          const restoredContent = await restoreReadme();
+          reject(restoredContent || error);
+        }
+      };
 
       responseStream.on("data", (chunk: Buffer) => {
         buffer += chunk.toString();
+
+        // Prevent buffer overflow
+        if (buffer.length > MAX_BUFFER_SIZE) {
+          const lines = buffer.split("\n");
+          buffer = lines.slice(-10).join("\n"); // Keep only last 10 lines
+        }
 
         const lines = buffer.split("\n");
         buffer = lines.pop() || "";
@@ -427,28 +506,15 @@ const generateReadme = async (
       });
 
       responseStream.on("end", () => {
-        fileStream.end(async () => {
-          spinner.success({
-            text: chalk.green("\nREADME.md created successfully"),
-          });
-          readmeBackup = null;
-          resolve(readmePath);
-        });
+        cleanup(true);
       });
 
       fileStream.on("error", async (err) => {
-        console.log(chalk.red("\nFailed to write README"));
-        spinner.error({ text: chalk.red("Failed to generate README") });
-        const restoredContent = await restoreReadme();
-        fileStream.end();
-        reject(restoredContent || err);
+        cleanup(false, err);
       });
 
       responseStream.on("error", async (err: Error) => {
-        console.log(chalk.red("\nError receiving stream data"));
-        spinner.error({ text: chalk.red("Failed to generate README") });
-        const restoredContent = await restoreReadme();
-        reject(restoredContent || err);
+        cleanup(false, err);
       });
     });
   } catch (error: unknown) {

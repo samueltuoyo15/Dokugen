@@ -68,6 +68,7 @@ def generate_readme_remote(project_type, project_files, project_dir, existing_re
 
         include_setup = False
         include_contrib = False
+        include_api_docs = False
 
         if not template_url:
             ans_setup = ask_yes_no("Do you want to include setup instructions in the README?")
@@ -79,6 +80,17 @@ def generate_readme_remote(project_type, project_files, project_dir, existing_re
             if ans_contrib == "cancel":
                 return None
             include_contrib = (ans_contrib == "yes")
+
+            # Check if it's a backend/full-stack project
+            is_backend_project = any(keyword in project_type.lower() for keyword in [
+                "backend", "api", "express", "fastapi", "django", "flask", "spring", "nest"
+            ])
+
+            if is_backend_project:
+                ans_api = ask_yes_no("Include API documentation in README?")
+                if ans_api == "cancel":
+                    return None
+                include_api_docs = (ans_api == "yes")
 
         full_code = utils.extract_full_code(project_files, project_dir)
         user_info = utils.get_user_info()
@@ -98,7 +110,11 @@ def generate_readme_remote(project_type, project_files, project_dir, existing_re
             "projectFiles": project_files,
             "fullCode": compressed_full_code,
             "userInfo": user_info,
-            "options": {"includeSetup": include_setup, "includeContributionGuideLine": include_contrib},
+            "options": {
+                "includeSetup": include_setup, 
+                "includeContributionGuideLine": include_contrib,
+                "includeApiDocs": include_api_docs
+            },
             "existingReadme": compressed_existing_readme,
             "repoUrl": repo_url,
             "templateUrl": template_url,
@@ -124,19 +140,24 @@ def generate_readme_remote(project_type, project_files, project_dir, existing_re
             utils.restore_readme()
             return None
 
-        with open(readme_path, "w", encoding="utf-8") as f:
-            for line in response.iter_lines():
-                if line:
-                    decoded = line.decode("utf-8")
-                    if decoded.startswith("data:"):
-                        json_str = decoded.replace("data: ", "").strip()
-                        try:
-                            data = json.loads(json_str)
-                            if "response" in data and isinstance(data["response"], str):
-                                f.write(data["response"])
-                                f.flush()
-                        except Exception:
-                            pass
+        # Write response with proper resource management
+        try:
+            with open(readme_path, "w", encoding="utf-8") as f:
+                for line in response.iter_lines():
+                    if line:
+                        decoded = line.decode("utf-8")
+                        if decoded.startswith("data:"):
+                            json_str = decoded.replace("data: ", "").strip()
+                            try:
+                                data = json.loads(json_str)
+                                if "response" in data and isinstance(data["response"], str):
+                                    f.write(data["response"])
+                                    f.flush()
+                            except Exception:
+                                pass
+        finally:
+            # Ensure response is closed
+            response.close()
 
         console.print("\n[green]README.md created successfully[/green]")
         utils.readme_backup = None
