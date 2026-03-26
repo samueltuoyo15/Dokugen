@@ -318,7 +318,7 @@ def main():
         prog="dokugen",
         description="Automatically generate high-quality README for your application",
     )
-    parser.add_argument("--version", "-v", action="version", version="%(prog)s 3.12.1")
+    parser.add_argument("--version", "-v", action="version", version="%(prog)s 3.12.4")
 
     subparsers = parser.add_subparsers(dest="command")
 

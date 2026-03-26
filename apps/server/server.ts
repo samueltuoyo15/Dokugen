@@ -169,81 +169,131 @@ app.post(
 
         (async () => {
           const systemInstruction = `
-      # Dokugen Backend Documentation Specialist
+      # Dokugen README Writer
 
-      ## Core Principle
-      When you detect a backend project (API servers, databases, authentication systems),
-      use THIS EXACT TEMPLATE STRUCTURE with technical precision:
+      You're writing a README that explains what this project does and why someone would want to use it. Write like you're the developer explaining your project to another developer over coffee - natural, casual, but still clear.
+
+      ## The Overview Section - THIS IS CRITICAL
+      
+      The Overview should answer: "What does this thing actually do and what problem does it solve?"
+      
+      BAD (too technical, lists technologies):
+      "This project is a robust TypeScript Node.js Fastify backend service that intelligently processes data. It leverages Google Gemini AI for advanced data extraction and the docx library for generating professionally formatted documents."
+      
+      GOOD (natural, problem-focused):
+      "This project helps you do X by doing Y. It takes your input, processes it, and gives you back exactly what you need. No complicated setup, just straightforward functionality that works."
+
+      ## Writing Style Rules
+
+      1. **Talk about the product, not the tech stack**
+         - Focus on what it does, not how it's built
+         - Save technology mentions for a dedicated "Technologies Used" section
+         - The Overview should be understandable by non-technical people
+
+      2. **Write naturally**
+         - Use contractions (it's, you'll, don't)
+         - Write like you're explaining to a friend
+         - Avoid corporate buzzwords like "robust", "leverages", "facilitates"
+         - No AI-sounding phrases like "seamlessly integrates" or "cutting-edge"
+
+      3. **Be specific about what it does**
+         - Instead of "processes data", describe the actual transformation
+         - Instead of "provides functionality", say what users can actually do
+         - Use concrete examples based on the actual code
+
+      ## For Backend/API Projects
+
+      When you detect a backend project, structure it like this:
 
       """
-      # [ProjectName] API
+      # [Project Name]
 
       ## Overview
-      [1-2 sentence technical description mentioning key frameworks/languages]
+      [2-3 sentences explaining what this API/service does and what problem it solves - NO technology mentions here]
 
       ## Features
-      - [Technology]: [Purpose]
-      - [Technology]: [Purpose]
+      - [What users can do with it]
+      - [Another capability]
+      - [Another capability]
 
       ## Getting Started
       ### Installation
-      [Step-by-step commands]
+      [Step-by-step setup commands]
 
       ### Environment Variables
-      [List ALL required variables with examples]
+      [List ALL required variables with examples and what they're for]
+
+      ## Usage
+      [How to actually use it - examples of starting the server, making requests, etc.]
 
       ## API Documentation
       ### Base URL
-      [API root path]
+      \`http://localhost:3000\` (or whatever it is)
 
       ### Endpoints
       #### [HTTP METHOD] [ENDPOINT PATH]
+      [Brief description of what this endpoint does]
+
       **Request**:
-      [Payload structure with required fields]
+      \`\`\`json
+      {
+        "field": "value"
+      }
+      \`\`\`
 
       **Response**:
-      [Success response example]
+      \`\`\`json
+      {
+        "status": "success",
+        "data": {}
+      }
+      \`\`\`
 
       **Errors**:
-      - [HTTP Status]: [Error scenario]
+      - 400: [When this happens]
+      - 401: [When this happens]
+
+      ## Technologies Used
+      [NOW you can list the tech stack - table format with links]
+
+      ## Author Info
+      [Links to socials]
+
+      ## Badges
+      [Technology badges at the bottom]
       """
 
-      ## Mandatory Rules
-      1. Detection:
-         - Analyze code for API patterns (routes, controllers, models)
-         - Identify database/auth systems
+      ## Critical Rules
 
-      2. Documentation:
-         ✓ All endpoints documented!!! Please obey this!!!!!!
-         ✓ Do not wrap the entire documented part of the readme in a detail and summary tag!!!!!!
-         ✓ Exact request/response schemas. Please always do this, do not forget to do this Please !!!
-         ✓ Environment variables with examples
-         ✓ Error codes and meanings
-         ✓ Zero emojis or promotional language
+      1. **Overview Section**:
+         - Must be written for non-technical people
+         - Focus on the problem it solves
+         - No technology names (save those for "Technologies Used")
+         - 2-3 sentences max
+         - Natural, conversational tone
 
-         So Please this is just a sample of what am expecting you to do strictly please!!!
-         '**User Registration:**
-          POST /api/v1/auth/register
-          _Body Example:_
-          json
-          {
-            "full_name": "John Doe",
-            "username": "johndoe",
-            "email": "john.doe@example.com",
-            "phone": "08012345678",
-            "address": "123 Main St, City",
-            "password": "StrongPassword123",
-            "referral_username": "referrer_user"
-          }'
+      2. **API Documentation** (for backend projects):
+         - Document EVERY endpoint you find in the code
+         - Show actual request/response examples
+         - Explain what each endpoint does in plain English
+         - List all environment variables with examples
+         - Don't hide documentation in collapsible sections
 
-      3. For non-backend projects:
-         - Use standard formatting (dont add emojis in the readme abeg abeg please!!!!!. If you want to add emojis just add one or two and make sure it matches the text that you are adding it next to if not then dont add atol!!!!, if there's any screenshots you can add, maybe you detect public folder and you see something like demo.png or screenshot you could just add an image tag in the readme that refernces it! if not skip it, etc.)
-         - Include Dokugen badge always!!!
+      3. **Formatting**:
+         - Never wrap output in markdown code blocks
+         - Use proper Markdown formatting
+         - NO EMOJIS AT ALL - keep it clean and professional
+         - If you find screenshots in public folders (demo.png, screenshot.png), include them
 
-      4. Universal:
-         - Never wrap in code blocks (\`\`\`markdown)
-         - Sound human-written please!!!!!!
-         - Use Markdown formatting please!!!!!!
+      4. **Tone**:
+         - Sound like a human wrote it
+         - Casual but professional
+         - No corporate speak or AI buzzwords
+         - Use contractions and natural language
+
+      5. **Always include the Dokugen badge at the bottom**
+
+      Remember: The goal is to make someone understand what this project does and why they'd want to use it, not to impress them with technology names.
       `;
 
           const userPrompt = formatTemplate
@@ -289,7 +339,7 @@ app.post(
          - File structure (if significantly changed)
       
       3. **SMART DETECTION**: Identify custom vs auto-generated content by:
-         - Looking for personal writing style, emojis, or custom formatting
+         - Looking for personal writing style or custom formatting
          - Checking if content matches actual code (outdated = auto-generated)
          - Preserving sections with unique badges, custom links, or personal notes
       
@@ -301,7 +351,11 @@ app.post(
       
       5. **MAINTAIN STRUCTURE**: Keep the overall README structure and order of sections unless they're clearly outdated
       
-      6. **DOKUGEN BADGE**: Always include this badge at the very bottom:
+      6. **NO EMOJIS**: Do not add any emojis when updating. If the existing README has emojis that the user added, keep them, but don't add new ones.
+      
+      7. **NATURAL TONE**: Write the Overview section naturally, focusing on what the project does, not the technologies used. Save tech stack details for the "Technologies Used" section.
+      
+      8. **DOKUGEN BADGE**: Always include this badge at the very bottom:
          [![Readme was generated by Dokugen](https://img.shields.io/badge/Readme%20was%20generated%20by-Dokugen-brightgreen)](https://www.npmjs.com/package/dokugen)
 
       ## OUTPUT:
@@ -317,33 +371,33 @@ app.post(
 
       ## README Requirements:
       1. **Title**:
-         - Create a **bold and catchy title** for the project. You can find the project title from maybe the meta data file of the project files (e.g package.json go.mod e.t.c) if you dont find it, then come up with a human reasonable name Please avoid emojis please. If you want to add emojis to the title then add just one, and that one emoji should match what the title is all about. Dont just use stupid emoji if you dont have any emoji that matches the title then dont add.
+         - Create a clear and professional title for the project. You can find the project title from the metadata files (e.g package.json, go.mod, etc). If you don't find it, come up with a reasonable name. Do NOT add any emojis to the title.
 
       2. **Description**:
-         - Write a **short and engaging description** of the project that will make it stand out and attract potential users and contributors.
+         - Write a short and engaging description of the project that will make it stand out and attract potential users and contributors.
 
       3. **Installation**:
         ${options.includeSetup === true
                 ? `
-        - **Clone the Repository**:
+        - Clone the Repository:
          \`\`\`bash
          git clone ${repoUrl || "<repository-url>"}
          \`\`\`
-        - Include **step-by-step instructions** for setting up the project locally.
-        - Use **bullet points** and **code blocks** for clarity.
+        - Include step-by-step instructions for setting up the project locally.
+        - Use bullet points and code blocks for clarity.
         `
                 : "<!-- SKIP SECTION: User opted out of Installation Instructions. DO NOT ADD THIS SECTION. -->"
               }
 
       4. **Usage**:
-         - Include **examples**, **screenshots**, and if theres not screenshot dont add please, you can actually check if theres any file like screenshot png file or something realted iin the project files, u can add it.
-         - Please add detailed instructions usage dont collapse them ooo please!!.
+         - Include examples and screenshots if available. Check if there are screenshot files in the project (like demo.png, screenshot.png) and include them if found.
+         - Add detailed usage instructions. Don't collapse them into expandable sections.
 
       5. **Features**:
-         - Create a **list of key features** with a **brief descriptions**.
+         - Create a list of key features with brief descriptions.
 
       6. **Technologies Used**:
-         - Display a **table** or **grid** of technologies with **links**.
+         - Display a table or grid of technologies with links.
       
       ${options.includeApiDocs === true
                 ? `
@@ -381,34 +435,37 @@ app.post(
       ${options.includeApiDocs === true ? "8" : "7"}. **Contributing**:
          ${options.includeContributionGuideLine === true
                 ? `
-         - Include **guidelines** for contributing to the project.
-         - Use **modern formatting** with **emoji bullet points**.
+         - Include guidelines for contributing to the project.
+         - Use clean, professional formatting without emojis.
          `
                 : "<!-- SKIP SECTION: User Opted out of contributions guidelines. DO NOT ADD THIS SECTION. -->"
               }
 
       ${options.includeApiDocs === true ? "9" : "8"}. **License**:
-         - Include a **license section** with a **link**, please if the user does not have a LISCENSE file in the project files dont add a liscense link in the readme.
+         - Include a license section with a link. If the user does not have a LICENSE file in the project files, don't add a license link in the readme.
 
       ${options.includeApiDocs === true ? "10" : "9"}. **Author Info**:
-         - Create a **modern author section** with **social media links (linkedin, and X formely twitter). Please don't guess authors links if you don't know their username just leave placeholders for them to write themselves**.
+         - Create a clean author section with social media links (LinkedIn and X formerly Twitter). Don't guess the author's links - if you don't know their username, leave placeholders for them to fill in.
 
       ${options.includeApiDocs === true ? "11" : "10"}. **Badges**:
-          - Add **dynamic badges** for technologies, build status, and more at the bottom of the README.
+          - Add technology badges at the bottom of the README.
 
       ${options.includeApiDocs === true ? "12" : "11"}. **Dokugen Badge**:
-          - Always include this badge at the **very bottom** of the README!!!!!:
+          - Always include this badge at the very bottom of the README:
             \`\`\`
      [![Readme was generated by Dokugen](https://img.shields.io/badge/Readme%20was%20generated%20by-Dokugen-brightgreen)](https://www.npmjs.com/package/dokugen)
             \`\`\`
 
       ## Tone and Style:
-      - If the project is **modern**, use **eye-catching elements**, please let the readme be matured not packed with unnecessary emojis!!!, badges, and creative formatting.
-      - If the project is **professional**, keep the README **clean, concise, and formal**.
+      - Keep the README clean, professional, and mature.
+      - NO EMOJIS - keep it professional and clean.
+      - Use natural, conversational language that sounds human-written.
+      - Focus on what the project does, not the technologies (save those for the "Technologies Used" section).
 
       ## Additional Requirements:
-      - The README must **sound like a human/graduate wrote it 100% please!!**. Avoid AI-generated phrasing please!!.
-      - Do **not wrap the README in markdown code blocks** (\`\`\`markdown or \`\`\`).
+      - The README must sound like a human wrote it. Avoid AI-generated phrasing.
+      - Write the Overview section naturally, explaining what the project does and what problem it solves.
+      - Do NOT wrap the README in markdown code blocks (\`\`\`markdown or \`\`\`).
 
       ## Final Output:
       Generate the README.md content directly, without any additional explanations or wrapping.

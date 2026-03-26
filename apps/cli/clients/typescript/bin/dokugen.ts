@@ -384,8 +384,7 @@ const generateReadme = async (
       if (contributionAnswer === "cancel") return null;
       includeContributionGuideLine = contributionAnswer === true;
 
-      // Check if it's a backend/full-stack project
-      const isBackendProject = projectType.toLowerCase().includes("backend") ||
+       const isBackendProject = projectType.toLowerCase().includes("backend") ||
         projectType.toLowerCase().includes("api") ||
         projectType.toLowerCase().includes("express") ||
         projectType.toLowerCase().includes("fastapi") ||
