@@ -5,8 +5,7 @@
   "main": "server.ts",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/server.js",
-    "postinstall": "tsc"
+    "start": "node dist/server.js"
   },
   "keywords": [
     "open source",
