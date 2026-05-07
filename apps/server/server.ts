@@ -10,6 +10,7 @@ import rateLimit from "express-rate-limit";
 import logger from "./utils/logger";
 import { gunzip } from "zlib";
 import { promisify } from "util";
+import cron from "node-cron";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -535,10 +536,10 @@ app.use((err: Error, req: Request, res: Response, next: Function) => {
 const PORT = process.env.PORT || "3000";
 app.listen(PORT, () => {
   logger.info(`Dokugen running on port ${PORT}`);
-  // cron.schedule("*/14 * * * *", () => {
-  //   const keepAliveUrl = `${process.env.BACKEND_DOMAIN}/api/health`
-  //   logger.info(`Performing self-ping to: ${keepAliveUrl}`)
-  //   fetch(keepAliveUrl).then(res => logger.info(`Keep-alive ping successful (Status: ${res.status})`)).catch(err => logger.error("Keep-alive ping failed:", err))
-  // })
-  // logger.info("Self-pinger initialized)")
+  cron.schedule("*/14 * * * *", () => {
+    const keepAliveUrl = `${process.env.BACKEND_DOMAIN}/api/health`
+    logger.info(`Performing self-ping to: ${keepAliveUrl}`)
+    fetch(keepAliveUrl).then(res => logger.info(`Keep-alive ping successful (Status: ${res.status})`)).catch(err => logger.error("Keep-alive ping failed:", err))
+  })
+  logger.info("Self-pinger initialized)")
 });
