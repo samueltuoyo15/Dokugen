@@ -69,6 +69,8 @@ def generate_readme_remote(project_type, project_files, project_dir, existing_re
         include_setup = False
         include_contrib = False
         include_api_docs = False
+        linkedin_url = ""
+        twitter_url = ""
 
         if not template_url:
             ans_setup = ask_yes_no("Do you want to include setup instructions in the README?")
@@ -92,6 +94,16 @@ def generate_readme_remote(project_type, project_files, project_dir, existing_re
                     return None
                 include_api_docs = (ans_api == "yes")
 
+            try:
+                linkedin_url = questionary.text(
+                    "LinkedIn profile URL (leave blank to skip):",
+                ).ask() or ""
+                twitter_url = questionary.text(
+                    "X (Twitter) profile URL (leave blank to skip):",
+                ).ask() or ""
+            except KeyboardInterrupt:
+                return None
+
         full_code = utils.extract_full_code(project_files, project_dir)
         user_info = utils.get_user_info()
         repo_url = utils.get_git_repo_url()
@@ -113,7 +125,9 @@ def generate_readme_remote(project_type, project_files, project_dir, existing_re
             "options": {
                 "includeSetup": include_setup, 
                 "includeContributionGuideLine": include_contrib,
-                "includeApiDocs": include_api_docs
+                "includeApiDocs": include_api_docs,
+                "linkedinUrl": linkedin_url,
+                "twitterUrl": twitter_url,
             },
             "existingReadme": compressed_existing_readme,
             "repoUrl": repo_url,

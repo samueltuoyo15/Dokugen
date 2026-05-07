@@ -204,65 +204,7 @@ app.post(
 
       ## For Backend/API Projects
 
-      When you detect a backend project, structure it like this:
-
-      """
-      # [Project Name]
-
-      ## Overview
-      [2-3 sentences explaining what this API/service does and what problem it solves - NO technology mentions here]
-
-      ## Features
-      - [What users can do with it]
-      - [Another capability]
-      - [Another capability]
-
-      ## Getting Started
-      ### Installation
-      [Step-by-step setup commands]
-
-      ### Environment Variables
-      [List ALL required variables with examples and what they're for]
-
-      ## Usage
-      [How to actually use it - examples of starting the server, making requests, etc.]
-
-      ## API Documentation
-      ### Base URL
-      \`http://localhost:3000\` (or whatever it is)
-
-      ### Endpoints
-      #### [HTTP METHOD] [ENDPOINT PATH]
-      [Brief description of what this endpoint does]
-
-      **Request**:
-      \`\`\`json
-      {
-        "field": "value"
-      }
-      \`\`\`
-
-      **Response**:
-      \`\`\`json
-      {
-        "status": "success",
-        "data": {}
-      }
-      \`\`\`
-
-      **Errors**:
-      - 400: [When this happens]
-      - 401: [When this happens]
-
-      ## Technologies Used
-      [NOW you can list the tech stack - table format with links]
-
-      ## Author Info
-      [Links to socials]
-
-      ## Badges
-      [Technology badges at the bottom]
-      """
+      When you detect a backend project, use ONLY the sections that are explicitly requested via the options passed in the user prompt. Do NOT add sections that are marked as skipped. The user prompt will contain explicit SKIP instructions — follow them strictly.
 
       ## Critical Rules
 
@@ -446,7 +388,9 @@ app.post(
          - Include a license section with a link. If the user does not have a LICENSE file in the project files, don't add a license link in the readme.
 
       ${options.includeApiDocs === true ? "10" : "9"}. **Author Info**:
-         - Create a clean author section with social media links (LinkedIn and X formerly Twitter). Don't guess the author's links - if you don't know their username, leave placeholders for them to fill in.
+         - Create a clean author section with social media links.
+         ${options.linkedinUrl ? `- LinkedIn: use this exact URL: ${options.linkedinUrl}` : "- LinkedIn: leave a placeholder [Your LinkedIn](https://linkedin.com/in/yourusername)"}
+         ${options.twitterUrl ? `- X (Twitter): use this exact URL: ${options.twitterUrl}` : "- X (Twitter): leave a placeholder [@yourhandle](https://x.com/yourhandle)"}
 
       ${options.includeApiDocs === true ? "11" : "10"}. **Badges**:
           - Add technology badges at the bottom of the README.
