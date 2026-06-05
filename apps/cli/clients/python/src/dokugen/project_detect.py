@@ -558,6 +558,64 @@ def detect_project_type(project_dir):
     has_server_dir = _is_dir(os.path.join(project_dir, "server"))
     has_apps_dir = _is_dir(os.path.join(project_dir, "apps"))
     has_packages_dir = _is_dir(os.path.join(project_dir, "packages"))
+    has_services_dir = _is_dir(os.path.join(project_dir, "services"))
+
+    # Detect microservices: a root directory with multiple service subdirectories,
+    # each containing their own project files (no root package.json required)
+    root_has_no_package_json = not _path_exists(os.path.join(project_dir, "package.json"))
+
+    def _is_service_dir(path):
+        """Check if a directory looks like an independent service/app."""
+        service_indicators = [
+            "package.json", "go.mod", "requirements.txt", "pyproject.toml",
+            "Pipfile", "Cargo.toml", "pom.xml", "build.gradle", "composer.json",
+            "Gemfile", "mix.exs", "pubspec.yaml", "*.csproj"
+        ]
+        for indicator in service_indicators:
+            if "*" in indicator:
+                if glob.glob(os.path.join(path, indicator)):
+                    return True
+            elif _path_exists(os.path.join(path, indicator)):
+                return True
+        return False
+
+    # Check if services/ or a root with many subdirs is a microservices layout
+    microservice_dirs = []
+    if has_services_dir:
+        for svc in _list_dir_safe(os.path.join(project_dir, "services")):
+            svc_path = os.path.join(project_dir, "services", svc)
+            if _is_dir(svc_path) and _is_service_dir(svc_path):
+                microservice_dirs.append(("services", svc, svc_path))
+
+    # Also treat root-level subdirs as microservices if no root package.json
+    # and multiple subdirs each have their own project manifest
+    if root_has_no_package_json and not microservice_dirs:
+        try:
+            root_subdirs = [
+                d for d in os.listdir(project_dir)
+                if _is_dir(os.path.join(project_dir, d))
+                and not d.startswith(".")
+                and d not in {"node_modules", "dist", "build", ".git", "docs", "scripts", "config"}
+            ]
+        except Exception:
+            root_subdirs = []
+
+        candidate_services = [
+            d for d in root_subdirs
+            if _is_service_dir(os.path.join(project_dir, d))
+        ]
+        if len(candidate_services) >= 2:
+            for svc in candidate_services:
+                microservice_dirs.append(("root", svc, os.path.join(project_dir, svc)))
+
+    if microservice_dirs:
+        service_types = []
+        for _, svc_name, svc_path in microservice_dirs:
+            svc_type = detect_project_type(svc_path)
+            if svc_type != "Unknown":
+                service_types.append(f"{svc_name}: {svc_type}")
+        if service_types:
+            return f"Microservices [{' | '.join(service_types)}]"
 
     if (has_client_dir and has_server_dir) or (has_apps_dir and has_packages_dir):
         client_types = []
@@ -574,7 +632,10 @@ def detect_project_type(project_dir):
         if has_apps_dir:
             is_monorepo = True
             for app in _list_dir_safe(os.path.join(project_dir, "apps")):
-                app_type = detect_project_type(os.path.join(project_dir, "apps", app))
+                app_path = os.path.join(project_dir, "apps", app)
+                if not _is_dir(app_path):
+                    continue
+                app_type = detect_project_type(app_path)
                 app_lower = app_type.lower()
                 if any(k in app_lower for k in ["react", "vue", "angular", "front"]):
                     client_types.append(app_type)
@@ -584,7 +645,10 @@ def detect_project_type(project_dir):
         if has_packages_dir:
             is_monorepo = True
             for pkg in _list_dir_safe(os.path.join(project_dir, "packages")):
-                pkg_type = detect_project_type(os.path.join(project_dir, "packages", pkg))
+                pkg_path = os.path.join(project_dir, "packages", pkg)
+                if not _is_dir(pkg_path):
+                    continue
+                pkg_type = detect_project_type(pkg_path)
                 if pkg_type != "Unknown":
                     pkg_lower = pkg_type.lower()
                     if any(k in pkg_lower for k in ["react", "vue", "angular", "front"]):

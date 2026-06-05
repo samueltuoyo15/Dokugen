@@ -2,6 +2,8 @@
 
 ![Demo GIF](./public/Demo.gif)
 
+[![Sponsor Dokugen](https://img.shields.io/badge/Sponsor-Dokugen-red?style=for-the-badge&logo=ko-fi&logoColor=white)](https://myhappr.xyz/samueltuoyo)
+
 Dokugen is a lightweight README.md file Generator Command Line Interface Tool. It simplifies the process of writing your README.md file from scratch by generating professional README.md files for your projects, saving you time and ensuring consistency using AI. The idea behind Dokugen is simple but impactful, automate the most neglected part of a repo. The results cleaner projects and happier contributors
 
 ## Usage
