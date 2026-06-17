@@ -1,11 +1,13 @@
 import { Router, Request, Response } from "express";
 import os from "os";
 import { v4 as uuidv4 } from "uuid";
+import { GoogleGenAI } from "@google/genai";
 import { fetchGitHubReadme } from "../lib/fetchGitHubReadme";
 import { gunzipAsync } from "../middleware/compression";
 import { trackUser } from "../lib/supabaseTracker";
 import { getSystemInstruction } from "../prompts/systemInstruction";
 import { buildUserPrompt } from "../prompts/userPrompt";
+import { getCachedContentName, getVersionedModelName } from "../lib/cacheManager";
 import logger from "../utils/logger";
 
 const router = Router();
@@ -27,26 +29,31 @@ router.post(
         geminiApiKey,
         groqApiKey,
       } = req.body;
-      logger.info({ projectType, compressed, hasExistingReadme: !!rawExistingReadme }, "Generate README request received");
+
+      logger.info(
+        { projectType, compressed, hasExistingReadme: !!rawExistingReadme },
+        "Generate README request received"
+      );
 
       const apiKey = geminiApiKey || groqApiKey || process.env.GOOGLE_GEMINI_API_KEY;
       if (!apiKey) {
         return res.status(500).json({ error: "No API Key Provided" });
       }
 
-      let fullCode = rawFullCode;
+      // ── Decompress payload if needed ──────────────────────────────────────
+      let fullCode      = rawFullCode;
       let existingReadme = rawExistingReadme;
 
       if (compressed) {
         if (rawFullCode) {
-          const buffer = Buffer.from(rawFullCode, "base64");
+          const buffer      = Buffer.from(rawFullCode, "base64");
           const decompressed = await gunzipAsync(buffer);
-          fullCode = decompressed.toString("utf-8");
+          fullCode           = decompressed.toString("utf-8");
         }
         if (rawExistingReadme) {
-          const buffer = Buffer.from(rawExistingReadme, "base64");
+          const buffer      = Buffer.from(rawExistingReadme, "base64");
           const decompressed = await gunzipAsync(buffer);
-          existingReadme = decompressed.toString("utf-8");
+          existingReadme     = decompressed.toString("utf-8");
         }
       }
 
@@ -72,96 +79,77 @@ router.post(
 
       const id = userInfo?.id || uuidv4();
 
-      // Start user tracking in background/Promise.all
-      const [_, response] = await Promise.all([
+      // ── Build prompts ─────────────────────────────────────────────────────
+      const systemInstruction = getSystemInstruction(options);
+      const userPrompt        = buildUserPrompt(
+        formatTemplate,
+        repoUrl,
+        projectType,
+        projectFiles,
+        fullCode,
+        existingReadme,
+        options
+      );
+
+      const modelAlias     = process.env.MODEL_NAME || "gemini-2.5-flash";
+      const versionedModel = getVersionedModelName(modelAlias);
+      const ai             = new GoogleGenAI({ apiKey });
+
+      // ── Attempt context-cached request + user tracking in parallel ────────
+      const [_, streamResult] = await Promise.all([
         trackUser({ username, email, id, osInfo }),
 
         (async () => {
-          const systemInstruction = getSystemInstruction(options);
-          const userPrompt = buildUserPrompt(
-            formatTemplate,
-            repoUrl,
-            projectType,
-            projectFiles,
-            fullCode,
-            existingReadme,
-            options
-          );
+          // Try to get (or create) a cached system instruction.
+          const cacheName = await getCachedContentName(apiKey, options, modelAlias);
 
-          const model = process.env.MODEL_NAME || "gemini-2.5-flash";
-          const resModel = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?key=${apiKey}&alt=sse`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              contents: [
-                {
-                  role: "user",
-                  parts: [{ text: userPrompt }]
-                }
-              ],
-              system_instruction: {
-                parts: [{ text: systemInstruction }]
-              }
-            })
-          });
-
-          if (!resModel.ok) {
-            const errorText = await resModel.text();
-            throw new Error(`Gemini API error: ${resModel.statusText} - ${errorText}`);
+          if (cacheName) {
+            // ✅ Cache HIT — system instruction is already stored server-side.
+            // We pay ~4× less for those tokens on every request.
+            logger.info({ cacheName }, "Generating README with context cache");
+            return ai.models.generateContentStream({
+              model: versionedModel,
+              config: {
+                cachedContent: cacheName,
+                // ⚠️  Do NOT pass systemInstruction here — it is already in the cache.
+              },
+              contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+            });
+          } else {
+            // ❌ Cache unavailable — send system instruction the regular way.
+            logger.info("Generating README without context cache (fallback)");
+            return ai.models.generateContentStream({
+              model: modelAlias,
+              config: { systemInstruction },
+              contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+            });
           }
-
-          return resModel;
         })(),
       ]);
 
-      if (!response.body) {
-        throw new Error("No response body from Gemini API");
-      }
-
+      // ── Set up SSE headers ────────────────────────────────────────────────
       res.setHeader("Content-Type", "text/event-stream");
       res.setHeader("Cache-Control", "no-cache");
       res.setHeader("Connection", "keep-alive");
 
-      const decoder = new TextDecoder();
-      let buffer = "";
-
       let clientDisconnected = false;
       req.on("close", () => {
         clientDisconnected = true;
-        logger.warn("Client disconnected during generation.");
+        logger.warn("Client disconnected during README generation.");
       });
 
-      for await (const chunk of response.body as any) {
+      // ── Stream response chunks to the client ──────────────────────────────
+      for await (const chunk of await streamResult) {
         if (clientDisconnected) break;
-        
-        const chunkText = decoder.decode(chunk, { stream: true });
-        buffer += chunkText;
-        
-        const lines = buffer.split("\n");
-        buffer = lines.pop() || "";
-        
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed) continue;
-          if (trimmed.startsWith("data: ")) {
-            try {
-              const json = JSON.parse(trimmed.slice(6));
-              const delta = json.candidates?.[0]?.content?.parts?.[0]?.text;
-              if (delta) {
-                res.write(`data: ${JSON.stringify({ response: delta })}\n\n`);
-              }
-            } catch (e) {
-              // Ignore parse errors on partial streams
-            }
-          }
+        const text = chunk.text;
+        if (text) {
+          res.write(`data: ${JSON.stringify({ response: text })}\n\n`);
         }
       }
 
       if (!clientDisconnected) {
         res.end();
-        logger.info("README Generated Successfully");
+        logger.info("README generated successfully");
       }
     } catch (error: any) {
       console.error("Error:", error);
