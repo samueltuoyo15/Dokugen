@@ -1,8 +1,18 @@
 import type { Metadata } from "next";
-import { GeistSans, GeistMono } from "geist/font";
+import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import siteMetadata from "../utils/siteMetaData";
 import Providers from "./Providers";
 import "./globals.css";
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-plus-jakarta",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteMetadata.siteUrl),
@@ -48,7 +58,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${GeistSans.variable} ${GeistMono.variable} select-none antialiased`}
+        className={`${plusJakartaSans.variable} ${jetbrainsMono.variable} select-none antialiased`}
       >
         <Providers>{children}</Providers>
       </body>

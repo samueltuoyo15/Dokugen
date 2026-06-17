@@ -1,4 +1,4 @@
-import { readdir, stat, rename } from 'fs/promises'
+import { readdir, stat, readFile, writeFile, unlink } from 'fs/promises'
 import { join, extname, dirname } from 'path'
 import { fileURLToPath } from 'url'
 
@@ -13,8 +13,16 @@ const renameFiles = async (dir: string) => {
     if (statResult.isDirectory()) {
       return renameFiles(filePath) 
     } else if (extname(file) === '.js') {
+      let content = await readFile(filePath, 'utf-8')
+      
+      // Replace static and dynamic imports/exports from '.js' to '.mjs'
+      content = content.replace(/(\b(?:from|import|export)\s+|import\()(['"])([^'"]+)\.js\2/g, (match, p1, p2, p3) => {
+        return `${p1}${p2}${p3}.mjs${p2}`;
+      })
+
       const newFilePath = join(dir, file.replace(/\.js$/, '.mjs'))
-      return rename(filePath, newFilePath) 
+      await writeFile(newFilePath, content, 'utf-8')
+      await unlink(filePath)
     }
   }))
 }

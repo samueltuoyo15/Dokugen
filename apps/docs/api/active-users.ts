@@ -20,7 +20,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
   try{
     const { data, error, count } = await supabase
       .from("active_users")
-      .select("id, username, usage_count, osInfo", { count: 'exact' })
+      .select("username, usage_count", { count: 'exact' })
       .order("usage_count", { ascending: false })
       .range(startIndex, endIndex)
     

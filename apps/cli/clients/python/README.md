@@ -1,95 +1,98 @@
-# Dokugen
+# Dokugen (Python Client)
 
-Dokugen is a lightweight README.md file Generator Command Line Interface Tool. It simplifies the process of writing your README.md file from scratch by generating professional README.md files for your projects, saving you time and ensuring consistency using AI. The idea behind Dokugen is simple but impactful, automate the most neglected part of a repo. The results cleaner projects and happier contributors
+Dokugen is a lightweight, AI-powered README.md generator command-line tool. It automates writing and updating project documentation, ensuring clean, consistent, and professional README files.
 
-## Installation
+---
 
-### Prerequisites
+## ⚡ Quick Start
 
-- Python 3.8+
-- [uv](https://docs.astral.sh/uv/) (Recommended) or pip
+### Installation
 
-### Install with uv (Recommended)
+Install Dokugen globally using `uv` (recommended) or `pip`:
 
 ```bash
 uv tool install dokugen
 # or
-uv pip install dokugen
-```
-
-### Install with pip
-
-```bash
 pip install dokugen
 ```
 
-## Usage
+---
 
-### Navigate to the project you want to work with
+## 🚀 Usage
+
+### 1. Launch the Interactive Assistant
+Simply run `dokugen` in your project folder to open the interactive setup assistant. From here, you can generate a README, update files, revert backups, or run AI-assisted Git commits.
 
 ```bash
-cd my-project
+dokugen
 ```
 
-### Generate a new README interactively
+*Note: If `dokugen` command is not in your PATH, you can also run it via Python:*
+```bash
+python -m dokugen
+```
 
+### 2. Standalone Commands
+
+#### Generate README
+Scan your project files and construct a new README.md.
 ```bash
 dokugen generate
-# or
-python -m dokugen generate
 ```
 
-> This command launches an interactive prompt to guide you through creating a professional README file.
-
-### Generate README with template
-
+#### Generate README with a custom Template
+Use any public README.md file as a structure template.
 ```bash
-dokugen generate --template https://raw.githubusercontent.com/username/repo-name/blob/main/README.md
+dokugen generate --template https://raw.githubusercontent.com/username/repo/main/README.md
 ```
 
-> Use a custom GitHub repo readme file as a template to generate a concise and strict readme for your project.
-
-### Update Existing README (Smart Update)
-
+#### Smart Update README
+Intelligently rebuilds auto-generated sections (tech stack, API details, file layout) while keeping your custom text, notes, and badges intact.
 ```bash
 dokugen update
 ```
 
-> **NEW!** Intelligently updates only auto-generated sections of your README while preserving all your custom content. Perfect for keeping your README fresh as your project evolves without losing your personal touch.
-
-### Check Version
-
+#### AI Git Commit (`aic`)
+Analyze your staged files, generate a Conventional Commit message automatically, commit, and optionally push.
 ```bash
-dokugen --version
+dokugen aic
+# or
+dokugen aic --push
 ```
 
-## Features
+#### Safety Backup Revert (`revert`)
+Accidentally generated something you didn't like? Restore your previous README instantly from our automatic backup.
+```bash
+dokugen revert
+```
 
-- **Auto-Update System**: Dokugen automatically checks for new versions and updates itself when you run any command. Always stay current!
-- **Smart README Updates**: Update your README without losing custom content. Only auto-generated sections get refreshed.
-- **Automated Generation**: Automatically analyzes your project and generates a comprehensive README.
-- **Real-Time Streaming**: Watch your README populate in real-time as it's being generated.
-- **Compression Technology**: Handles large codebases efficiently with 70-90% payload size reduction.
-- **Easy to Use**: Simple command-line interface for quick and easy README creation.
-- **Cross-Platform**: Works seamlessly on Windows, macOS, and Linux.
-- **Programming Language and Framework Agnostic**: Works with any language (e.g., Python, JavaScript, Go, C#, C, Rust, etc.)
-- **Options & Flags**: Supports flags and options like generating from a template, overwriting existing files, etc.
+---
 
-## Contributing
+## ✨ Features
 
-Contributions are welcome! [Read the contribution guide here.](https://github.com/samueltuoyo15/Dokugen/blob/main/CONTRIBUTION.md)
+- **Interactive Menu**: Run `dokugen` with no arguments to navigate all tool actions in a beautiful console prompt.
+- **Smart Updates**: Re-run the generation process without losing your manual modifications. Only auto-generated blocks get updated.
+- **AI-Powered Commits**: Automatic staging and conventional commit message generation via Gemini.
+- **Compressed Uploads**: Efficiently packages codebases with 70–90% upload size compression to support larger projects.
+- **Language Agnostic**: Works out of the box with JavaScript, TypeScript, Python, Rust, Go, C#, C++, Java, and more.
 
-## Author
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🤝 Contributing
+
+Contributions are welcome! Read our [Contribution Guide](https://github.com/samueltuoyo15/Dokugen/blob/main/CONTRIBUTION.md) to get started.
+
+## 👤 Author
 
 - **Samuel Tuoyo**
 - [Twitter](https://x.com/TuoyoS26091)
 - [LinkedIn](https://www.linkedin.com/in/samuel-tuoyo-8568b62b6)
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Badges
+---
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://opensource.org/)

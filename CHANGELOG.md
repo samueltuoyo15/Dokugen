@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [14.0.0] - 2026-06-17
+### Added
+- **Global Version Alignment**: Promoted all package and CLI versions to 14.0.0 to prepare for public release.
+
+### Fixed
+- **Zero-Latency Backend Connection**: Skipped localhost probe unless `DOKUGEN_LOCAL=1` is set, eliminating connection-refused latency for published users.
+
+## [3.13.0] - 2026-06-16
+### Added
+- **AI-Powered Commit Subcommand (`aic`)**: Added `aic` (alias `ai-commit`) command to TS and Python CLIs that stages files, requests Conventional Commit message generation from the backend server (using Gemini model), commits, and optionally pushes.
+- **Incremental Scanning**: Implemented cache checks using `.dokugen-cache.json` to upload and scan *only* the modified files for faster readme updates.
+- **Groq Integration**: Migrated the README generation backend from Google Gemini to the Groq LPU engine running `llama-3.3-70b-versatile` to address rate limit issues.
+- **Improved Size Capacity**: Increased CLI scan file cap to 150KB.
+- **Rate Limit Bypass**: Automatically bypasses server rate limiting if a user provides their own `geminiApiKey` or `groqApiKey`.
+- **Command Injection Prevention**: Secured Git execution inside TS CLI by using `spawnSync` instead of shell interpolation.
+- **Donation link**: Prints developer support link `https://myhappr.com/samueltuoyo` after README generations.
+- **Enhanced Interactive Menu**: Typing just `dokugen` now starts a full interactive prompt displaying all options (Generate README, Update README, AI Git Commit, and View Help) alongside the current version banner, making the tool self-documenting and easy to navigate.
+- **Zero-Config Experience**: Removed all API key prompting logic from both TS and Python CLIs. The CLI no longer asks the user for a Groq or Google Gemini API Key and communicates with the backend transparently using the server's shared API keys.
+
+
 ## [3.11.0] - 2026-02-11
 ### Added
 - **Standalone Binaries**: Introduced support for compiling Dokugen into standalone executables using Bun, allowing users to run the tool without installing Node.js.
