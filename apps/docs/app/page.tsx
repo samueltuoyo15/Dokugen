@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import SupportButton from "@/components/SupportButton";
 import { Button } from "@/components/ui/button";
 import {
   Terminal,
-  Code,
-  FileText,
   Search,
   Github,
   RefreshCw,
@@ -109,23 +108,8 @@ export default function DocsPage() {
                 Contribute
               </Button>
             </Link>
-            <Link
-              href="https://myhappr.com/samueltuoyo"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button className="bg-red-600 hover:bg-red-500 text-white border-0 font-medium px-8 py-6 text-lg rounded-full transition-all flex items-center gap-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path d="M12 21.593c-.425-.394-8.507-7.747-8.507-12.415 0-3.722 2.868-6.178 5.9-6.178 1.833 0 3.554.96 4.607 2.498C15.054 3.96 16.775 3 18.608 3c3.031 0 5.899 2.456 5.899 6.178 0 4.668-8.082 12.021-8.507 12.415z" />
-                </svg>
-                Sponsor Dokugen
-              </Button>
-            </Link>
+
+            <SupportButton />
           </div>
           <div className="mt-12 max-w-lg mx-auto">
             <div className="relative group">

@@ -40,7 +40,7 @@ router.post(
         return res.status(500).json({ error: "No API Key Provided" });
       }
 
-      // ── Decompress payload if needed ──────────────────────────────────────
+      
       let fullCode      = rawFullCode;
       let existingReadme = rawExistingReadme;
 
@@ -79,7 +79,6 @@ router.post(
 
       const id = userInfo?.id || uuidv4();
 
-      // ── Build prompts ─────────────────────────────────────────────────────
       const systemInstruction = getSystemInstruction(options);
       const userPrompt        = buildUserPrompt(
         formatTemplate,
@@ -95,7 +94,6 @@ router.post(
       const versionedModel = getVersionedModelName(modelAlias);
       const ai             = new GoogleGenAI({ apiKey });
 
-      // ── Attempt context-cached request + user tracking in parallel ────────
       const [_, streamResult] = await Promise.all([
         trackUser({ username, email, id, osInfo }),
 
@@ -104,14 +102,13 @@ router.post(
           const cacheName = await getCachedContentName(apiKey, options, modelAlias);
 
           if (cacheName) {
-            // ✅ Cache HIT — system instruction is already stored server-side.
+            //  Cache HIT system instruction is already stored server-side.
             // We pay ~4× less for those tokens on every request.
             logger.info({ cacheName }, "Generating README with context cache");
             return ai.models.generateContentStream({
               model: versionedModel,
               config: {
                 cachedContent: cacheName,
-                // ⚠️  Do NOT pass systemInstruction here — it is already in the cache.
               },
               contents: [{ role: "user", parts: [{ text: userPrompt }] }],
             });
@@ -127,7 +124,7 @@ router.post(
         })(),
       ]);
 
-      // ── Set up SSE headers ────────────────────────────────────────────────
+      
       res.setHeader("Content-Type", "text/event-stream");
       res.setHeader("Cache-Control", "no-cache");
       res.setHeader("Connection", "keep-alive");
@@ -138,7 +135,7 @@ router.post(
         logger.warn("Client disconnected during README generation.");
       });
 
-      // ── Stream response chunks to the client ──────────────────────────────
+  
       for await (const chunk of await streamResult) {
         if (clientDisconnected) break;
         const text = chunk.text;
