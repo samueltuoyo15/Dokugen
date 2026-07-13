@@ -53,109 +53,60 @@ router.post(
   "/generate-commit",
   async (req: Request, res: Response): Promise<any> => {
     try {
-      const { diff, geminiApiKey, groqApiKey } = req.body;
+      const { diff, geminiApiKey } = req.body;
 
       if (!diff) {
         return res.status(400).json({ error: "No git diff provided" });
       }
 
-      const geminiKey = geminiApiKey || process.env.GOOGLE_GEMINI_API_KEY;
-      const groqKey = groqApiKey || process.env.GROQ_API_KEY;
-
-      const provider = process.env.COMMIT_PROVIDER || (geminiKey ? "gemini" : "groq");
-
-      if (provider === "gemini" && geminiKey) {
-        const model = process.env.COMMIT_MODEL_NAME || "gemini-2.5-flash";
-        const prompt = buildCommitPrompt(diff);
-
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              contents: [
-                {
-                  parts: [{ text: prompt }]
-                }
-              ]
-            }),
-          }
-        );
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          logger.error(`Gemini API error: ${response.statusText} - ${errorText}`);
-          let errorMessage = "Failed to generate commit message from Gemini";
-          try {
-            const parsed = JSON.parse(errorText);
-            if (parsed.error && parsed.error.message) {
-              errorMessage = parsed.error.message;
-            }
-          } catch (e) {
-            // Ignore parsing error
-          }
-          return res.status(response.status).json({ error: errorMessage });
-        }
-
-        const data = (await response.json()) as any;
-        const message =
-          data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "chore: update code";
-
-        // Cleanup quotes if LLM outputs them
-        const cleanMessage = message.replace(/^["']|["']$/g, "");
-
-        return res.status(200).json({ message: cleanMessage });
-      } else {
-        const apiKey = groqKey;
-        if (!apiKey) {
-          return res.status(500).json({ error: "No Groq API Key Provided" });
-        }
-
-        const prompt = buildCommitPrompt(diff);
-        const model = process.env.GROQ_MODEL_NAME || "llama-3.1-8b-instant";
-
-        const response = await fetch(
-          "https://api.groq.com/openai/v1/chat/completions",
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${apiKey}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              model,
-              messages: [{ role: "user", content: prompt }],
-            }),
-          },
-        );
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          logger.error(`Groq API error: ${response.statusText} - ${errorText}`);
-          let errorMessage = "Failed to generate commit message from Groq";
-          try {
-            const parsed = JSON.parse(errorText);
-            if (parsed.error && parsed.error.message) {
-              errorMessage = parsed.error.message;
-            }
-          } catch (e) {
-            // Ignore parsing error
-          }
-          return res.status(response.status).json({ error: errorMessage });
-        }
-
-        const data = (await response.json()) as any;
-        const message =
-          data.choices?.[0]?.message?.content?.trim() || "chore: update code";
-
-        // Cleanup quotes if LLM outputs them
-        const cleanMessage = message.replace(/^["']|["']$/g, "");
-
-        return res.status(200).json({ message: cleanMessage });
+      const apiKey = geminiApiKey || process.env.GOOGLE_GEMINI_API_KEY;
+      if (!apiKey) {
+        return res.status(500).json({ error: "No Gemini API Key Provided" });
       }
+
+      const model = process.env.COMMIT_MODEL_NAME || "gemini-2.5-flash";
+      const prompt = buildCommitPrompt(diff);
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [{ text: prompt }]
+              }
+            ]
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        logger.error(`Gemini API error: ${response.statusText} - ${errorText}`);
+        let errorMessage = "Failed to generate commit message";
+        try {
+          const parsed = JSON.parse(errorText);
+          if (parsed.error && parsed.error.message) {
+            errorMessage = parsed.error.message;
+          }
+        } catch (e) {
+          // Ignore parsing error
+        }
+        return res.status(response.status).json({ error: errorMessage });
+      }
+
+      const data = (await response.json()) as any;
+      const message =
+        data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "chore: update code";
+
+      // Cleanup quotes if LLM outputs them
+      const cleanMessage = message.replace(/^["']|["']$/g, "");
+
+      return res.status(200).json({ message: cleanMessage });
     } catch (error: any) {
       logger.error(error, "Error generating commit message");
       return res.status(500).json({ error: "Internal Server Error" });

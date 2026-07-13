@@ -14,9 +14,11 @@ import { askYesNo } from "../helpers/prompts.js";
 import { detectProjectType } from "../projectDetect.mjs";
 
 export function registerUpdateCommand(program: Command) {
+  const projectName = path.basename(process.cwd());
+
   program
     .command("update")
-    .description("Update auto-generated sections of README while preserving custom content")
+    .description(`Update auto-generated sections of ${projectName} README while preserving custom content`)
     .option(
       "--template <url>",
       "use a custom GitHub repo readme file as a template",
@@ -53,7 +55,8 @@ export function registerUpdateCommand(program: Command) {
       connectionSpinner.stop();
 
       if (!hasGoodInternetConnection) {
-        const username = getUserInfo()?.username;
+        const rawUsername = getUserInfo()?.username;
+        const username = rawUsername ? rawUsername.replace(/\d+/g, "") : "";
         return console.log(
           chalk.red(
             `Opps... ${username} kindly check your device or pc internet connection and try again.`,
@@ -85,7 +88,7 @@ export function registerUpdateCommand(program: Command) {
             ),
           );
           const proceed = await askYesNo(
-            "Do you want to regenerate the entire README?",
+            `Do you want to regenerate the entire ${projectName} README?`,
           );
 
           if (proceed === true) {
@@ -128,7 +131,6 @@ export function registerUpdateCommand(program: Command) {
         console.log(chalk.blue(`Detected project type: ${projectType}`));
         console.log(chalk.blue("Updating auto-generated sections..."));
 
-        // Generate new content
         await generateReadme(
           projectType,
           projectFiles,

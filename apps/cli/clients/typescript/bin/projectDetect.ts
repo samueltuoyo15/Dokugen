@@ -904,10 +904,10 @@ export const detectProjectType = async (projectDir: string): Promise<string> => 
     // To check  for files first
     if (pattern.files) {
       for (const file of pattern.files) {
-        // To Handle wildcard patterns
         if (file.includes("*")) {
           const files = await fs.readdir(projectDir).catch(() => [])
-          if (files.some(f => new RegExp(file.replace("*", ".*")).test(f))) {
+          const regexStr = "^" + file.replace(/\./g, "\\.").replace(/\*/g, ".*") + "$"
+          if (files.some(f => new RegExp(regexStr).test(f))) {
             confidence += 30
             break
           }
@@ -1289,11 +1289,16 @@ export const detectProjectType = async (projectDir: string): Promise<string> => 
     }
 
     if (isMonorepo) {
-      const uniqueClientTypes = [...new Set(clientTypes)].filter(t => t !== "Unknown")
-      const uniqueServerTypes = [...new Set(serverTypes)].filter(t => t !== "Unknown")
+      const getUniqueTerms = (types: string[]) => {
+        const words = types.filter(t => t !== "Unknown").flatMap(t => t.split(/[\s+]+/));
+        return [...new Set(words)].join(" ");
+      }
 
-      const clientStr = uniqueClientTypes.length ? `Client: ${uniqueClientTypes.join(" + ")}` : ""
-      const serverStr = uniqueServerTypes.length ? `Server: ${uniqueServerTypes.join(" + ")}` : ""
+      const clientTerms = getUniqueTerms(clientTypes);
+      const serverTerms = getUniqueTerms(serverTypes);
+
+      const clientStr = clientTerms ? `Client: ${clientTerms}` : ""
+      const serverStr = serverTerms ? `Server: ${serverTerms}` : ""
 
       return `Monorepo [${[clientStr, serverStr].filter(Boolean).join(" | ")}]`
     }

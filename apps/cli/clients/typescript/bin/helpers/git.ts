@@ -53,4 +53,3 @@ export const isGitRepository = (): boolean => {
     return false;
   }
 };
-

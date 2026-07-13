@@ -2,37 +2,27 @@ import { GoogleGenAI } from "@google/genai";
 import { getSystemInstruction } from "../prompts/systemInstruction";
 import logger from "../utils/logger";
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
 
 interface CacheEntry {
   name: string;
   expiresAt: Date;
 }
 
-// ---------------------------------------------------------------------------
-// In-memory store  —  key: `${apiKey}:${includeDiagrams}`
-// ---------------------------------------------------------------------------
+//  key: `${apiKey}:${includeDiagrams}`
+
 
 const cacheStore = new Map<string, CacheEntry>();
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
 /** How long (seconds) each cached-content lives on Google's servers. */
-const CACHE_TTL_SECONDS = 3600; // 1 hour
+const CACHE_TTL_SECONDS = 3600; 
 
 /**
  * How far before expiry we proactively refresh the cache (milliseconds).
  * Avoids a request racing against an expiring cache.
  */
-const REFRESH_BUFFER_MS = 5 * 60 * 1000; // 5 minutes
+const REFRESH_BUFFER_MS = 5 * 60 * 1000; 
 
-// ---------------------------------------------------------------------------
 // Model name helpers
-// ---------------------------------------------------------------------------
 
 /**
  * Context Caching requires a *versioned* model name (e.g. "gemini-2.5-flash-001").
@@ -50,10 +40,20 @@ export function getVersionedModelName(model: string): string {
   return versionMap[model] ?? model;
 }
 
-// ---------------------------------------------------------------------------
-// Core function
-// ---------------------------------------------------------------------------
+/**
+ * Models that do not support context caching on the free tier (limit=0).
+ * Attempting to create a cache for these models wastes an API call and always
+ * returns RESOURCE_EXHAUSTED, so we skip it entirely and fall back to uncached.
+ */
+const NO_CACHE_MODELS = new Set([
+  "gemini-3.1-flash-lite",
+  "gemini-2.5-flash-lite",
+  "gemini-2.0-flash-lite",
+  "gemini-2.0-flash-lite-001",
+]);
 
+ //Core function
+ 
 /**
  * Returns a valid Gemini cache name for the given API key + options combo.
  *
@@ -73,6 +73,12 @@ export async function getCachedContentName(
   options: { includeDiagrams?: boolean },
   modelName: string
 ): Promise<string | null> {
+  // Skip caching entirely for models with no free-tier cache quota.
+  if (NO_CACHE_MODELS.has(modelName)) {
+    logger.info({ model: modelName }, "Context caching skipped - model has no free-tier cache quota");
+    return null;
+  }
+
   const withDiagrams = !!options.includeDiagrams;
   const cacheKey     = `${apiKey}:${withDiagrams}`;
   const existing     = cacheStore.get(cacheKey);
@@ -94,7 +100,7 @@ export async function getCachedContentName(
 
     logger.info(
       { model: versionedModel, withDiagrams },
-      "Context cache MISS — creating new cached content"
+      "Context cache MISS, creating new cached content"
     );
 
     const cache = await ai.caches.create({
@@ -123,9 +129,7 @@ export async function getCachedContentName(
   }
 }
 
-/**
- * Clears all in-memory cache entries (useful for testing / graceful shutdown).
- */
+
 export function clearCacheStore(): void {
   cacheStore.clear();
 }

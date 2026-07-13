@@ -1,6 +1,6 @@
 [project]
 name = "dokugen"
-version = "14.0.0"
+version = "14.0.1"
 description = "Automatically generate high-quality README for your application"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -29,7 +29,7 @@ Repository = "https://github.com/samueltuoyo15/Dokugen"
 Issues = "https://github.com/samueltuoyo15/Dokugen/issues"
 
 [project.scripts]
-dokugen = "dokugen.cli:main"
+local-dokugen = "dokugen.cli:main"
 
 [build-system]
 requires = ["hatchling"]

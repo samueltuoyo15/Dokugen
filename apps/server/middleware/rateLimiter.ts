@@ -11,8 +11,7 @@ export const limiter = rateLimit({
     return (
       req.path === "/health" ||
       req.path === "/api/health" ||
-      !!req.body?.geminiApiKey ||
-      !!req.body?.groqApiKey
+      !!req.body?.geminiApiKey
     );
   },
 });

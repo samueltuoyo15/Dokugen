@@ -140,8 +140,6 @@ This handles the backend logic and API requests.
     BACKEND_DOMAIN=http://localhost:3000
     GOOGLE_GEMINI_API_KEY=your_gemini_api_key_here
     MODEL_NAME=gemini-2.5-flash
-    GROQ_API_KEY=your_groq_api_key_here
-    GROQ_MODEL_NAME=llama-3.3-70b-versatile
     SUPABASE_CLIENT_URL=your_supabase_url
     SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
     SUPABASE_SECRET_KEY=your_supabase_secret_key

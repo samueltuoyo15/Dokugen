@@ -14,9 +14,11 @@ import { askYesNo } from "../helpers/prompts.js";
 import { detectProjectType } from "../projectDetect.mjs";
 
 export function registerGenerateCommand(program: Command) {
+  const projectName = path.basename(process.cwd());
+
   program
     .command("generate")
-    .description("Scan project and generate a README.md")
+    .description(`Scan ${projectName} and generate a README.md`)
     .option(
       "--no-overwrite",
       "Do not overwrite existing README.md, append new features instead",
@@ -46,7 +48,8 @@ export function registerGenerateCommand(program: Command) {
       connectionSpinner.stop();
 
       if (!hasGoodInternetConnection) {
-        const username = getUserInfo()?.username;
+        const rawUsername = getUserInfo()?.username;
+        const username = rawUsername ? rawUsername.replace(/\d+/g, "") : "";
         return console.log(
           chalk.red(
             `Opps... ${username} kindly check your device or pc internet connection and try again.`,
@@ -113,7 +116,8 @@ export function registerGenerateCommand(program: Command) {
               undefined,
             );
           } else {
-            const overwrite = await askYesNo("README.md exists. Overwrite?");
+            const projectName = path.basename(projectDir);
+            const overwrite = await askYesNo(`README.md exists for ${projectName}. Overwrite?`);
 
             if (overwrite === true) {
               await generateReadme(

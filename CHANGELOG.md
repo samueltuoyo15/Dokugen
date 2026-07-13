@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+### [14.0.1] - 2026-07-13
+### Added
+- **Premium Colored Diagrams**: System Design Diagrams(Flowcharts) now look gorgeous on GitHub with theme-matched colors (instead of boring black-and-white). It auto-colors your tech stack—so Redis is red, Postgres is blue, MongoDB is green, and so on!
+- **Mixed Layout Directions**: Diagrams aren't locked to left-to-right (`LR`) anymore. The AI will switch it up (like top-down `TD` or bottom-up `BT`) depending on what fits the diagram best.
+- **Dynamic Project Menu & App Info**: The interactive command menu and CLI descriptions now show the actual name of your project folder instead of generic filler text.
+- **Clear terminal on Exit/Ctrl+C**: When you quit or hit `Ctrl+C`, it clears the screen completely and displays a clean, bold `Dokugen: Goodbye!` sign-off.
+- **Robust Screen Clearing**: Replaced old clear code with robust ANSI escapes so it resets the terminal cleanly on PowerShell, Linux, macOS, and Android/Termux without issues.
+- **Remember Social Details**: Added a local config profile (`~/.dokugen/config.json`) to save and reuse your LinkedIn/X handles, so you don't have to retype them every single run.
+- **Standalone `license` Command**: Added a brand new subcommand `dokugen license` to generate LICENSE files locally with auto Git author/year detection and simple English overviews.
+- **myhappr page promotion**: Shows a quick prompt at the end of generations to set up a developer monetization page if you are in Africa, on myhappr with silent retries.
+
+### Patches
+- **Redirection of Badge URLs**: Pointed badge URL to `https://dokugen-readme.vercel.app` so they redirect to the website directly instead of the npm package, becuase we dont only support Typescript/Javascript projects.
+- **Runaway Spinner & 503 Lockup**: Fixed the annoying bug where the CLI spinner would spin forever if the backend timed out or threw a 503 error.
+- **Strict Omit Rules for Social Handles**: Fixed the AI occasionally generating placeholder links if you left your LinkedIn/X handles blank. It now deletes them entirely so your Author section stays clean.
+- **Markdown 4-Space Paragraph Indentation Ban**: Blocked the AI from indenting standard paragraphs with 4 spaces, which previously broke hyperlink rendering by triggering preformatted code-block mode.
+- **No More Duplicate Description Text**: Fixed a bug where updating a README caused the AI to double up on the description text when merging update blocks.
+- **Full Codebase Context on Updates**: Stopped cutting off the codebase context to 1000 characters during updates, so the AI can resolve real endpoints/routes (like `/h/:id` instead of `/webhook/:id`) accurately.
+- **Python CLI Modularity Clean-up**: Broke down the massive 900+ lines `cli.py` in the Python client into neat command modules (`dokugen/commands/`) to match the TypeScript client structure.
+- **Termux open browser fix**: Fixed browser redirects failing on Android/Termux by checking environment variables and falling back to `termux-open-url`.
+- **Groq Integration**: Discontinued Groq Integration.
+
 ## [14.0.0] - 2026-06-17
 ### Added
 - **Global Version Alignment**: Promoted all package and CLI versions to 14.0.0 to prepare for public release.

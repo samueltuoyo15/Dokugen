@@ -6,7 +6,6 @@
     "allowJs": true,
     "moduleResolution": "NodeNext",
     "outDir": "dist",
-    "downlevelIteration": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

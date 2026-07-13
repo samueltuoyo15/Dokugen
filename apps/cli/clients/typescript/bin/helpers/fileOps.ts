@@ -2,22 +2,36 @@ import * as path from "path";
 import fs from "fs-extra";
 import chalk from "chalk";
 import { createHash } from "crypto";
+import os from "os";
 
 export interface DokugenCache {
   version: string;
   files: Record<string, string>;
 }
 
+const DOKUGEN_HOME = path.join(os.homedir(), ".dokugen");
+
+function projectKey(projectDir: string): string {
+  return createHash("md5").update(projectDir).digest("hex").slice(0, 16);
+}
+
+export function getDokugenCachePath(projectDir: string): string {
+  return path.join(DOKUGEN_HOME, "cache", `${projectKey(projectDir)}.json`);
+}
+
+export function getDokugenBackupPath(projectDir: string): string {
+  return path.join(DOKUGEN_HOME, "backup", `${projectKey(projectDir)}.md`);
+}
+
 export const loadCache = async (
   projectDir: string,
 ): Promise<DokugenCache | null> => {
-  const cachePath = path.join(projectDir, ".dokugen-cache.json");
+  const cachePath = getDokugenCachePath(projectDir);
   try {
     if (await fs.pathExists(cachePath)) {
       return await fs.readJson(cachePath);
     }
   } catch {
-    // Ignore cache loading errors
   }
   return null;
 };
@@ -26,11 +40,11 @@ export const saveCache = async (
   projectDir: string,
   cache: DokugenCache,
 ): Promise<void> => {
-  const cachePath = path.join(projectDir, ".dokugen-cache.json");
+  const cachePath = getDokugenCachePath(projectDir);
   try {
+    await fs.ensureDir(path.dirname(cachePath));
     await fs.writeJson(cachePath, cache, { spaces: 2 });
   } catch {
-    // Ignore cache saving errors
   }
 };
 
@@ -74,7 +88,6 @@ export const extractFullCode = async (
             const filePath = path.resolve(projectDir, file);
             const stats = await fs.stat(filePath);
 
-            // Use streaming to avoid loading entire file into memory at once
             const contentStream = fs.createReadStream(filePath, "utf-8");
             let content = "";
 
@@ -82,12 +95,10 @@ export const extractFullCode = async (
               content += chunk;
             }
 
-            // Ensure stream is closed
             contentStream.close();
 
             const snippet = `### ${file}\n- **Path:** ${file}\n- **Size:** ${(stats.size / 1024).toFixed(2)} KB\n\`\`\`${path.extname(file).slice(1) || "txt"}\n${content}\n\`\`\`\n`;
 
-            // Clear content reference to free memory
             content = "";
 
             return snippet;

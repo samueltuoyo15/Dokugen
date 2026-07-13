@@ -223,15 +223,46 @@ def compress_data(data):
     return base64.b64encode(compressed).decode("utf-8")
 
 
+DOKUGEN_HOME = os.path.expanduser("~/.dokugen")
+
+def get_project_key(project_dir):
+    abs_path = os.path.abspath(project_dir)
+    return hashlib.md5(abs_path.encode("utf-8")).hexdigest()[:16]
+
+def get_dokugen_cache_path(project_dir):
+    return os.path.join(DOKUGEN_HOME, "cache", f"{get_project_key(project_dir)}.json")
+
+def get_dokugen_backup_path(project_dir):
+    return os.path.join(DOKUGEN_HOME, "backup", f"{get_project_key(project_dir)}.md")
+
+def load_profile():
+    profile_path = os.path.join(DOKUGEN_HOME, "config.json")
+    try:
+        if os.path.exists(profile_path):
+            with open(profile_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+    except Exception:
+        pass
+    return {}
+
+def save_profile(profile):
+    profile_path = os.path.join(DOKUGEN_HOME, "config.json")
+    try:
+        os.makedirs(os.path.dirname(profile_path), exist_ok=True)
+        with open(profile_path, "w", encoding="utf-8") as f:
+            json.dump(profile, f, indent=2)
+    except Exception:
+        pass
+
 def backup_readme(readme_path):
     global readme_backup, current_readme_path
     if os.path.exists(readme_path):
         current_readme_path = readme_path
         with open(readme_path, "r", encoding="utf-8", errors="ignore") as f:
             readme_backup = f.read()
-        # Persist backup to disk so revert command can use it later
-        backup_file = os.path.join(os.path.dirname(readme_path), ".dokugen-backup.md")
+        backup_file = get_dokugen_backup_path(os.path.dirname(readme_path))
         try:
+            os.makedirs(os.path.dirname(backup_file), exist_ok=True)
             with open(backup_file, "w", encoding="utf-8") as bf:
                 bf.write(readme_backup)
         except Exception:
@@ -252,13 +283,11 @@ def restore_readme():
                 "[green]Original README content restored successfully[/green]"
             )
             backup_content = readme_backup
-            # Clear global state immediately after restore
             readme_backup = None
             current_readme_path = ""
             return backup_content
         except Exception as e:
             console.print(f"[red]Failed to restore README: {e}[/red]")
-            # Clear global state even on error
             readme_backup = None
             current_readme_path = ""
             return None
@@ -268,11 +297,10 @@ def restore_readme():
 
 
 def revert_readme_from_disk(project_dir=None):
-    """Restore README from the .dokugen-backup.md file on disk."""
     if project_dir is None:
         project_dir = os.getcwd()
     readme_path = os.path.join(project_dir, "README.md")
-    backup_file = os.path.join(project_dir, ".dokugen-backup.md")
+    backup_file = get_dokugen_backup_path(project_dir)
     if not os.path.exists(backup_file):
         return None, "No backup found. Run 'dokugen generate' or 'dokugen update' first to create a backup."
     try:
@@ -319,7 +347,7 @@ def get_file_hash(file_path):
 
 
 def load_cache(project_dir):
-    cache_path = os.path.join(project_dir, ".dokugen-cache.json")
+    cache_path = get_dokugen_cache_path(project_dir)
     try:
         if os.path.exists(cache_path):
             with open(cache_path, "r", encoding="utf-8") as f:
@@ -330,8 +358,9 @@ def load_cache(project_dir):
 
 
 def save_cache(project_dir, cache):
-    cache_path = os.path.join(project_dir, ".dokugen-cache.json")
+    cache_path = get_dokugen_cache_path(project_dir)
     try:
+        os.makedirs(os.path.dirname(cache_path), exist_ok=True)
         with open(cache_path, "w", encoding="utf-8") as f:
             json.dump(cache, f, indent=2)
     except Exception:
@@ -657,14 +686,12 @@ def extract_full_code(project_files, project_dir):
 
 
 def get_backend_domain():
-    # Only probe localhost in explicit local dev mode — skip for all published users
-    if os.environ.get("DOKUGEN_LOCAL") == "1":
-        try:
-            r = requests.get("http://localhost:3000/api/health", timeout=0.5)
-            if r.status_code == 200 and r.json().get("status") == "Ok":
-                return "http://localhost:3000"
-        except Exception:
-            pass
+    try:
+        r = requests.get("http://localhost:3000/api/health", timeout=0.5)
+        if r.status_code == 200 and r.json().get("status") == "Ok":
+            return "http://localhost:3000"
+    except Exception:
+        pass
 
     try:
         r = requests.get(

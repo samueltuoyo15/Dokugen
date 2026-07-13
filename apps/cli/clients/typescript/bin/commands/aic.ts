@@ -31,7 +31,6 @@ export function registerAicCommand(program: Command) {
           execSync("git config core.autocrlf true");
           diff = execSync("git diff --cached --ignore-space-at-eol", { encoding: "utf-8" }).trim();
         } catch {
-          // Ignore config issues
         }
 
         if (!diff) {
@@ -59,12 +58,11 @@ export function registerAicCommand(program: Command) {
           stagedFiles.forEach((file) => console.log(chalk.cyan(`- ${file}`)));
           console.log("");
         } catch {
-          // Fallback if staged list command fails
         }
 
         const startTime = Date.now();
         const spinner = createSpinner(chalk.blue("Analyzing staged changes...")).start();
-        
+
         let commitMessage = "";
         try {
           const backendDomain = await getBackendDomain();
@@ -162,7 +160,6 @@ export function registerAicCommand(program: Command) {
           }
         }
 
-        // Use spawnSync to execute the command securely without a shell (preventing shell injection)
         const commitResult = spawnSync("git", ["commit", "-m", finalCommitMessage], { stdio: "inherit" });
         if (commitResult.status !== 0) {
           throw new Error(`Git commit failed with exit status ${commitResult.status}`);

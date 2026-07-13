@@ -4,16 +4,19 @@ import * as path from "path";
 import fs from "fs-extra";
 import { select, isCancel } from "@clack/prompts";
 import { checkAndUpdate } from "../helpers/network.js";
+import { getDokugenBackupPath } from "../helpers/fileOps.js";
 
 export function registerRevertCommand(program: Command) {
+  const projectName = path.basename(process.cwd());
+
   program
     .command("revert")
-    .description("Revert README.md to the previous Dokugen-generated backup")
+    .description(`Revert ${projectName} README.md to the previous Dokugen-generated backup`)
     .action(async () => {
       await checkAndUpdate();
 
       const projectDir = process.cwd();
-      const backupFile = path.join(projectDir, ".dokugen-backup.md");
+      const backupFile = getDokugenBackupPath(projectDir);
       const readmePath = path.join(projectDir, "README.md");
 
       if (!(await fs.pathExists(backupFile))) {
@@ -28,7 +31,7 @@ export function registerRevertCommand(program: Command) {
       console.log(chalk.blue("Found a previous README backup."));
 
       const action = await select({
-        message: "Revert README.md to the previous Dokugen-generated version?",
+        message: `Revert ${projectName} README.md to the previous Dokugen-generated version?`,
         options: [
           { value: "yes", label: "Yes, revert it" },
           { value: "no", label: "No, keep current" },

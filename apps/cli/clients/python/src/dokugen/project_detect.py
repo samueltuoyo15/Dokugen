@@ -657,11 +657,21 @@ def detect_project_type(project_dir):
                         server_types.append(pkg_type)
 
         if is_monorepo:
-            unique_client = list(dict.fromkeys(t for t in client_types if t != "Unknown"))
-            unique_server = list(dict.fromkeys(t for t in server_types if t != "Unknown"))
+            import re
+            def get_unique_terms(types_list):
+                words = []
+                for t in types_list:
+                    if t != "Unknown":
+                        words.extend(re.split(r'[\s+]+', t))
+                # Remove empty strings and preserve order using dict keys
+                unique_words = list(dict.fromkeys(w for w in words if w))
+                return " ".join(unique_words)
 
-            client_str = f"Client: {' + '.join(unique_client)}" if unique_client else ""
-            server_str = f"Server: {' + '.join(unique_server)}" if unique_server else ""
+            client_terms = get_unique_terms(client_types)
+            server_terms = get_unique_terms(server_types)
+
+            client_str = f"Client: {client_terms}" if client_terms else ""
+            server_str = f"Server: {server_terms}" if server_terms else ""
 
             parts = [p for p in [client_str, server_str] if p]
             return f"Monorepo [{' | '.join(parts)}]"

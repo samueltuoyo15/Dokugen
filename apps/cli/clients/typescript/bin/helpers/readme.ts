@@ -2,14 +2,17 @@ import * as path from "path";
 import fs from "fs-extra";
 import chalk from "chalk";
 import axios from "axios";
+import { exec } from "child_process";
 import { Readable } from "stream";
 import { createSpinner } from "nanospinner";
-import { askYesNo } from "./prompts.js";
+import { select, isCancel } from "@clack/prompts";
+import { askYesNo, askSocialHandles } from "./prompts.js";
 import {
   extractFullCode,
   loadCache,
   saveCache,
   getFileHash,
+  getDokugenBackupPath,
 } from "./fileOps.js";
 import { getUserInfo, getGitRepoUrl } from "./git.js";
 import { compressData, getBackendDomain } from "./network.js";
@@ -37,17 +40,75 @@ function terminalLink(text: string, url: string): string {
 let readmeBackup: string | null = null;
 let currentReadmePath: string = "";
 
+function openBrowser(url: string): void {
+  const platform = process.platform;
+  const isTermux = !!process.env.TERMUX_VERSION;
+
+  if (isTermux) {
+    exec(`termux-open-url "${url}"`);
+  } else if (platform === "win32") {
+    exec(`start "" "${url}"`);
+  } else if (platform === "darwin") {
+    exec(`open "${url}"`);
+  } else {
+    exec(`xdg-open "${url}"`);
+  }
+}
+
+async function promptMyhappr(): Promise<void> {
+  try {
+    console.log("");
+    const projectName = path.basename(process.cwd());
+    const rawUsername = getUserInfo()?.username || "developer";
+    const username = rawUsername.replace(/\d+/g, "");
+
+    const action = await select({
+      message: chalk.cyan(`Want to monetize ${projectName}? like receive donations... right? ${username}`),
+      options: [
+        { value: "yes", label: "Set up a funding page on myhappr (opens browser)" },
+        { value: "no", label: "Maybe later" },
+      ],
+    });
+
+    if (isCancel(action) || action === "no") return;
+
+    const spinner = createSpinner("Opening myhappr...").start();
+    const MAX_RETRIES = 3;
+    let uri: string | null = null;
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const res = await axios.get<{ data: { uri: string } }>(
+          "https://api.myhappr.com/api/v1/auth/google-auth",
+          { timeout: 5000 },
+        );
+        uri = res.data?.data?.uri ?? null;
+        if (uri) break;
+      } catch {
+        if (attempt < MAX_RETRIES) continue;
+      }
+    }
+
+    if (uri) {
+      spinner.success({ text: chalk.green("Browser opened. Make sure to complete account setup on myhappr.") });
+      openBrowser(uri);
+    } else {
+      spinner.error({ text: chalk.yellow("Something went wrong connecting to myhappr. Please try again later.") });
+    }
+  } catch {
+  }
+}
+
 export const backupReadme = async (readmePath: string): Promise<void> => {
   try {
     if (await fs.pathExists(readmePath)) {
       currentReadmePath = readmePath;
       readmeBackup = await fs.readFile(readmePath, "utf-8");
-      // Persist to disk so revert command can use it later
-      const backupFile = path.join(path.dirname(readmePath), ".dokugen-backup.md");
+      const backupFile = getDokugenBackupPath(path.dirname(readmePath));
       try {
+        await fs.ensureDir(path.dirname(backupFile));
         await fs.writeFile(backupFile, readmeBackup, "utf-8");
       } catch {
-        // Non-critical — in-memory backup still available
       }
       console.log(
         chalk.green(
@@ -81,6 +142,38 @@ export const restoreReadme = async (): Promise<string | null> => {
   }
 };
 
+function getHttpErrorLabel(error: any): string {
+  const status =
+    error?.response?.status ||
+    error?.response?.data?.error?.code ||
+    error?.code;
+
+  if (!status) {
+    const msg = (error?.message || "").toLowerCase();
+    if (msg.includes("timeout") || msg.includes("timedout") || msg.includes("econnaborted")) {
+      return "Request Timed Out";
+    }
+    if (msg.includes("network") || msg.includes("enotfound") || msg.includes("econnrefused")) {
+      return "Network Error";
+    }
+    return "Unexpected Error";
+  }
+
+  const labels: Record<number, string> = {
+    400: "Bad Request",
+    401: "Unauthorized",
+    403: "Forbidden",
+    404: "Not Found",
+    429: "Too Many Requests",
+    500: "Internal Server Error",
+    502: "Bad Gateway",
+    503: "Service Unavailable",
+    504: "Gateway Timeout",
+  };
+
+  return labels[status] ? `${labels[status]} (${status})` : `Error ${status}`;
+}
+
 export const generateReadme = async (
   projectType: string,
   projectFiles: string[],
@@ -88,6 +181,9 @@ export const generateReadme = async (
   existingReadme?: string,
   templateUrl?: string,
 ): Promise<string | null> => {
+  let spinner: ReturnType<typeof createSpinner> | null = null;
+  let timerInterval: ReturnType<typeof setInterval> | null = null;
+
   try {
     console.log(chalk.blue("Analyzing project files..."));
     const readmePath = path.join(projectDir, "README.md");
@@ -96,6 +192,8 @@ export const generateReadme = async (
     let includeContributionGuideLine = false;
     let includeApiDocs = false;
     let includeDiagrams = false;
+    let linkedinUsername: string | undefined;
+    let twitterUsername: string | undefined;
 
     if (!templateUrl) {
       const setupAnswer = await askYesNo(
@@ -121,6 +219,10 @@ export const generateReadme = async (
       );
       if (diagramAnswer === "cancel") return null;
       includeDiagrams = diagramAnswer === true;
+
+      const socialHandles = await askSocialHandles();
+      linkedinUsername = socialHandles.linkedinUsername;
+      twitterUsername = socialHandles.twitterUsername;
     }
 
     let isIncremental = false;
@@ -140,7 +242,6 @@ export const generateReadme = async (
         }
       }
 
-      // Check if any files were deleted
       const cacheFilePaths = Object.keys(cache.files);
       const deletedFiles = cacheFilePaths.filter(
         (f) => !projectFiles.includes(f),
@@ -168,10 +269,10 @@ export const generateReadme = async (
       projectDir,
     );
     const startTime = Date.now();
-    const spinner = createSpinner(chalk.blue("Generating README...")).start();
-    const timerInterval = setInterval(() => {
+    spinner = createSpinner(chalk.blue("Generating README...")).start();
+    timerInterval = setInterval(() => {
       const elapsedSec = ((Date.now() - startTime) / 1000).toFixed(1);
-      spinner.update({
+      spinner!.update({
         text: chalk.blue(`Generating README... (${elapsedSec}s)`),
       });
     }, 100);
@@ -185,6 +286,13 @@ export const generateReadme = async (
     const compressedFullCode = await compressData(fullCode);
     const compressedExistingReadme = existingReadme
       ? await compressData(existingReadme)
+      : undefined;
+
+    const linkedinUrl = linkedinUsername
+      ? `https://linkedin.com/in/${linkedinUsername}`
+      : undefined;
+    const twitterUrl = twitterUsername
+      ? `https://x.com/${twitterUsername}`
       : undefined;
 
     const response = await axios.post(
@@ -201,6 +309,8 @@ export const generateReadme = async (
           includeDiagrams: includeDiagrams === true,
           isIncremental,
           modifiedFiles: isIncremental ? modifiedFiles : undefined,
+          linkedinUrl,
+          twitterUrl,
         },
         existingReadme: compressedExistingReadme,
         repoUrl,
@@ -216,13 +326,13 @@ export const generateReadme = async (
     const responseStream = response.data as Readable;
     return new Promise((resolve, reject) => {
       let buffer = "";
-      const MAX_BUFFER_SIZE = 1024 * 1024; // 1MB limit for buffer
+      const MAX_BUFFER_SIZE = 1024 * 1024;
       let isCleanedUp = false;
 
       const cleanup = async (success: boolean, error?: any) => {
         if (isCleanedUp) return;
         isCleanedUp = true;
-        clearInterval(timerInterval);
+        if (timerInterval) clearInterval(timerInterval);
 
         responseStream.removeAllListeners();
         fileStream.removeAllListeners();
@@ -250,22 +360,21 @@ export const generateReadme = async (
             timeString = parts.join(" ");
           }
 
-          spinner.success({
+          spinner!.success({
             text: chalk.green(`\nREADME.md created successfully in ${timeString}`),
           });
           console.log(
-            chalk.cyan("\nLove Dokugen? Consider supporting the project: ") +
+            chalk.cyan("\nYou like what you see? Support Dokugen financially: ") +
               chalk.blue.underline(
                 terminalLink(
                   "https://myhappr.com/samueltuoyo",
                   "https://myhappr.com/samueltuoyo",
                 ),
               ) +
-              chalk.dim(" (Cmd+Click / Ctrl+Click to follow link)"),
+              chalk.dim(" (Ctrl+Click or Cmd+Click to follow link)"),
           );
           readmeBackup = null;
 
-          // Save cache
           const newCacheFiles: Record<string, string> = {};
           for (const file of projectFiles) {
             const filePath = path.resolve(projectDir, file);
@@ -273,10 +382,11 @@ export const generateReadme = async (
           }
           await saveCache(projectDir, { version: "1.0", files: newCacheFiles });
 
+          await promptMyhappr();
+
           resolve(readmePath);
         } else {
-          console.log(chalk.red("\nFailed to generate README"));
-          spinner.error({ text: chalk.red("Failed to generate README") });
+          spinner!.error({ text: chalk.red("Failed to generate README") });
           const restoredContent = await restoreReadme();
           reject(restoredContent || error);
         }
@@ -320,10 +430,11 @@ export const generateReadme = async (
       });
     });
   } catch (error: unknown) {
-    console.error(
-      "\n Error Generating Readme",
-      (error as any).response?.data || (error as any).message,
-    );
+    if (timerInterval) clearInterval(timerInterval);
+    if (spinner) {
+      const label = getHttpErrorLabel(error);
+      spinner.error({ text: chalk.red(`Something went wrong: ${label}`) });
+    }
     const restoredContent = await restoreReadme();
     return restoredContent || null;
   }

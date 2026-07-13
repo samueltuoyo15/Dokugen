@@ -70,16 +70,12 @@ export const checkAndUpdate = async (): Promise<void> => {
 };
 
 export const getBackendDomain = async (): Promise<string> => {
-  // Only probe localhost in explicit local dev mode — skip for all published users
-  if (process.env.DOKUGEN_LOCAL === "1") {
-    try {
-      const localHealth = await axios.get<{ status?: string }>("http://localhost:3000/api/health", { timeout: 500 });
-      if (localHealth.status === 200 && localHealth.data?.status === "Ok") {
-        return "http://localhost:3000";
-      }
-    } catch (err) {
-      // Local server not running
+  try {
+    const localHealth = await axios.get<{ status?: string }>("http://localhost:3000/api/health", { timeout: 500 });
+    if (localHealth.status === 200 && localHealth.data?.status === "Ok") {
+      return "http://localhost:3000";
     }
+  } catch (err) {
   }
 
   try {
