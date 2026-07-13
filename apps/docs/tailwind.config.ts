@@ -13,6 +13,9 @@ export default {
         foreground: "var(--foreground)",
       },
       fontFamily: {
+        sans: ["var(--font-plus-jakarta)", "sans-serif"],
+        caveat: ["var(--font-caveat)", "cursive"],
+        mono: ["var(--font-jetbrains-mono)", "monospace"],
         inter: ['var(--font-inter)'],
       },
     },

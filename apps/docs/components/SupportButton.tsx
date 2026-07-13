@@ -11,9 +11,9 @@ export default function SupportButton() {
         data-radius="9999px"
         data-text="Support Dokugen"
         data-title="Support Dokugen"
-        data-theme="#0a0a0a"
+        data-theme="light"
         style={{
-          backgroundColor: "#FF5E5E",
+          backgroundColor: "#7c3aedE",
           color: "#ededed",
           borderRadius: "9999px",
           padding: "12px 24px",

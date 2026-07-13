@@ -5,20 +5,30 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #09090b;
   --font-plus-jakarta: 'Plus Jakarta Sans', sans-serif;
   --font-jetbrains-mono: 'JetBrains Mono', monospace;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-caveat: 'Caveat', cursive;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-plus-jakarta), sans-serif;
+}
+
+/* Custom handwritten highlights using Caveat cursive */
+.highlight {
+  font-family: var(--font-caveat), cursive;
+  display: inline-block;
+  transform: rotate(-1.5deg);
+  font-weight: 700;
+}
+
+.highlight-purple {
+  color: #7c3aed;
+}
+
+.highlight-yellow {
+  color: #eab308;
 }

@@ -18,12 +18,12 @@ const Copy = ({code, className}: CopyProps) => {
         }, 2000)
     }
   return (
-    <div tabIndex={0} onClick={handleCopy} className="bg-zinc-950 p-4 rounded-xl border border-zinc-900 flex justify-between items-center">
+    <div tabIndex={0} onClick={handleCopy} className="bg-zinc-50 hover:bg-zinc-100/70 p-4 rounded-xl border border-zinc-200/80 hover:border-zinc-300 flex justify-between items-center transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-500/20 select-none">
         <div className="flex items-center gap-2">
-            <code className={cn("text-zinc-300 font-mono text-xs", className)}>{code}</code>
+            <code className={cn("text-zinc-800 font-mono text-xs", className)}>{code}</code>
         </div>
         {
-            copied ? <CopyCheckIcon className="text-green-500 size-4" /> : <CopyIcon className="text-zinc-300 size-4" />
+            copied ? <CopyCheckIcon className="text-emerald-500 size-4 shrink-0" /> : <CopyIcon className="text-zinc-400 size-4 shrink-0" />
         }
     </div>
   )
