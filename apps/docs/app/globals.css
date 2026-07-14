@@ -32,3 +32,20 @@ body {
 .highlight-yellow {
   color: #eab308;
 }
+
+/* Lenis smooth scroll styling resets */
+html.lenis, html.lenis-smooth {
+  height: auto;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}

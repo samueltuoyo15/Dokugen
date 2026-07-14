@@ -2,22 +2,26 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import SupportButton from "@/components/SupportButton";
+import SupportCard from "@/components/SupportCard";
 import { Button } from "@/components/ui/button";
 import {
   Terminal,
   Search,
   Github,
   RefreshCw,
-  Sparkles,
   GitBranch,
   Workflow,
   Scale,
+  Zap,
+  Layers,
+  Layout,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import MetricsSection from "@/components/metricsSection";
 import Copy from "@/components/Copy";
+import confetti from "canvas-confetti";
+import { useQuery } from "@tanstack/react-query";
 
 const searchableContent = [
   {
@@ -41,24 +45,54 @@ const searchableContent = [
   },
   {
     id: 4,
+    title: "How does the AI Commit subcommand work?",
+    content: "Running dokugen aic stages files, scans the git diff, and generates clean Conventional Commit messages automatically using Gemini, with an option to push.",
+    type: "faq",
+  },
+  {
+    id: 5,
+    title: "Does Dokugen require my own API keys?",
+    content: "No. Dokugen works completely out of the box with zero setup using shared backend API keys. You can also supply your own API key if you hit rate limits.",
+    type: "faq",
+  },
+  {
+    id: 6,
+    title: "What is the license generation feature?",
+    content: "Run dokugen license to instantly output a project LICENSE with automatic git author/year detection and a plain English summary of permissions.",
+    type: "faq",
+  },
+  {
+    id: 7,
+    title: "How do the colorized flowcharts work?",
+    content: "Dokugen automatically scans your tech stack and generates colorized flowcharts (e.g. Postgres is blue, Redis is red) with optimized layout directions (TD, LR, BT).",
+    type: "faq",
+  },
+  {
+    id: 8,
+    title: "What is the smart update command?",
+    content: "Running dokugen update uses a local cache to update only the auto-detected parts of your README while keeping your custom descriptions and badges intact.",
+    type: "faq",
+  },
+  {
+    id: 9,
     title: "Modern READMEs",
     content: "Generate READMEs with emojis, badges, and modern formatting.",
     type: "feature",
   },
   {
-    id: 5,
+    id: 10,
     title: "Cross-Platform",
     content: "Works on any OS and programming language.",
     type: "feature",
   },
   {
-    id: 6,
+    id: 11,
     title: "Easy Integration",
     content: "Integrate with GitHub, GitLab, and VS Code.",
     type: "feature",
   },
   {
-    id: 7,
+    id: 12,
     title: "Intelligent Updates",
     content:
       "Updates only auto-generated sections while preserving all your custom edits.",
@@ -68,6 +102,64 @@ const searchableContent = [
 
 export default function DocsPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const heroRef = useRef<HTMLDivElement>(null);
+  const [heroInView, setHeroInView] = useState(false);
+
+  const { data: starsCount } = useQuery<number>({
+    queryKey: ["githubStars"],
+    queryFn: async () => {
+      try {
+        const res = await fetch("https://api.github.com/repos/samueltuoyo15/Dokugen")
+        if (!res.ok) return 0
+        const data = await res.json()
+        return data.stargazers_count
+      } catch {
+        return 0
+      }
+    },
+    staleTime: 1000 * 60 * 10
+  })
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setHeroInView(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    if (heroRef.current) {
+      observer.observe(heroRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!heroInView) return;
+
+    // Gentle infinite confetti shower from corners when hero is in view
+    const interval = setInterval(() => {
+      confetti({
+        particleCount: 2,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0, y: 0.9 },
+        colors: ['#7c3aed', '#38bdf8', '#10b981', '#fbbf24', '#f43f5e']
+      });
+      confetti({
+        particleCount: 2,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1, y: 0.9 },
+        colors: ['#7c3aed', '#38bdf8', '#10b981', '#fbbf24', '#f43f5e']
+      });
+    }, 400);
+
+    return () => clearInterval(interval);
+  }, [heroInView]);
 
   const filteredContent = searchableContent.filter(
     (item) =>
@@ -76,9 +168,10 @@ export default function DocsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#fafafa] text-zinc-900 font-sans selection:bg-zinc-900 selection:text-white">
+    <div className="min-h-screen bg-[#fafafa] text-zinc-900 font-sans selection:bg-zinc-900 selection:text-white relative overflow-x-hidden">
       <div className="container mx-auto px-4 py-16 max-w-5xl">
         <motion.div
+          ref={heroRef}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -92,30 +185,27 @@ export default function DocsPage() {
               width={70}
               alt="Smile Logo"
             />
+            {/* Slanted GitHub Stars Badge - Responsive (inline under logo on mobile, absolute on desktop) */}
+            {starsCount !== undefined && (
+              <a
+                href="https://github.com/samueltuoyo15/Dokugen"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="sm:absolute sm:-top-1 sm:-right-24 mt-3 sm:mt-0 mx-auto sm:mx-0 bg-yellow-100 text-yellow-800 text-[10px] px-2.5 py-1 rounded-full border border-yellow-200 font-bold rotate-[-6deg] sm:rotate-[12deg] hover:scale-105 transition-transform shadow-sm flex items-center gap-1 font-mono selection:bg-yellow-800 selection:text-white whitespace-nowrap w-fit"
+              >
+                ★ {starsCount.toLocaleString()} stars!
+              </a>
+            )}
           </div>
 
-          <h1 className="text-5xl md:text-6xl font-black mb-6 tracking-tight text-zinc-900 max-w-3xl mx-auto leading-[1.15]">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black mb-6 tracking-tight text-zinc-900 max-w-3xl mx-auto leading-[1.15]">
             The easiest way to generate <br />
             <span className="highlight highlight-purple">beautiful</span> and <span className="highlight highlight-yellow">accurate</span> READMEs
           </h1>
 
           <p className="text-lg md:text-xl text-zinc-500 mb-10 max-w-2xl mx-auto leading-relaxed font-light">
-         Dokugen is a helpful tool that automatically creates and updates README files for your projects. It takes a look at your codebase, figures out what your project does, and then writes a clear, detailed README so you don't have to spend time doing it yourself. It's built to make sure your project always has professional and accurate documentation.   </p>
-
-          <div className="flex justify-center gap-4 flex-wrap">
-            <Link
-              href="https://github.com/samueltuoyo15/Dokugen/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button className="bg-zinc-900 text-white hover:bg-zinc-800 border-0 font-semibold px-8 py-6 text-base rounded-full transition-all">
-                <Github className="mr-2 h-5 w-5" />
-                Contribute
-              </Button>
-            </Link>
-
-            <SupportButton />
-          </div>
+            Dokugen automatically scans your codebase and generates clear, professional, and up-to-date README files in seconds. Save hours of writing documentation and keep your project README perfectly synced as your code changes.
+          </p>
 
           <div className="mt-12 max-w-lg mx-auto">
             <div className="relative group">
@@ -184,6 +274,12 @@ export default function DocsPage() {
                     installed.
                   </p>
                   <Copy code="npm install -g dokugen" />
+                  <p className="text-zinc-400 text-xs mt-3">
+                    or:{" "}
+                    <code className="font-mono text-zinc-600">
+                      pnpm add -g dokugen@latest
+                    </code>
+                  </p>
                 </div>
 
                 <div className="group bg-white p-8 rounded-2xl border border-[#a7f3d0]/60 hover:border-[#34d399]/70 transition-all flex flex-col">
@@ -191,10 +287,6 @@ export default function DocsPage() {
                     <h3 className="text-xl font-bold text-zinc-950">
                       Method 2: Python
                     </h3>
-                    <span className="inline-flex items-center gap-1.5 bg-[#ecfdf5] text-[#047857] text-xs px-2.5 py-1 rounded-full border border-[#a7f3d0] font-medium">
-                      <Sparkles className="w-3.5 h-3.5" />
-                      NEW
-                    </span>
                   </div>
                   <p className="text-zinc-500 mb-6 leading-relaxed flex-grow text-sm">
                     Install via uv (recommended) or pip. The Python client is
@@ -270,7 +362,7 @@ export default function DocsPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Card 1: System Design Diagrams (Double-wide Card) */}
-              <div className="md:col-span-2 group relative bg-[#f5f3ff]/60 hover:bg-[#f5f3ff] p-8 rounded-3xl border border-[#ddd6fe] hover:border-[#c084fc] transition-all duration-300 flex flex-col justify-between min-h-[350px]">
+              <div className="md:col-span-2 group relative bg-[#f5f3ff]/60 hover:bg-[#f5f3ff] p-8 rounded-3xl border border-[#ddd6fe] hover:border-[#c084fc] transition-all duration-300 flex flex-col h-full">
                 <div>
                   <div className="inline-flex p-4 rounded-2xl bg-white border border-[#ddd6fe] text-[#7c3aed] mb-6">
                     <Workflow className="w-8 h-8 stroke-[1.5]" />
@@ -279,16 +371,13 @@ export default function DocsPage() {
                     System Design Diagrams
                   </h3>
                   <p className="text-[#6d28d9] leading-relaxed text-sm font-normal max-w-xl">
-                    Generate beautiful system flowcharts directly inside your docs. Auto-colors your tech stack (Redis is red, Postgres is blue, MongoDB is green) and dynamically selects the best layout direction (TD, LR, BT) to fit your architecture.
+                    Setting up architecture diagrams by hand is tedious and they go out of date instantly. Dokugen draws beautiful system design diagrams directly inside your docs when you generate a README. It is fully included in the main command! The layout colors each piece of your stack (like Redis in red or Postgres in blue) and organizes them so they look great.
                   </p>
-                </div>
-                <div className="mt-8 font-mono text-[10px] uppercase tracking-wider text-[#7c3aed]/70">
-                  FEATURE_01 // DIAGRAM_ENGINE
                 </div>
               </div>
 
               {/* Card 2: Smart Updates */}
-              <div className="group relative bg-[#ecfdf5]/60 hover:bg-[#ecfdf5] p-8 rounded-3xl border border-[#a7f3d0] hover:border-[#34d399] transition-all duration-300 flex flex-col justify-between min-h-[350px]">
+              <div className="group relative bg-[#ecfdf5]/60 hover:bg-[#ecfdf5] p-8 rounded-3xl border border-[#a7f3d0] hover:border-[#34d399] transition-all duration-300 flex flex-col h-full">
                 <div>
                   <div className="inline-flex p-4 rounded-2xl bg-white border border-[#a7f3d0] text-[#10b981] mb-6">
                     <RefreshCw className="w-8 h-8 stroke-[1.5]" />
@@ -297,38 +386,28 @@ export default function DocsPage() {
                     Smart Updates
                   </h3>
                   <p className="text-[#047857] leading-relaxed text-sm font-normal">
-                    Regenerate your README without losing manual changes. We only refresh the auto-detected parts (tech stack, files, features), keeping your custom paragraphs and badges untouched.
+                    Regenerating docs often overwrites your manual edits and custom styles. With Smart Updates, you can refresh your README without losing any of your custom text. Dokugen only updates the automatic parts (like files and tech stack), keeping your custom notes and badges completely safe.
                   </p>
-                </div>
-                <div className="font-mono text-[10px] uppercase tracking-wider text-[#10b981]/70 mt-6">
-                  FEATURE_02 // SYNC_SYSTEM
                 </div>
               </div>
 
-              {/* Card 3: AI Commit Messages */}
-              <div className="group relative bg-[#f0f9ff]/60 hover:bg-[#f0f9ff] p-8 rounded-3xl border border-[#bae6fd] hover:border-[#38bdf8] transition-all duration-300 flex flex-col justify-between min-h-[320px]">
+              {/* Card 3: Quality Commit Messages */}
+              <div className="group relative bg-[#f0f9ff]/60 hover:bg-[#f0f9ff] p-8 rounded-3xl border border-[#bae6fd] hover:border-[#38bdf8] transition-all duration-300 flex flex-col h-full">
                 <div>
                   <div className="inline-flex p-4 rounded-2xl bg-white border border-[#bae6fd] text-[#0ea5e9] mb-6">
                     <GitBranch className="w-8 h-8 stroke-[1.5]" />
                   </div>
                   <h3 className="text-xl font-bold mb-3 text-[#0c4a6e] tracking-tight">
-                    AI Commit Messages
+                    Quality Commit Messages
                   </h3>
                   <p className="text-[#0369a1] leading-relaxed text-sm font-normal">
-                    Type{" "}
-                    <code className="text-[#0284c7] font-mono text-xs bg-white border border-[#bae6fd] px-1.5 py-0.5 rounded">
-                      dokugen aic
-                    </code>{" "}
-                    to scan your staged git diff and instantly draft clean Conventional Commit messages. You can even auto-push!
+                    Writing good commit messages is boring and easy to neglect. Run <code className="text-[#0284c7] font-mono text-xs bg-white border border-[#bae6fd] px-1.5 py-0.5 rounded">dokugen aic</code> to check your staged changes and write clean conventional commit messages in seconds. You can even choose to push automatically.
                   </p>
-                </div>
-                <div className="font-mono text-[10px] uppercase tracking-wider text-[#0ea5e9]/70 mt-6">
-                  FEATURE_03 // GIT_WORKFLOW
                 </div>
               </div>
 
               {/* Card 4: Standalone Licenses */}
-              <div className="group relative bg-[#fff1f2]/60 hover:bg-[#fff1f2] p-8 rounded-3xl border border-[#fecdd3] hover:border-[#fb7185] transition-all duration-300 flex flex-col justify-between min-h-[320px]">
+              <div className="group relative bg-[#fff1f2]/60 hover:bg-[#fff1f2] p-8 rounded-3xl border border-[#fecdd3] hover:border-[#fb7185] transition-all duration-300 flex flex-col h-full">
                 <div>
                   <div className="inline-flex p-4 rounded-2xl bg-white border border-[#fecdd3] text-[#f43f5e] mb-6">
                     <Scale className="w-8 h-8 stroke-[1.5]" />
@@ -337,20 +416,58 @@ export default function DocsPage() {
                     License Generation
                   </h3>
                   <p className="text-[#be123c] leading-relaxed text-sm font-normal">
-                    Run{" "}
-                    <code className="text-[#e11d48] font-mono text-xs bg-white border border-[#fecdd3] px-1.5 py-0.5 rounded">
-                      dokugen license
-                    </code>{" "}
-                    to instantly output project licenses. Features automatic git author/year detection and plain-English permission summaries.
+                    Your open-source project should not be pushed unlicensed. Anyone can do whatever they want with your code. Create a LICENSE file in seconds with <code className="text-[#e11d48] font-mono text-xs bg-white border border-[#fecdd3] px-1.5 py-0.5 rounded">dokugen license</code>. It automatically finds the right author name and year from git, and gives you a plain English summary of what the license permits.
                   </p>
-                </div>
-                <div className="font-mono text-[10px] uppercase tracking-wider text-[#f43f5e]/70 mt-6">
-                  FEATURE_04 // LEGAL_HELPER
                 </div>
               </div>
 
-              {/* Card 5: Interactive Prompt */}
-              <div className="group relative bg-[#fffbeb]/60 hover:bg-[#fffbeb] p-8 rounded-3xl border border-[#fde68a] hover:border-[#fbbf24] transition-all duration-300 flex flex-col justify-between min-h-[320px]">
+              {/* Card 5: Zero-Config Setup */}
+              <div className="group relative bg-[#e0e7ff]/60 hover:bg-[#e0e7ff] p-8 rounded-3xl border border-[#c7d2fe] hover:border-[#818cf8] transition-all duration-300 flex flex-col h-full">
+                <div>
+                  <div className="inline-flex p-4 rounded-2xl bg-white border border-[#c7d2fe] text-[#6366f1] mb-6">
+                    <Zap className="w-8 h-8 stroke-[1.5]" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3 text-[#312e81] tracking-tight">
+                    Zero-Config Experience
+                  </h3>
+                  <p className="text-[#4338ca] leading-relaxed text-sm font-normal">
+                    Setting up API keys and accounts is a hassle when you just want to get started. With Dokugen, there are no API keys to copy-paste or set up. It works right out of the box using our shared keys.
+                  </p>
+                </div>
+              </div>
+
+              {/* Card 6: Incremental Scanning */}
+              <div className="group relative bg-[#f0fdfa]/60 hover:bg-[#f0fdfa] p-8 rounded-3xl border border-[#ccfbf1] hover:border-[#2dd4bf] transition-all duration-300 flex flex-col h-full">
+                <div>
+                  <div className="inline-flex p-4 rounded-2xl bg-white border border-[#ccfbf1] text-[#0d9488] mb-6">
+                    <Layers className="w-8 h-8 stroke-[1.5]" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3 text-[#115e59] tracking-tight">
+                    Incremental Scanning
+                  </h3>
+                  <p className="text-[#0f766e] leading-relaxed text-sm font-normal">
+                    Scanning the entire codebase every time is slow and wastes bandwidth. Save time by only scanning what changed. Dokugen keeps track of your files using a local cache so updates finish in seconds.
+                  </p>
+                </div>
+              </div>
+
+              {/* Card 7: Custom Templates */}
+              <div className="group relative bg-[#fdf2f8]/60 hover:bg-[#fdf2f8] p-8 rounded-3xl border border-[#fbcfe8] hover:border-[#f472b6] transition-all duration-300 flex flex-col h-full">
+                <div>
+                  <div className="inline-flex p-4 rounded-2xl bg-white border border-[#fbcfe8] text-[#db2777] mb-6">
+                    <Layout className="w-8 h-8 stroke-[1.5]" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3 text-[#831843] tracking-tight">
+                    Custom Templates
+                  </h3>
+                  <p className="text-[#be185d] leading-relaxed text-sm font-normal">
+                    Making READMEs look consistent across different projects is hard. Copy the structure of any README you like. Use the `--template` flag with any public repository's URL to replicate its style.
+                  </p>
+                </div>
+              </div>
+
+              {/* Card 8: Interactive Prompt */}
+              <div className="group relative bg-[#fffbeb]/60 hover:bg-[#fffbeb] p-8 rounded-3xl border border-[#fde68a] hover:border-[#fbbf24] transition-all duration-300 flex flex-col h-full">
                 <div>
                   <div className="inline-flex p-4 rounded-2xl bg-white border border-[#fde68a] text-[#d97706] mb-6">
                     <Terminal className="w-8 h-8 stroke-[1.5]" />
@@ -359,15 +476,8 @@ export default function DocsPage() {
                     Interactive Prompt
                   </h3>
                   <p className="text-[#b45309] leading-relaxed text-sm font-normal">
-                    Forget syntax flags and subcommands! Just type{" "}
-                    <code className="text-[#d97706] font-mono text-xs bg-white border border-[#fde68a] px-1.5 py-0.5 rounded">
-                      dokugen
-                    </code>{" "}
-                    to launch a gorgeous step-by-step interactive menu in your console.
+                    Remembering CLI syntax flags and subcommands is annoying. Just type <code className="text-[#d97706] font-mono text-xs bg-white border border-[#fde68a] px-1.5 py-0.5 rounded">dokugen</code> to open a friendly, step-by-step menu in your terminal that guides you through everything.
                   </p>
-                </div>
-                <div className="font-mono text-[10px] uppercase tracking-wider text-[#d97706]/70 mt-6">
-                  FEATURE_05 // CLI_MENU
                 </div>
               </div>
             </div>
@@ -397,11 +507,7 @@ export default function DocsPage() {
                   to install Dokugen globally.
                   <br />
                   <span className="block mt-2">
-                    <strong className="text-zinc-800">Python</strong>{" "}
-                    <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-600 text-xs px-1.5 py-0.5 rounded border border-emerald-200/60 font-medium ml-1">
-                      NEW
-                    </span>
-                    <strong className="text-zinc-800">:</strong> Run{" "}
+                    <strong className="text-zinc-800">Python:</strong> Run{" "}
                     <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
                       pip install dokugen
                     </code>{" "}
@@ -441,6 +547,66 @@ export default function DocsPage() {
                   flag to watch and auto-generate your README in upcoming Dokugen versions.
                 </p>
               </div>
+              <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
+                <h3 className="text-lg font-bold mb-3 text-zinc-950">
+                  How does the AI Commit subcommand work?
+                </h3>
+                <p className="text-zinc-600 leading-relaxed text-sm">
+                  Running{" "}
+                  <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
+                    dokugen aic
+                  </code>{" "}
+                  automatically stages your files, scans the staged git diff, generates a clean Conventional Commit message using Gemini, commits the changes, and optionally pushes them to your remote repository.
+                </p>
+              </div>
+              <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
+                <h3 className="text-lg font-bold mb-3 text-zinc-950">
+                  Does Dokugen read my .env files or sensitive API keys?
+                </h3>
+                <p className="text-zinc-600 leading-relaxed text-sm">
+                  <strong className="text-zinc-800">Absolutely not.</strong> Dokugen is built with strict privacy and security filters. It automatically ignores all environment variable files (like <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-xs font-mono border border-zinc-200/60">.env</code>, <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-xs font-mono border border-zinc-200/60">.env.local</code>, etc.), package manager lockfiles, logs, compiled binaries/bytecode, local config files, and private credentials. None of your sensitive credentials, environment keys, or token secrets are ever read or transmitted.
+                </p>
+              </div>
+              <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
+                <h3 className="text-lg font-bold mb-3 text-zinc-950">
+                  Does Dokugen require my own API keys?
+                </h3>
+                <p className="text-zinc-600 leading-relaxed text-sm">
+                  No. Dokugen offers a zero-config experience. The CLI communicates with our secure backend transparently using shared API keys. However, if you hit rate limits, you can easily configure your own API key in your profile configuration.
+                </p>
+              </div>
+              <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
+                <h3 className="text-lg font-bold mb-3 text-zinc-950">
+                  What is the license generation feature?
+                </h3>
+                <p className="text-zinc-600 leading-relaxed text-sm">
+                  By running{" "}
+                  <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
+                    dokugen license
+                  </code>{" "}
+                  you can instantly output project license files. The command automatically detects your Git author details and the current year, and provides a clear English explanation of the permissions.
+                </p>
+              </div>
+              <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
+                <h3 className="text-lg font-bold mb-3 text-zinc-950">
+                  How do the colorized flowcharts work?
+                </h3>
+                <p className="text-zinc-600 leading-relaxed text-sm">
+                  Dokugen automatically detects your project's technology stack and builds beautiful system flowcharts/diagrams directly inside your markdown. The engine maps colors to specific technologies (e.g. Postgres is blue, Redis is red) and dynamically chooses the layout direction (top-down, left-to-right) for the best fit.
+                </p>
+              </div>
+              <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
+                <h3 className="text-lg font-bold mb-3 text-zinc-950">
+                  What is the smart update command?
+                </h3>
+                <p className="text-zinc-600 leading-relaxed text-sm">
+                  Using{" "}
+                  <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
+                    dokugen update
+                  </code>{" "}
+                  performs an incremental scan using a local cache to update only the auto-detected parts (files, features, tech stack) of your README, leaving your custom descriptions, notes, and manually added badges perfectly safe.
+                </p>
+              </div>
             </div>
           </motion.div>
         )}
@@ -458,10 +624,10 @@ export default function DocsPage() {
                 <div className="w-3 h-3 rounded-full bg-rose-400"></div>
                 <div className="w-3 h-3 rounded-full bg-amber-400"></div>
                 <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
-                <div className="text-[11px] text-zinc-400 font-mono mx-auto pr-10 select-none">Demo.mp4</div>
+                <div className="text-[11px] text-zinc-400 font-mono mx-auto pr-10 select-none">Demo.gif</div>
               </div>
               <video
-                src="/Demo.mp4"
+                src="/Demo.gif"
                 muted
                 autoPlay
                 loop
@@ -490,26 +656,79 @@ export default function DocsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1 }}
-          className="mt-32 pb-8 border-t border-zinc-200 pt-16"
+          className="mt-32 pb-8 border-t border-zinc-200 pt-16 w-full"
         >
-          <div className="flex flex-col items-center">
-            <p className="text-zinc-500 mb-6 text-center max-w-lg mx-auto">
-              Need help? Check out our{" "}
-              <a
-                href="https://github.com/samueltuoyo15/Dokugen"
-                className="text-zinc-800 hover:text-zinc-950 hover:underline decoration-zinc-400 underline-offset-4 font-semibold transition-colors"
-              >
-                GitHub
-              </a>{" "}
-              or{" "}
-              <a
-                href="https://github.com/sponsors/samueltuoyo15"
-                className="text-zinc-800 hover:text-zinc-950 hover:underline decoration-zinc-400 underline-offset-4 font-semibold transition-colors"
-              >
-                support page
-              </a>
-              .
+          <div className="flex flex-col items-center gap-8 text-center w-full">
+            <p className="text-zinc-500 max-w-lg leading-relaxed font-light text-sm">
+              Dokugen is an open-source project. If you find it useful, consider contributing to the repository or supporting the developers.
             </p>
+            <div className="flex justify-center mb-6">
+              <Link
+                href="https://github.com/samueltuoyo15/Dokugen/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button className="bg-zinc-900 text-white hover:bg-zinc-800 border-0 font-semibold px-8 py-6 text-base rounded-full transition-all shadow-sm">
+                  <Github className="mr-2 h-5 w-5" />
+                  Contribute
+                  {starsCount !== undefined && (
+                    <span className="ml-2 bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-full text-xs font-mono font-medium">
+                      ★ {starsCount.toLocaleString()}
+                    </span>
+                  )}
+                </Button>
+              </Link>
+            </div>
+
+            {/* Side-by-Side Flex Support Section */}
+            <div className="w-full max-w-4xl mt-4 mb-8">
+              <h3 className="text-xl font-bold text-zinc-900 mb-2">
+                Support the Project
+              </h3>
+              <p className="text-zinc-500 text-xs mb-10 max-w-xs mx-auto leading-relaxed">
+                Dokugen is completely free. Consider sponsoring or tipping the developers!
+              </p>
+              
+              <div className="flex flex-col md:flex-row gap-8 items-start justify-center text-left w-full">
+                {/* Left hand side: GitHub Sponsors */}
+                <div className="flex-1 w-full flex flex-col">
+                  <div className="mb-4 text-center md:text-left">
+                    <h4 className="text-sm font-bold text-zinc-800 mb-1">GitHub Sponsors</h4>
+                    <p className="text-zinc-400 text-[11px]">For international sponsors worldwide</p>
+                  </div>
+                  <div className="bg-white border border-zinc-200/80 rounded-2xl shadow-sm h-[480px] p-6 flex flex-col justify-between items-center text-center">
+                    <div className="mt-4">
+                      <Github className="w-10 h-10 text-zinc-800 mx-auto mb-3" />
+                      <h5 className="font-bold text-zinc-900 text-sm mb-2">Global Sponsorship</h5>
+                      <p className="text-zinc-500 text-xs leading-relaxed max-w-[240px]">
+                        Support Samuel Tuoyo directly on GitHub Sponsors to help fund Dokugen development.
+                      </p>
+                    </div>
+                    <div className="w-full max-w-[360px] my-auto flex justify-center items-center">
+                      <iframe
+                        src="https://github.com/sponsors/samueltuoyo15/card"
+                        title="Sponsor samueltuoyo15"
+                        height="225"
+                        width="100%"
+                        style={{ border: 0, borderRadius: "12px", display: "block" }}
+                      />
+                    </div>
+                    <span className="text-[10px] text-zinc-400 font-mono">
+                      github.com/sponsors/samueltuoyo15
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Right hand side: Myhappr Tip Card */}
+                <div className="flex-1 w-full flex flex-col">
+                  <div className="mb-4 text-center md:text-left">
+                    <h4 className="text-sm font-bold text-zinc-800 mb-1">Myhappr Tip Card</h4>
+                    <p className="text-zinc-400 text-[11px]">For African local card & mobile money transfers</p>
+                  </div>
+                  <SupportCard />
+                </div>
+              </div>
+            </div>
 
             <div className="flex items-center gap-6 mb-8">
               <Link

@@ -1,6 +1,6 @@
 # Dokugen: The Smart README Generator
 
-![Demo GIF](./apps/cli/clients/typescript/public/Demo.gif)
+![Demo GIF](./public/Demo.gif)
 
 ## Overview
 

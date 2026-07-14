@@ -135,7 +135,7 @@ export function buildUserPrompt(
           }
 
         - **Usage**:
-           - Include examples and screenshots if available. Check if there are screenshot files in the project (like demo.png, screenshot.png) and include them if found.
+           - Include examples and screenshots if available. Check if there are screenshot files in the project (like demo.png, demo.gif, screenshot.png) and include them if found.
            - Add detailed usage instructions. Don't collapse them into expandable sections.
            - CRITICAL: If you reference an example with phrases like "like this:", "for example:", or "it will look something like this:", you MUST immediately follow it with an actual code block or example. NEVER write a lead-in phrase and leave it with nothing after it. If you cannot infer a realistic example from the code, omit the lead-in phrase entirely.
            - For CLI tools or relay commands, infer a realistic example from the project code (e.g. package name, binary name, flags) and show it in a bash code block.

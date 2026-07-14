@@ -1,7 +1,12 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import siteMetadata from "../utils/siteMetaData";
 import Providers from "./Providers";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteMetadata.siteUrl),
@@ -17,6 +22,14 @@ export const metadata: Metadata = {
     siteName: siteMetadata.title,
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: siteMetadata.socialBanner,
+        width: 1200,
+        height: 630,
+        alt: siteMetadata.title,
+      },
+    ],
   },
   robots: {
     index: true,
@@ -33,6 +46,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: siteMetadata.title,
+    description: siteMetadata.description,
+    images: [siteMetadata.socialBanner],
   },
   other: {
     "google-site-verification": process.env.GOOGLE_SITE_VERIFICATION_TOKEN!,
@@ -51,7 +66,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Caveat:wght@700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="select-none antialiased">
+      <body className="antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>
