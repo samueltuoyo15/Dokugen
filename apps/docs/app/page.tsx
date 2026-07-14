@@ -627,7 +627,7 @@ export default function DocsPage() {
                 <div className="text-[11px] text-zinc-400 font-mono mx-auto pr-10 select-none">Demo.gif</div>
               </div>
               <video
-                src="/Demo.gif"
+                src="/Demo.mp4"
                 muted
                 autoPlay
                 loop
