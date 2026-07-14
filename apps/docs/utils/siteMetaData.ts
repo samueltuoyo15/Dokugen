@@ -8,7 +8,7 @@ const siteMetadata = {
   theme: "system",
   siteUrl: "https://dokugen-readme.vercel.app",
   siteLogo: "/card.png",
-  socialBanner: "/Generate Readme - Language & Framework agnostic.png",
+  socialBanner: "/banner.png",
   email: "samueltuoyo9082@gmail.com",
   github: "https://github.com/sameultuoyo15/Dokugen",
   twitter: "https://x.com/TuoyoS26091?t=cauMkLaDHxTX_oieHzVjkw&s=09",
