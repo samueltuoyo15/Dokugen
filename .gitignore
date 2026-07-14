@@ -7,6 +7,7 @@ node_modules
 
 # Local env files
 *.env
+
 .env
 .env.local
 .env.development
@@ -44,3 +45,5 @@ yarn-error.log*
 # Bun build artifacts
 *.bun-build
 dist/binaries/
+
+design_system.md

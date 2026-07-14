@@ -10,9 +10,7 @@ import {
   Github,
   RefreshCw,
   Sparkles,
-  Undo,
   GitBranch,
-  Wand2,
   Workflow,
   Scale,
 } from "lucide-react";
