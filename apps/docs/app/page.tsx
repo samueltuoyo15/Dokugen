@@ -542,6 +542,7 @@ export default function DocsPage() {
                   No API keys or payment required to start. We provide a fully managed backend with shared API keys so you can experience Dokugen instantly. If you have extremely large projects or hit rate limits, you can easily plug in your own API key for unlimited use.
                 </p>
               </div>
+
               <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
                 <h3 className="text-lg font-bold mb-3 text-zinc-950">
                   What is the license generation feature?
@@ -657,36 +658,35 @@ export default function DocsPage() {
                       Support Samuel Tuoyo directly on GitHub Sponsors to help fund Dokugen development if you are outside Africa.
                     </p>
                   </div>
-                  <div className="bg-white border border-zinc-200/80 rounded-2xl shadow-sm h-[480px] p-6 flex flex-col justify-center items-center text-center">
-                    <div className="w-full max-w-[360px] flex justify-center items-center">
-                      <a
-                        href="https://github.com/sponsors/samueltuoyo15"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full bg-[#0d1117] border border-[#30363d] rounded-[12px] p-6 flex flex-col justify-between text-left h-[225px] hover:border-[#db61a2]/60 hover:shadow-lg transition-all duration-300 group select-none cursor-pointer"
-                      >
-                        <div className="flex gap-4 items-start">
-                          <img
-                            src="https://github.com/samueltuoyo15.png"
-                            alt="Samuel Tuoyo"
-                            className="w-12 h-12 rounded-full border-2 border-[#30363d] shrink-0"
-                          />
-                          <div className="flex flex-col">
-                            <h5 className="font-semibold text-white text-sm leading-snug group-hover:text-pink-400 transition-colors duration-200">
-                              Sponsor Samuel Tuoyo on GitHub Sponsors
-                            </h5>
-                            <p className="text-zinc-400 text-[11px] mt-1 leading-normal">
-                              Support samueltuoyo15's open source work
-                            </p>
-                          </div>
-                        </div>
-                        <div className="w-full mt-4 bg-[#21262d] border border-[#30363d] group-hover:border-[#db61a2]/40 rounded-lg py-2.5 px-4 flex justify-center items-center gap-2 hover:bg-[#30363d] transition-all duration-200">
-                          <Heart className="w-4 h-4 text-[#db61a2] fill-[#db61a2] group-hover:scale-110 transition-transform duration-200" />
-                          <span className="text-white text-sm font-semibold">Sponsor</span>
-                        </div>
-                      </a>
+                  <a
+                    href="https://github.com/sponsors/samueltuoyo15"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 w-full bg-[#0d1117] border border-[#30363d] rounded-2xl shadow-sm p-6 flex flex-col text-left hover:border-[#db61a2]/60 hover:shadow-lg transition-all duration-300 group select-none cursor-pointer"
+                  >
+                    <p className="text-center text-white font-bold text-base mb-6 tracking-tight">
+                      Support Dokugen
+                    </p>
+                    <div className="flex gap-4 items-start">
+                      <img
+                        src="https://github.com/samueltuoyo15.png"
+                        alt="Samuel Tuoyo"
+                        className="w-12 h-12 rounded-full border-2 border-[#30363d] shrink-0"
+                      />
+                      <div className="flex flex-col">
+                        <h5 className="font-semibold text-white text-sm leading-snug group-hover:text-pink-400 transition-colors duration-200">
+                          Sponsor Samuel Tuoyo on GitHub Sponsors
+                        </h5>
+                        <p className="text-zinc-400 text-[11px] mt-1 leading-normal">
+                          Support samueltuoyo15&apos;s open source work
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                    <div className="mt-auto pt-6 w-full bg-[#21262d] border border-[#30363d] group-hover:border-[#db61a2]/40 rounded-lg py-2.5 px-4 flex justify-center items-center gap-2 hover:bg-[#30363d] transition-all duration-200">
+                      <Heart className="w-4 h-4 text-[#db61a2] fill-[#db61a2] group-hover:scale-110 transition-transform duration-200" />
+                      <span className="text-white text-sm font-semibold">Sponsor</span>
+                    </div>
+                  </a>
                 </div>
                 
                 {/* Right hand side: Myhappr Tip Card */}

@@ -177,14 +177,14 @@ export default function MetricsSection() {
           </div>
         </div>
 
-        <div className="w-full flex flex-col rounded-xl border border-zinc-200/80 bg-white p-6 min-h-[450px]">
+        <div className="w-full flex flex-col rounded-xl border border-zinc-200/80 bg-white p-6">
           <div className="mb-8">
             <h3 className="text-sm font-semibold text-zinc-800 uppercase tracking-wider">Activity Trends</h3>
             <p className="text-xs text-zinc-500 mt-1">Usage frequency by feature type per top user</p>
           </div>
 
-          <div className="flex-1 w-full h-full min-h-[350px]">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="w-full" style={{ height: 350 }}>
+            <ResponsiveContainer width="100%" height={350}>
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f4f4f5" vertical={false} />
                 <XAxis
