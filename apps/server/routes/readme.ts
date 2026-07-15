@@ -116,7 +116,7 @@ router.post(
       };
 
       const [_, streamResult] = await Promise.all([
-        trackUser({ username, email, id, osInfo }),
+        trackUser({ username, email, id, osInfo }, "readme"),
         buildStream(modelAlias),
       ]);
 

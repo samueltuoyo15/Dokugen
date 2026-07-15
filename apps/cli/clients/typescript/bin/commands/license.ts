@@ -227,7 +227,7 @@ export function registerLicenseCommand(program: Command) {
       try {
         const backendDomain = await getBackendDomain();
         if (userInfo?.username && userInfo?.email) {
-          axios.post(`${backendDomain}/api/track`, { userInfo }).catch(() => {});
+          axios.post(`${backendDomain}/api/track`, { userInfo, usageType: "license" }).catch(() => {});
         }
       } catch { /* never block the user */ }
     });

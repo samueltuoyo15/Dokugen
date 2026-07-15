@@ -53,7 +53,7 @@ def cmd_revert(args):
             threading.Thread(
                 target=lambda: requests.post(
                     f"{backend_domain}/api/track",
-                    json={"userInfo": user_info},
+                    json={"userInfo": user_info, "usageType": "revert"},
                     timeout=5
                 ),
                 daemon=True

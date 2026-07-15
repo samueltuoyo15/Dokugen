@@ -29,43 +29,43 @@ const searchableContent = [
     id: 1,
     title: "How do I install Dokugen?",
     content:
-      "Run npm install -g dokugen or pnpm add -g dokugen to install globally via Node.js, or pip install dokugen / uv tool install dokugen for Python.",
+      "Dokugen installs in seconds on any system. For Node.js users, run npm install -g dokugen or pnpm add -g dokugen. For Python, run uv tool install dokugen or pip install dokugen. You're just one command away from clean documentation.",
     type: "faq",
   },
   {
     id: 2,
     title: "Can I use custom templates?",
-    content: "Yes, use the --template flag to specify a custom template.",
+    content: "Absolutely. Stand out from the crowd by matching the layout of your favorite repositories. Simply use the --template flag and provide any public README URL to instantly model your documentation after the best in the industry.",
     type: "faq",
   },
   {
     id: 4,
     title: "How does the AI Commit subcommand work?",
-    content: "Running dokugen aic stages your files, reads the diff from your project, and writes clean Conventional Commit messages instantly using Gemini, with a one-click push option.",
+    content: "Writing commits is tedious, but clean history is crucial for team projects. Dokugen reads your changes, writes Conventional Commits using Gemini, and lets you commit and push with one confirmation. Look professional without the cognitive load.",
     type: "faq",
   },
   {
     id: 5,
     title: "Does Dokugen require my own API keys?",
-    content: "No. Dokugen works completely out of the box with zero setup using shared backend API keys. You can also supply your own API key if you hit rate limits.",
+    content: "No API keys or payment required to start. We provide a fully managed backend with shared API keys so you can experience Dokugen instantly. If you have extremely large projects or hit rate limits, you can easily plug in your own API key for unlimited use.",
     type: "faq",
   },
   {
     id: 6,
     title: "What is the license generation feature?",
-    content: "Run dokugen license to instantly output a project LICENSE with automatic git author/year detection and a plain English summary of permissions.",
+    content: "Did you know that without a LICENSE file, other developers legally cannot use, modify, or contribute to your code? Unlicensed repositories scare away contributors and companies alike. Protect your work and open the door to collaboration by running dokugen license. It auto-detects git details and generates a compliant LICENSE along with a human-readable summary that builds trust.",
     type: "faq",
   },
   {
     id: 7,
     title: "How do the colorized flowcharts work?",
-    content: "Dokugen automatically understands your project and generates colorized flowcharts (e.g. Postgres is blue, Redis is red) with optimized layout directions (TD, LR, BT).",
+    content: "A picture is worth a thousand words. Dokugen automatically maps your project's structure and renders clean, color-coded architecture flowcharts inside your README. It assigns distinct colors to each service (like database, cache, or queue) and optimizes layout directions so your project structure is instantly readable.",
     type: "faq",
   },
   {
     id: 8,
     title: "What is the smart update command?",
-    content: "Running dokugen update refreshes only the auto-generated parts of your README while keeping every custom description, badge, and note you wrote completely safe.",
+    content: "Most generators completely overwrite your manual edits, forcing you to copy-paste. Dokugen's smart update is different: it updates the technical directories and dependencies while leaving your carefully written descriptions, tutorials, and badges untouched. Keep your docs in sync with your code effortlessly.",
     type: "faq",
   },
   {
@@ -199,7 +199,7 @@ export default function DocsPage() {
           </h1>
 
           <p className="text-lg md:text-xl text-zinc-500 mb-10 max-w-2xl mx-auto leading-relaxed font-light">
-            Stop spending hours writing docs nobody reads. Dokugen automatically understands your project and generates a clear, professional README in seconds and keeps it perfectly in sync every time your code changes.
+            Writing READMEs is a chore, and keeping them updated is even worse. Dokugen takes that pain away by scanning your codebase to generate a beautiful, detailed README in seconds. It even keeps it perfectly updated every time you push code, so you can spend your time building, not formatting markdown.
           </p>
 
           <div className="mt-12 max-w-lg mx-auto">
@@ -366,7 +366,7 @@ export default function DocsPage() {
                     System Design Diagrams
                   </h3>
                   <p className="text-[#6d28d9] leading-relaxed text-sm font-normal max-w-xl">
-                    Hand-drawn architecture diagrams go stale the moment you commit new code. Dokugen generates stunning, colorized system diagrams directly inside your README automatically with no extra tools, no Figma, and no fuss. Every service in your project gets its own color and a layout that actually makes sense.
+                    Developers love visuals, but manual diagrams go stale the second you push code. Dokugen automatically renders interactive, color-coded architecture flowcharts directly inside your README. Show off your system design instantly, build trust with users, and make your repo look 10x more professional without touching Figma.
                   </p>
                 </div>
               </div>
@@ -381,7 +381,7 @@ export default function DocsPage() {
                     Smart Updates
                   </h3>
                   <p className="text-[#047857] leading-relaxed text-sm font-normal">
-                    Scared to regenerate because it nukes your custom edits? Smart Updates only refreshes the parts Dokugen owns (detected files, dependencies, and project structure) while leaving every note, badge, and description you wrote completely untouched.
+                    Never worry about losing your custom descriptions, notes, or badges. Smart Updates intelligently target only the auto-generated elements of your README, preserving your hand-written text perfectly. Keep your docs fresh and accurate without repeating your hard work.
                   </p>
                 </div>
               </div>
@@ -396,7 +396,7 @@ export default function DocsPage() {
                     Quality Commit Messages
                   </h3>
                   <p className="text-[#0369a1] leading-relaxed text-sm font-normal">
-                    Tired of writing "fix stuff" commit messages? Run <code className="text-[#0284c7] font-mono text-xs bg-white border border-[#bae6fd] px-1.5 py-0.5 rounded">dokugen aic</code> and Dokugen reads your staged changes to write a clean, Conventional Commit message in seconds. One more keypress and it pushes too.
+                    Unprofessional git logs hurt your credibility. Boost your project's reputation with clean, Conventional Commit messages generated instantly from your actual file diffs. Save mental energy and push your changes with a single keystroke.
                   </p>
                 </div>
               </div>
@@ -411,7 +411,7 @@ export default function DocsPage() {
                     License Generation
                   </h3>
                   <p className="text-[#be123c] leading-relaxed text-sm font-normal">
-                    No license doesn't mean free to use; it means nobody knows what they're allowed to do. Contributors won't touch it. Companies won't ship it. Run <code className="text-[#e11d48] font-mono text-xs bg-white border border-[#fecdd3] px-1.5 py-0.5 rounded">dokugen license</code> to generate a proper LICENSE file in seconds, with author and year auto-detected from git, and a plain English summary of what the license permits.
+                    Unlicensed code is dead code—companies won't touch it, and developers won't contribute. Protect your intellectual property and welcome contributors in seconds. Automatically detect the author and year, generate a compliant LICENSE, and get a human-readable summary so everyone feels safe using your work.
                   </p>
                 </div>
               </div>
@@ -426,7 +426,7 @@ export default function DocsPage() {
                     Zero-Config Experience
                   </h3>
                   <p className="text-[#4338ca] leading-relaxed text-sm font-normal">
-                    Most AI tools make you create accounts, copy API keys, and configure environment variables before you can do anything useful. Dokugen skips all of that. Install it, run it in your project, and you're done: no setup required.
+                    No login, no API keys to copy, and zero setup friction. We believe you should experience value in less than 30 seconds. Just run Dokugen in your project and see the magic immediately—no strings attached.
                   </p>
                 </div>
               </div>
@@ -441,7 +441,7 @@ export default function DocsPage() {
                     Incremental Scanning
                   </h3>
                   <p className="text-[#0f766e] leading-relaxed text-sm font-normal">
-                    Re-reading your entire project on every update is slow and pointless. Dokugen caches what it already knows about your codebase and only re-processes files that actually changed, so `dokugen update` finishes in a blink, not a minute.
+                    Don't waste time waiting for slow documentation builds. Our intelligent caching engine only rescans the files you modified, delivering lightning-fast updates in milliseconds. High performance that respects your development flow.
                   </p>
                 </div>
               </div>
@@ -456,7 +456,7 @@ export default function DocsPage() {
                     Custom Templates
                   </h3>
                   <p className="text-[#be185d] leading-relaxed text-sm font-normal">
-                    Want your README to look like a project you admire? Point Dokugen at any public GitHub README with the `--template` flag and it will replicate that structure, filled with your own project's details automatically.
+                    Success leaves clues. If you admire a popular repository's layout, simply point Dokugen to it. We will replicate its exact structure and fill it with your project's details automatically, giving you the layout of top-tier projects instantly.
                   </p>
                 </div>
               </div>
@@ -471,7 +471,7 @@ export default function DocsPage() {
                     Interactive Prompt
                   </h3>
                   <p className="text-[#b45309] leading-relaxed text-sm font-normal">
-                    Nobody memorizes CLI flags. Just type <code className="text-[#d97706] font-mono text-xs bg-white border border-[#fde68a] px-1.5 py-0.5 rounded">dokugen</code> in your project and an interactive menu walks you through every option, including README generation, diagrams, licenses, and commits, step by step.
+                    Say goodbye to memorizing complex CLI arguments. Type a single command and let our friendly interactive guide walk you through README generation, licensing, and commits step-by-step. Smooth, effortless, and simple.
                   </p>
                 </div>
               </div>
@@ -495,27 +495,21 @@ export default function DocsPage() {
                   How do I install Dokugen?
                 </h3>
                 <p className="text-zinc-600 leading-relaxed text-sm">
-                  <strong className="text-zinc-800">Node.js:</strong> Run{" "}
+                  Dokugen installs in seconds on any system. For Node.js users, run{" "}
                   <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
                     npm install -g dokugen
                   </code>{" "}
                   or{" "}
                   <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
                     pnpm add -g dokugen
+                  </code>. For Python, run{" "}
+                  <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
+                    uv tool install dokugen
                   </code>{" "}
-                  to install Dokugen globally.
-                  <br />
-                  <span className="block mt-2">
-                    <strong className="text-zinc-800">Python:</strong> Run{" "}
-                    <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
-                      pip install dokugen
-                    </code>{" "}
-                    or{" "}
-                    <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
-                      uv tool install dokugen
-                    </code>
-                    .
-                  </span>
+                  or{" "}
+                  <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
+                    pip install dokugen
+                  </code>. You're just one command away from clean documentation.
                 </p>
               </div>
               <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
@@ -523,15 +517,11 @@ export default function DocsPage() {
                   Can I use custom templates?
                 </h3>
                 <p className="text-zinc-600 leading-relaxed text-sm">
-                  Yes. Use the{" "}
+                  Absolutely. Stand out from the crowd by matching the layout of your favorite repositories. Simply use the{" "}
                   <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
                     --template
                   </code>{" "}
-                  flag to specify a custom template URL.
-                  <br />
-                  <span className="block mt-1 text-xs text-zinc-500 font-mono">
-                    Example: docs --template https://raw.github.../README.md
-                  </span>
+                  flag and provide any public README URL to instantly model your documentation after the best in the industry.
                 </p>
               </div>
 
@@ -540,11 +530,11 @@ export default function DocsPage() {
                   How does the AI Commit subcommand work?
                 </h3>
                 <p className="text-zinc-600 leading-relaxed text-sm">
-                  Running{" "}
+                  Writing commits is tedious, but clean history is crucial for team projects. Running{" "}
                   <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
                     dokugen aic
                   </code>{" "}
-                  automatically stages your files, reads the git diff from your project, and generates a clean Conventional Commit message using Gemini, then commits and optionally pushes with a single confirmation.
+                  stages your files, reads the git diff, and writes Conventional Commits using Gemini—then commits and optionally pushes with one confirmation. Look professional without the cognitive load.
                 </p>
               </div>
               <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
@@ -552,7 +542,7 @@ export default function DocsPage() {
                   Does Dokugen read my .env files or sensitive API keys?
                 </h3>
                 <p className="text-zinc-600 leading-relaxed text-sm">
-                  <strong className="text-zinc-800">Absolutely not.</strong> Dokugen is built with strict privacy and security filters. It automatically ignores all environment variable files (like <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-xs font-mono border border-zinc-200/60">.env</code>, <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-xs font-mono border border-zinc-200/60">.env.local</code>, etc.), package manager lockfiles, logs, compiled binaries/bytecode, local config files, and private credentials. None of your sensitive credentials, environment keys, or token secrets are ever read or transmitted.
+                  Your trust is our top priority. Dokugen has built-in security filters that strictly ignore sensitive files like <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-xs font-mono border border-zinc-200/60">.env</code>, credentials, bytecode, and lockfiles. None of your private keys or secrets are ever read or transmitted. Your intellectual property and credentials remain 100% secure.
                 </p>
               </div>
               <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
@@ -560,7 +550,7 @@ export default function DocsPage() {
                   Does Dokugen require my own API keys?
                 </h3>
                 <p className="text-zinc-600 leading-relaxed text-sm">
-                  No. Dokugen offers a zero-config experience. The CLI communicates with our secure backend transparently using shared API keys. However, if you hit rate limits, you can easily configure your own API key in your profile configuration.
+                  No API keys or payment required to start. We provide a fully managed backend with shared API keys so you can experience Dokugen instantly. If you have extremely large projects or hit rate limits, you can easily plug in your own API key for unlimited use.
                 </p>
               </div>
               <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
@@ -568,11 +558,7 @@ export default function DocsPage() {
                   What is the license generation feature?
                 </h3>
                 <p className="text-zinc-600 leading-relaxed text-sm">
-                  Publishing code without a license doesn't make it free to use, as copyright is automatic in most countries. By default, nobody has legal permission to copy, modify, or redistribute your work. The problem is that people won't know that. Contributors avoid unlicensed repos, and companies outright won't touch them. By running{" "}
-                  <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
-                    dokugen license
-                  </code>{" "}
-                  you instantly generate a proper LICENSE file (with git author and year auto-detected) along with a plain English summary so everyone knows exactly what they can and can't do with your code.
+                  Did you know that without a LICENSE file, other developers legally cannot use, modify, or distribute your code? Unlicensed repositories scare away contributors and companies alike. Protect your work and open the door to collaboration by running <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">dokugen license</code>. It auto-detects git details and generates a compliant LICENSE along with a human-readable summary that builds trust.
                 </p>
               </div>
               <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
@@ -580,7 +566,7 @@ export default function DocsPage() {
                   How do the colorized flowcharts work?
                 </h3>
                 <p className="text-zinc-600 leading-relaxed text-sm">
-                  Dokugen automatically understands your project's architecture and builds beautiful, colorized system diagrams directly inside your markdown README. Each technology gets a unique color (Postgres → blue, Redis → red) and the layout direction is chosen automatically for the cleanest result.
+                  A picture is worth a thousand words. Dokugen automatically maps your project's structure and renders clean, color-coded architecture flowcharts inside your README. It assigns distinct colors to each service (like database, cache, or queue) and optimizes layout directions so your project structure is instantly readable.
                 </p>
               </div>
               <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
@@ -588,11 +574,7 @@ export default function DocsPage() {
                   What is the smart update command?
                 </h3>
                 <p className="text-zinc-600 leading-relaxed text-sm">
-                  Using{" "}
-                  <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
-                    dokugen update
-                  </code>{" "}
-                  intelligently refreshes only the auto-detected parts of your README (project files, dependencies, and detected features) while leaving every custom description, note, and badge you wrote completely intact.
+                  Most generators completely overwrite your manual edits, forcing you to copy-paste. Using <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">dokugen update</code> is different: it updates the technical directories and dependencies while leaving your carefully written descriptions, tutorials, and badges untouched. Keep your docs in sync with your code effortlessly.
                 </p>
               </div>
             </div>

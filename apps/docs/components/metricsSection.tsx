@@ -10,6 +10,10 @@ interface UserMetrics {
   username: string
   email: string
   usage_count: number
+  readme_usage?: number
+  commit_usage?: number
+  license_usage?: number
+  revert_usage?: number
 }
 
 interface ApiResponse {
@@ -110,7 +114,11 @@ export default function MetricsSection() {
               <thead className="bg-zinc-50">
                 <tr>
                   <th className="px-6 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide">User</th>
-                  <th className="px-6 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">Usage</th>
+                  <th className="px-6 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">Total</th>
+                  <th className="hidden sm:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">READMEs</th>
+                  <th className="hidden sm:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">Commits</th>
+                  <th className="hidden md:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">Licenses</th>
+                  <th className="hidden md:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">Reverts</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
@@ -120,9 +128,21 @@ export default function MetricsSection() {
                       <GitHubUserLink username={user.username} />
                     </td>
                     <td className="px-6 py-3 text-right">
-                      <span className="px-2.5 py-1 rounded-md bg-zinc-50 text-zinc-700 font-mono text-xs border border-zinc-200/60 group-hover:border-zinc-300 transition-colors font-medium">
+                      <span className="px-2.5 py-1 rounded-md bg-zinc-900 text-white font-mono text-xs font-semibold">
                         {user.usage_count.toLocaleString()}
                       </span>
+                    </td>
+                    <td className="hidden sm:table-cell px-4 py-3 text-right text-zinc-600 font-mono text-xs">
+                      {(user.readme_usage ?? 0).toLocaleString()}
+                    </td>
+                    <td className="hidden sm:table-cell px-4 py-3 text-right text-zinc-600 font-mono text-xs">
+                      {(user.commit_usage ?? 0).toLocaleString()}
+                    </td>
+                    <td className="hidden md:table-cell px-4 py-3 text-right text-zinc-600 font-mono text-xs">
+                      {(user.license_usage ?? 0).toLocaleString()}
+                    </td>
+                    <td className="hidden md:table-cell px-4 py-3 text-right text-zinc-600 font-mono text-xs">
+                      {(user.revert_usage ?? 0).toLocaleString()}
                     </td>
                   </tr>
                 ))}

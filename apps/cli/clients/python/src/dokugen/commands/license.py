@@ -217,7 +217,7 @@ def cmd_license(args):
                 threading.Thread(
                     target=lambda: __import__("requests").post(
                         f"{backend_domain}/api/track",
-                        json={"userInfo": user_info},
+                        json={"userInfo": user_info, "usageType": "license"},
                         timeout=5
                     ),
                     daemon=True

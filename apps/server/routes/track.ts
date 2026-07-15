@@ -9,13 +9,13 @@ router.post(
   "/track",
   async (req: Request, res: Response): Promise<any> => {
     try {
-      const { userInfo } = req.body;
+      const { userInfo, usageType } = req.body;
       if (!userInfo || !userInfo.username || !userInfo.email) {
         return res.status(400).json({ error: "Missing userInfo" });
       }
       const id = userInfo.id || uuidv4();
-      await trackUser({ ...userInfo, id });
-      logger.info(`Tracked action for user ${userInfo.username}`);
+      await trackUser({ ...userInfo, id }, usageType);
+      logger.info(`Tracked action for user ${userInfo.username} (type: ${usageType || "license"})`);
       return res.status(200).json({ ok: true });
     } catch (error) {
       logger.error(error, "Error in /api/track");

@@ -56,7 +56,7 @@ export function registerRevertCommand(program: Command) {
           const backendDomain = await getBackendDomain();
           const userInfo = getUserInfo();
           if (userInfo?.username && userInfo?.email) {
-            axios.post(`${backendDomain}/api/track`, { userInfo }).catch(() => {});
+            axios.post(`${backendDomain}/api/track`, { userInfo, usageType: "revert" }).catch(() => {});
           }
         } catch { /* never block the user */ }
       } catch (error: any) {

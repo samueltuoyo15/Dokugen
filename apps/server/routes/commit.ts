@@ -63,7 +63,7 @@ router.post(
 
       // Track usage fire-and-forget — never block commit generation
       if (userInfo?.username && userInfo?.email) {
-        trackUser({ ...userInfo, id: userInfo.id || uuidv4() }).catch(() => {});
+        trackUser({ ...userInfo, id: userInfo.id || uuidv4() }, "commit").catch(() => {});
       }
 
       const apiKey = geminiApiKey || process.env.GOOGLE_GEMINI_API_KEY;
