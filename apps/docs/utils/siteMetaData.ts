@@ -3,7 +3,7 @@ const siteMetadata = {
   author: "Samuel Tuoyo",
   headerTitle: "Dokugen",
   description:
-    "Dokugen is an open source command-line tool that effortlessly generates high-quality README.md files for your projects. It intelligently analyzes your project structure and code to create a detailed, professional README—saving you time while ensuring clarity and consistency.",
+    "Dokugen is an open source command-line tool that effortlessly generates high-quality README.md files for your projects. It intelligently analyzes your project structure and code to create a detailed, professional README, saving you time while ensuring clarity and consistency.",
   language: "en-us",
   theme: "system",
   siteUrl: "https://dokugen-readme.vercel.app",

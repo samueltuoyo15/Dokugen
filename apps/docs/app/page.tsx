@@ -29,7 +29,7 @@ const searchableContent = [
     id: 1,
     title: "How do I install Dokugen?",
     content:
-      "Run npm install -g dokugen to install globally via Node.js, or pip install dokugen / uv tool install dokugen for Python.",
+      "Run npm install -g dokugen or pnpm add -g dokugen to install globally via Node.js, or pip install dokugen / uv tool install dokugen for Python.",
     type: "faq",
   },
   {
@@ -39,15 +39,9 @@ const searchableContent = [
     type: "faq",
   },
   {
-    id: 3,
-    title: "Can I auto generate my readme using the --live flag?",
-    content: "Coming soon: Use the --live flag to watch and auto-generate.",
-    type: "faq",
-  },
-  {
     id: 4,
     title: "How does the AI Commit subcommand work?",
-    content: "Running dokugen aic stages your files, reads the diff from your project, and writes clean Conventional Commit messages instantly using Gemini — with a one-click push option.",
+    content: "Running dokugen aic stages your files, reads the diff from your project, and writes clean Conventional Commit messages instantly using Gemini, with a one-click push option.",
     type: "faq",
   },
   {
@@ -205,7 +199,7 @@ export default function DocsPage() {
           </h1>
 
           <p className="text-lg md:text-xl text-zinc-500 mb-10 max-w-2xl mx-auto leading-relaxed font-light">
-            Stop spending hours writing docs nobody reads. Dokugen automatically understands your project and generates a clear, professional README in seconds — and keeps it perfectly in sync every time your code changes.
+            Stop spending hours writing docs nobody reads. Dokugen automatically understands your project and generates a clear, professional README in seconds and keeps it perfectly in sync every time your code changes.
           </p>
 
           <div className="mt-12 max-w-lg mx-auto">
@@ -372,7 +366,7 @@ export default function DocsPage() {
                     System Design Diagrams
                   </h3>
                   <p className="text-[#6d28d9] leading-relaxed text-sm font-normal max-w-xl">
-                    Hand-drawn architecture diagrams go stale the moment you commit new code. Dokugen generates stunning, colorized system diagrams directly inside your README automatically — no extra tools, no Figma, no fuss. Every service in your project gets its own color and a layout that actually makes sense.
+                    Hand-drawn architecture diagrams go stale the moment you commit new code. Dokugen generates stunning, colorized system diagrams directly inside your README automatically with no extra tools, no Figma, and no fuss. Every service in your project gets its own color and a layout that actually makes sense.
                   </p>
                 </div>
               </div>
@@ -387,7 +381,7 @@ export default function DocsPage() {
                     Smart Updates
                   </h3>
                   <p className="text-[#047857] leading-relaxed text-sm font-normal">
-                    Scared to regenerate because it nukes your custom edits? Smart Updates only refreshes the parts Dokugen owns — detected files, dependencies, and project structure — while leaving every note, badge, and description you wrote completely untouched.
+                    Scared to regenerate because it nukes your custom edits? Smart Updates only refreshes the parts Dokugen owns (detected files, dependencies, and project structure) while leaving every note, badge, and description you wrote completely untouched.
                   </p>
                 </div>
               </div>
@@ -417,7 +411,7 @@ export default function DocsPage() {
                     License Generation
                   </h3>
                   <p className="text-[#be123c] leading-relaxed text-sm font-normal">
-                    No license doesn't mean free to use — it means nobody knows what they're allowed to do. Contributors won't touch it. Companies won't ship it. Run <code className="text-[#e11d48] font-mono text-xs bg-white border border-[#fecdd3] px-1.5 py-0.5 rounded">dokugen license</code> to generate a proper LICENSE file in seconds — author and year auto-detected from git, with a plain English summary of what the license permits.
+                    No license doesn't mean free to use; it means nobody knows what they're allowed to do. Contributors won't touch it. Companies won't ship it. Run <code className="text-[#e11d48] font-mono text-xs bg-white border border-[#fecdd3] px-1.5 py-0.5 rounded">dokugen license</code> to generate a proper LICENSE file in seconds, with author and year auto-detected from git, and a plain English summary of what the license permits.
                   </p>
                 </div>
               </div>
@@ -432,7 +426,7 @@ export default function DocsPage() {
                     Zero-Config Experience
                   </h3>
                   <p className="text-[#4338ca] leading-relaxed text-sm font-normal">
-                    Most AI tools make you create accounts, copy API keys, and configure environment variables before you can do anything useful. Dokugen skips all of that. Install it, run it in your project, and you're done — no setup required.
+                    Most AI tools make you create accounts, copy API keys, and configure environment variables before you can do anything useful. Dokugen skips all of that. Install it, run it in your project, and you're done: no setup required.
                   </p>
                 </div>
               </div>
@@ -447,7 +441,7 @@ export default function DocsPage() {
                     Incremental Scanning
                   </h3>
                   <p className="text-[#0f766e] leading-relaxed text-sm font-normal">
-                    Re-reading your entire project on every update is slow and pointless. Dokugen caches what it already knows about your codebase and only re-processes files that actually changed — so `dokugen update` finishes in a blink, not a minute.
+                    Re-reading your entire project on every update is slow and pointless. Dokugen caches what it already knows about your codebase and only re-processes files that actually changed, so `dokugen update` finishes in a blink, not a minute.
                   </p>
                 </div>
               </div>
@@ -462,7 +456,7 @@ export default function DocsPage() {
                     Custom Templates
                   </h3>
                   <p className="text-[#be185d] leading-relaxed text-sm font-normal">
-                    Want your README to look like a project you admire? Point Dokugen at any public GitHub README with the `--template` flag and it will replicate that structure — filled with your own project's details automatically.
+                    Want your README to look like a project you admire? Point Dokugen at any public GitHub README with the `--template` flag and it will replicate that structure, filled with your own project's details automatically.
                   </p>
                 </div>
               </div>
@@ -477,7 +471,7 @@ export default function DocsPage() {
                     Interactive Prompt
                   </h3>
                   <p className="text-[#b45309] leading-relaxed text-sm font-normal">
-                    Nobody memorizes CLI flags. Just type <code className="text-[#d97706] font-mono text-xs bg-white border border-[#fde68a] px-1.5 py-0.5 rounded">dokugen</code> in your project and an interactive menu walks you through every option — README generation, diagrams, licenses, and commits — step by step.
+                    Nobody memorizes CLI flags. Just type <code className="text-[#d97706] font-mono text-xs bg-white border border-[#fde68a] px-1.5 py-0.5 rounded">dokugen</code> in your project and an interactive menu walks you through every option, including README generation, diagrams, licenses, and commits, step by step.
                   </p>
                 </div>
               </div>
@@ -504,6 +498,10 @@ export default function DocsPage() {
                   <strong className="text-zinc-800">Node.js:</strong> Run{" "}
                   <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
                     npm install -g dokugen
+                  </code>{" "}
+                  or{" "}
+                  <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
+                    pnpm add -g dokugen
                   </code>{" "}
                   to install Dokugen globally.
                   <br />
@@ -536,18 +534,7 @@ export default function DocsPage() {
                   </span>
                 </p>
               </div>
-              <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
-                <h3 className="text-lg font-bold mb-3 text-zinc-950">
-                  Can I auto generate my readme using the --live flag?
-                </h3>
-                <p className="text-zinc-600 leading-relaxed text-sm">
-                  Coming Soon. You will be able to use the{" "}
-                  <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
-                    --live
-                  </code>{" "}
-                  flag to watch and auto-generate your README in upcoming Dokugen versions.
-                </p>
-              </div>
+
               <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
                 <h3 className="text-lg font-bold mb-3 text-zinc-950">
                   How does the AI Commit subcommand work?
@@ -557,7 +544,7 @@ export default function DocsPage() {
                   <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
                     dokugen aic
                   </code>{" "}
-                  automatically stages your files, reads the git diff from your project, and generates a clean Conventional Commit message using Gemini — then commits and optionally pushes with a single confirmation.
+                  automatically stages your files, reads the git diff from your project, and generates a clean Conventional Commit message using Gemini, then commits and optionally pushes with a single confirmation.
                 </p>
               </div>
               <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
@@ -581,11 +568,11 @@ export default function DocsPage() {
                   What is the license generation feature?
                 </h3>
                 <p className="text-zinc-600 leading-relaxed text-sm">
-                  Publishing code without a license doesn't make it free to use — copyright is automatic in most countries, so by default nobody has legal permission to copy, modify, or redistribute your work. The problem is that people won't know that. Contributors avoid unlicensed repos, and companies outright won't touch them. By running{" "}
+                  Publishing code without a license doesn't make it free to use, as copyright is automatic in most countries. By default, nobody has legal permission to copy, modify, or redistribute your work. The problem is that people won't know that. Contributors avoid unlicensed repos, and companies outright won't touch them. By running{" "}
                   <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
                     dokugen license
                   </code>{" "}
-                  you instantly generate a proper LICENSE file — git author and year auto-detected — with a plain English summary so everyone knows exactly what they can and can't do with your code.
+                  you instantly generate a proper LICENSE file (with git author and year auto-detected) along with a plain English summary so everyone knows exactly what they can and can't do with your code.
                 </p>
               </div>
               <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
@@ -605,7 +592,7 @@ export default function DocsPage() {
                   <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
                     dokugen update
                   </code>{" "}
-                  intelligently refreshes only the auto-detected parts of your README — project files, dependencies, and detected features — while leaving every custom description, note, and badge you wrote completely intact.
+                  intelligently refreshes only the auto-detected parts of your README (project files, dependencies, and detected features) while leaving every custom description, note, and badge you wrote completely intact.
                 </p>
               </div>
             </div>
