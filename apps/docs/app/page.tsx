@@ -16,6 +16,7 @@ import {
   Layers,
   Layout,
   Heart,
+  Globe,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
@@ -83,7 +84,7 @@ const searchableContent = [
   {
     id: 11,
     title: "Easy Integration",
-    content: "Integrate with GitHub, GitLab, and VS Code.",
+    content: "Integrate with GitHub, GitLab, and terminal workflows.",
     type: "feature",
   },
   {
@@ -91,6 +92,13 @@ const searchableContent = [
     title: "Intelligent Updates",
     content:
       "Updates only auto-generated sections while preserving all your custom edits.",
+    type: "feature",
+  },
+  {
+    id: 13,
+    title: "Language & Framework Agnostic",
+    content:
+      "Works with all languages and frameworks (React, Django, Go, Node, etc.). Just install globally via npm or Python and run in any repository.",
     type: "feature",
   },
 ];
@@ -464,6 +472,21 @@ export default function DocsPage() {
                   </p>
                 </div>
               </div>
+
+              {/* Card 9: Language & Framework Agnostic */}
+              <div className="group relative bg-[#f0f7ff]/60 hover:bg-[#f0f7ff] p-8 rounded-3xl border border-[#d0e1fd] hover:border-[#a0c4ff] transition-all duration-300 flex flex-col h-full">
+                <div>
+                  <div className="inline-flex p-4 rounded-2xl bg-white border border-[#d0e1fd] text-[#2563eb] mb-6">
+                    <Globe className="w-8 h-8 stroke-[1.5]" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3 text-[#1e3a8a] tracking-tight">
+                    Language Agnostic
+                  </h3>
+                  <p className="text-[#2563eb] leading-relaxed text-sm font-normal">
+                    Dokugen works with any codebase! Whether your project is built in React, Node, Python, Go, Rust, Java, PHP, C++, or Django, it doesn't matter. Just install Dokugen globally on your machine using npm or Python, and run it in any directory.
+                  </p>
+                </div>
+              </div>
             </div>
           </motion.div>
         )}
@@ -540,6 +563,14 @@ export default function DocsPage() {
                 </h3>
                 <p className="text-zinc-600 leading-relaxed text-sm">
                   No API keys or payment required to start. We provide a fully managed backend with shared API keys so you can experience Dokugen instantly. If you have extremely large projects or hit rate limits, you can easily plug in your own API key for unlimited use.
+                </p>
+              </div>
+              <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
+                <h3 className="text-lg font-bold mb-3 text-zinc-950">
+                  Which languages and frameworks does Dokugen support?
+                </h3>
+                <p className="text-zinc-600 leading-relaxed text-sm">
+                  Dokugen is 100% language and framework agnostic! It supports all types of frameworks and programming languages (Node.js, React, Python, Django, Go, Rust, Java, PHP, C++, and more). You do not need Node.js or Python to be the main language of your project. You simply install Dokugen globally on your machine using npm/pnpm/yarn or Python (pip/uv), and run it in any repository.
                 </p>
               </div>
 
@@ -649,55 +680,56 @@ export default function DocsPage() {
                 Dokugen is completely free. Consider sponsoring or tipping the developers!
               </p>
               
-              <div className="flex flex-col md:flex-row gap-8 items-start justify-center text-left w-full">
+              <div className="flex flex-col md:flex-row gap-8 justify-center text-left w-full">
                 {/* Left hand side: GitHub Sponsors */}
-                <div className="flex-1 w-full flex flex-col">
-                  <div className="mb-4 text-center md:text-left">
-                    <h4 className="text-sm font-bold text-zinc-800 mb-1">GitHub Sponsors</h4>
-                    <p className="text-zinc-400 text-[11px]">
-                      Support Samuel Tuoyo directly on GitHub Sponsors to help fund Dokugen development if you are outside Africa.
-                    </p>
-                  </div>
-                  <a
-                    href="https://github.com/sponsors/samueltuoyo15"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 w-full bg-[#0d1117] border border-[#30363d] rounded-2xl shadow-sm p-6 flex flex-col text-left hover:border-[#db61a2]/60 hover:shadow-lg transition-all duration-300 group select-none cursor-pointer"
-                  >
-                    <p className="text-center text-white font-bold text-base mb-6 tracking-tight">
-                      Support Dokugen
-                    </p>
-                    <div className="flex gap-4 items-start">
-                      <img
-                        src="https://github.com/samueltuoyo15.png"
-                        alt="Samuel Tuoyo"
-                        className="w-12 h-12 rounded-full border-2 border-[#30363d] shrink-0"
-                      />
-                      <div className="flex flex-col">
-                        <h5 className="font-semibold text-white text-sm leading-snug group-hover:text-pink-400 transition-colors duration-200">
+                <div className="flex-1 w-full flex">
+                  <div className="bg-white border border-zinc-200/80 rounded-2xl shadow-sm p-5 flex flex-col w-full">
+                    <div className="mb-4 text-center md:text-left">
+                      <h4 className="text-sm font-bold text-zinc-800 mb-1">GitHub Sponsors</h4>
+                      <p className="text-zinc-400 text-[10px] leading-relaxed">
+                        Support Samuel Tuoyo directly on GitHub Sponsors to help fund Dokugen development if you are outside Africa.
+                      </p>
+                    </div>
+                    <a
+                      href="https://github.com/sponsors/samueltuoyo15"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-grow w-full bg-[#F8F9FA] border border-[#e9ecef] rounded-xl p-6 flex flex-col text-center hover:border-blue-200 hover:shadow-lg transition-all duration-300 group select-none cursor-pointer min-h-[360px]"
+                    >
+                      <p className="text-center text-zinc-800 font-bold text-base mb-6 tracking-tight">
+                        Support Dokugen
+                      </p>
+                      <div className="flex flex-col items-center justify-center my-auto">
+                        <img
+                          src="https://github.com/samueltuoyo15.png"
+                          alt="Samuel Tuoyo"
+                          className="w-20 h-20 rounded-full border-2 border-zinc-200 shrink-0 mb-4 shadow-sm"
+                        />
+                        <h5 className="font-bold text-zinc-800 text-lg leading-snug group-hover:text-blue-600 transition-colors duration-200 max-w-[280px]">
                           Sponsor Samuel Tuoyo on GitHub Sponsors
                         </h5>
-                        <p className="text-zinc-400 text-[11px] mt-1 leading-normal">
-                          Support samueltuoyo15&apos;s open source work
-                        </p>
                       </div>
-                    </div>
-                    <div className="mt-auto pt-6 w-full bg-[#21262d] border border-[#30363d] group-hover:border-[#db61a2]/40 rounded-lg py-2.5 px-4 flex justify-center items-center gap-2 hover:bg-[#30363d] transition-all duration-200">
-                      <Heart className="w-4 h-4 text-[#db61a2] fill-[#db61a2] group-hover:scale-110 transition-transform duration-200" />
-                      <span className="text-white text-sm font-semibold">Sponsor</span>
-                    </div>
-                  </a>
+                      <div className="mt-auto w-full bg-[#eab308] border border-[#ca8a04] group-hover:bg-[#d97706] group-hover:border-[#b45309] rounded-full py-3 px-6 flex justify-center items-center gap-2 transition-all duration-200">
+                        <Heart className="w-4 h-4 text-rose-600 fill-rose-600 group-hover:scale-110 transition-transform duration-200" />
+                        <span className="text-zinc-900 text-sm font-bold tracking-wide">Support Dokugen</span>
+                      </div>
+                    </a>
+                  </div>
                 </div>
                 
                 {/* Right hand side: Myhappr Tip Card */}
-                <div className="flex-1 w-full flex flex-col">
-                  <div className="mb-4 text-center md:text-left">
-                    <h4 className="text-sm font-bold text-zinc-800 mb-1">Myhappr Tip Card</h4>
-                    <p className="text-zinc-400 text-[11px]">
-                      Support Samuel Tuoyo directly on Myhappr Tip Card to help fund Dokugen development if you are in Africa.
-                    </p>
+                <div className="flex-1 w-full flex">
+                  <div className="bg-white border border-zinc-200/80 rounded-2xl shadow-sm p-5 flex flex-col w-full">
+                    <div className="mb-4 text-center md:text-left">
+                      <h4 className="text-sm font-bold text-zinc-800 mb-1">Myhappr Tip Card</h4>
+                      <p className="text-zinc-400 text-[10px] leading-relaxed">
+                        Support Samuel Tuoyo directly on Myhappr Tip Card to help fund Dokugen development if you are in Africa.
+                      </p>
+                    </div>
+                    <div className="flex-grow flex items-center justify-center">
+                      <SupportCard />
+                    </div>
                   </div>
-                  <SupportCard />
                 </div>
               </div>
             </div>

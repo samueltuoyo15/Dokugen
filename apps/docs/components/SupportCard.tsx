@@ -5,7 +5,7 @@ export default function SupportCard() {
       width="100%" 
       height="480" 
       style={{ border: "none", display: "block", borderRadius: "12px" }}
-      className="bg-white border border-zinc-200/80 rounded-2xl shadow-sm"
+      className="w-full h-[480px]"
     />
   );
 }

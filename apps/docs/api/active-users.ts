@@ -14,6 +14,11 @@ export default async (req: VercelRequest, res: VercelResponse) => {
   
   const page = parseInt(req.query.page as string) || 1
   const limit = parseInt(req.query.limit as string) || 10
+  const sortBy = (req.query.sortBy as string) || "usage_count"
+  
+  const allowedSorts = ["usage_count", "readme_usage", "commit_usage", "license_usage", "revert_usage"]
+  const sortColumn = allowedSorts.includes(sortBy) ? sortBy : "usage_count"
+  
   const startIndex = (page - 1) * limit
   const endIndex = startIndex + limit - 1
   
@@ -21,7 +26,7 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     const { data, error, count } = await supabase
       .from("active_users")
       .select("username, usage_count, readme_usage, commit_usage, license_usage, revert_usage", { count: 'exact' })
-      .order("usage_count", { ascending: false })
+      .order(sortColumn, { ascending: false })
       .range(startIndex, endIndex)
     
     if(error) throw error

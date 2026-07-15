@@ -100,9 +100,8 @@ dokugen revert
 - **LICENSE Generator**: Pick from 6 popular open-source licenses and have a properly formatted `LICENSE` file created instantly, pre-filled with your author name and year.
 - **AI-Powered Commits**: Automatic staging and conventional commit message generation via Google Gemini, keeps your commit history clean and consistent.
 - **Compressed Uploads**: Efficiently packages codebases with 70–90% upload size compression to support analyzing larger projects without hitting API size limits.
-- **Language Agnostic**: Works out of the box with JavaScript, TypeScript, Python, Rust, Go, C#, C++, Java, PHP, and many more.
+- **Language & Framework Agnostic**: Works out of the box with any programming language or framework (JavaScript, TypeScript, Python, Rust, Go, Java, PHP, C++, Django, React, etc.). You don't need Node.js or Python to be your codebase's main language; you can simply install Dokugen globally using Node (`npm`/`pnpm`/`yarn`) or Python (`pip`/`uv`), and run it in any directory.
 - **Custom Templates**: Use any public GitHub README as a structural template for your generated docs.
-- **VSCode Extension**: Integrate Dokugen directly into your Visual Studio Code workflow for easy README generation from the explorer context menu.
 
 ---
 
@@ -135,7 +134,7 @@ Contributions are welcome! Read our [Contribution Guide](https://github.com/samu
 
 ## License
 
-This project is licensed under the MIT License — see the [LICENSE](https://github.com/samueltuoyo15/Dokugen/blob/main/LICENSE) file for details.
+This project is licensed under the MIT License, see the [LICENSE](https://github.com/samueltuoyo15/Dokugen/blob/main/LICENSE) file for details.
 
 ## Author
 

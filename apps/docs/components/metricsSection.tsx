@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
+import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
 import Image from "next/image"
 
 interface UserMetrics {
@@ -27,9 +27,9 @@ interface ApiResponse {
   }
 }
 
-const fetchMetrics = async (page: number): Promise<ApiResponse> => {
+const fetchMetrics = async (page: number, sortBy: string = "usage_count"): Promise<ApiResponse> => {
   try {
-    const response = await fetch(`https://dokugen-readme.vercel.app/api/active-users?page=${page}&limit=10`)
+    const response = await fetch(`https://dokugen-readme.vercel.app/api/active-users?page=${page}&limit=10&sortBy=${sortBy}`)
     if (!response.ok) {
       throw new Error(`Failed to fetch metrics: ${response.statusText}`)
     }
@@ -66,10 +66,30 @@ const GitHubUserLink = ({ username }: { username: string }) => {
 
 export default function MetricsSection() {
   const [currentPage, setCurrentPage] = useState(1)
+  const [sortBy, setSortBy] = useState<string>("usage_count")
+  const [hiddenLines, setHiddenLines] = useState<Record<string, boolean>>({
+    Total: false,
+    READMEs: false,
+    Commits: false,
+    Licenses: false,
+    Reverts: false,
+  })
+
+  const toggleLine = (dataKey: string) => {
+    setHiddenLines((prev) => ({
+      ...prev,
+      [dataKey]: !prev[dataKey],
+    }))
+  }
+
+  const handleSortChange = (column: string) => {
+    setSortBy(column)
+    setCurrentPage(1)
+  }
 
   const { data, error, isLoading } = useQuery<ApiResponse>({
-    queryKey: ["metrics", currentPage],
-    queryFn: () => fetchMetrics(currentPage),
+    queryKey: ["metrics", currentPage, sortBy],
+    queryFn: () => fetchMetrics(currentPage, sortBy),
     staleTime: 1000 * 60 * 5,
   })
 
@@ -118,11 +138,46 @@ export default function MetricsSection() {
               <thead className="bg-zinc-50">
                 <tr>
                   <th className="px-6 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide">User</th>
-                  <th className="px-6 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">Total</th>
-                  <th className="hidden sm:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">READMEs</th>
-                  <th className="hidden sm:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">Commits</th>
-                  <th className="hidden md:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">Licenses</th>
-                  <th className="hidden md:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">Reverts</th>
+                  <th
+                    onClick={() => handleSortChange("usage_count")}
+                    className="px-6 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors"
+                  >
+                    <span className="inline-flex items-center justify-end gap-1 w-full">
+                      Total {sortBy === "usage_count" && "↓"}
+                    </span>
+                  </th>
+                  <th
+                    onClick={() => handleSortChange("readme_usage")}
+                    className="hidden sm:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors"
+                  >
+                    <span className="inline-flex items-center justify-end gap-1 w-full">
+                      READMEs {sortBy === "readme_usage" && "↓"}
+                    </span>
+                  </th>
+                  <th
+                    onClick={() => handleSortChange("commit_usage")}
+                    className="hidden sm:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors"
+                  >
+                    <span className="inline-flex items-center justify-end gap-1 w-full">
+                      Commits {sortBy === "commit_usage" && "↓"}
+                    </span>
+                  </th>
+                  <th
+                    onClick={() => handleSortChange("license_usage")}
+                    className="hidden md:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors"
+                  >
+                    <span className="inline-flex items-center justify-end gap-1 w-full">
+                      Licenses {sortBy === "license_usage" && "↓"}
+                    </span>
+                  </th>
+                  <th
+                    onClick={() => handleSortChange("revert_usage")}
+                    className="hidden md:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors"
+                  >
+                    <span className="inline-flex items-center justify-end gap-1 w-full">
+                      Reverts {sortBy === "revert_usage" && "↓"}
+                    </span>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
@@ -185,7 +240,7 @@ export default function MetricsSection() {
 
           <div className="w-full" style={{ height: 350 }}>
             <ResponsiveContainer width="100%" height={350}>
-              <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f4f4f5" vertical={false} />
                 <XAxis
                   dataKey="username"
@@ -201,7 +256,7 @@ export default function MetricsSection() {
                   tickLine={false}
                 />
                 <Tooltip
-                  cursor={{ stroke: '#e4e4e7', strokeWidth: 1 }}
+                  cursor={{ fill: '#f4f4f5', opacity: 0.4 }}
                   contentStyle={{
                     backgroundColor: '#ffffff',
                     border: '1px solid #e4e4e7',
@@ -212,8 +267,67 @@ export default function MetricsSection() {
                   itemStyle={{ color: '#09090b' }}
                   labelStyle={{ color: '#71717a', marginBottom: '4px', display: 'block' }}
                 />
-                <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: '11px', fontFamily: 'sans-serif' }} />
+                <Legend
+                  verticalAlign="top"
+                  height={36}
+                  wrapperStyle={{ fontSize: '11px', fontFamily: 'sans-serif' }}
+                  onClick={(e) => {
+                    if (e && e.dataKey) {
+                      toggleLine(e.dataKey as string)
+                    }
+                  }}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  formatter={(value, entry: any) => {
+                    const isHidden = hiddenLines[entry.dataKey as string]
+                    return (
+                      <span
+                        style={{
+                          color: isHidden ? '#cbd5e1' : entry.color,
+                          textDecoration: isHidden ? 'line-through' : 'none',
+                          cursor: 'pointer',
+                          userSelect: 'none',
+                          fontWeight: 500,
+                        }}
+                      >
+                        {value}
+                      </span>
+                    )
+                  }}
+                />
+                <Bar
+                  hide={hiddenLines.READMEs}
+                  dataKey="READMEs"
+                  stackId="a"
+                  fill="#10b981"
+                  name="READMEs"
+                  radius={[0, 0, 0, 0]}
+                />
+                <Bar
+                  hide={hiddenLines.Commits}
+                  dataKey="Commits"
+                  stackId="a"
+                  fill="#3b82f6"
+                  name="Commits"
+                  radius={[0, 0, 0, 0]}
+                />
+                <Bar
+                  hide={hiddenLines.Licenses}
+                  dataKey="Licenses"
+                  stackId="a"
+                  fill="#f43f5e"
+                  name="Licenses"
+                  radius={[0, 0, 0, 0]}
+                />
+                <Bar
+                  hide={hiddenLines.Reverts}
+                  dataKey="Reverts"
+                  stackId="a"
+                  fill="#f59e0b"
+                  name="Reverts"
+                  radius={[4, 4, 0, 0]}
+                />
                 <Line
+                  hide={hiddenLines.Total}
                   type="monotone"
                   dataKey="Total"
                   stroke="#7c3aed"
@@ -222,39 +336,7 @@ export default function MetricsSection() {
                   dot={{ r: 4, fill: '#ffffff', stroke: '#7c3aed', strokeWidth: 2 }}
                   activeDot={{ r: 6, fill: '#7c3aed', stroke: '#ffffff', strokeWidth: 2 }}
                 />
-                <Line
-                  type="monotone"
-                  dataKey="READMEs"
-                  stroke="#10b981"
-                  strokeWidth={1.5}
-                  name="READMEs"
-                  dot={{ r: 3, fill: '#ffffff', stroke: '#10b981', strokeWidth: 1.5 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="Commits"
-                  stroke="#3b82f6"
-                  strokeWidth={1.5}
-                  name="Commits"
-                  dot={{ r: 3, fill: '#ffffff', stroke: '#3b82f6', strokeWidth: 1.5 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="Licenses"
-                  stroke="#f43f5e"
-                  strokeWidth={1.5}
-                  name="Licenses"
-                  dot={{ r: 3, fill: '#ffffff', stroke: '#f43f5e', strokeWidth: 1.5 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="Reverts"
-                  stroke="#f59e0b"
-                  strokeWidth={1.5}
-                  name="Reverts"
-                  dot={{ r: 3, fill: '#ffffff', stroke: '#f59e0b', strokeWidth: 1.5 }}
-                />
-              </LineChart>
+              </ComposedChart>
             </ResponsiveContainer>
           </div>
         </div>

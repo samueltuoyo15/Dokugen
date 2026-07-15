@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+### [14.0.3] - 2026-07-15
+### Patches
+- **Interactive Leaderboard Sorting**: Implemented server-side and client-side sorting/ranking by Total, READMEs, Commits, Licenses, and Reverts on the Project Analytics dashboard.
+- **Activity Trends Visualization**: Resolved coordinates overlapping issues by migrating the Line Chart to an interactive Composed Chart featuring stacked bars for categories and a line for Total Usage.
+- **CLI License Generation Wording**: Updated the default license hint in both TypeScript and Python CLIs to accurately warn users that projects without a LICENSE file are copyright-protected by default and legally restricted from copy, use, or distribution.
+
 ### [14.0.2] - 2026-07-15
 ### Patches
 - **Leaderboard Tracking**: Added usage tracking pings to local `license`, `revert`, and `aic` commands across both TS and Python CLIs for accurate leaderboard stats.

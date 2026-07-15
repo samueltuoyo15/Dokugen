@@ -30,7 +30,7 @@ This project is a monorepo. Here's how to get it running:
     ```
 
 3.  **Install All Dependencies**:
-    We use a workspace structure with pnpm, so installing at the root handles dependencies for all apps (CLI, Server, VSCode Extension) at once.
+    We use a workspace structure with pnpm, so installing at the root handles dependencies for all apps (CLI, Server) at once.
     ```bash
     pnpm install
     # or
@@ -229,20 +229,17 @@ dokugen revert
 
 *   **Compressed Uploads**: Efficiently packages codebases with 70–90% upload size compression to support analyzing larger projects without hitting API size limits.
 
-*   **Language Agnostic**: Works out of the box with a wide range of programming languages, including JavaScript, TypeScript, Python, Rust, Go, C#, C++, Java, and many more.
-
-*   **VSCode Extension**: Integrate Dokugen directly into your Visual Studio Code workflow for easy README generation from the explorer context menu.
+*   **Language & Framework Agnostic**: Works out of the box with any programming language or framework (JavaScript, TypeScript, Python, Rust, Go, Java, PHP, C++, Django, React, etc.). You don't need Node.js or Python to be the main language of your codebase; simply install the Dokugen CLI globally using Node (`npm`/`pnpm`/`yarn`) or Python (`pip`/`uv`) on your system, and run it in any project folder.
 
 ## System Architecture / Design
 
-Dokugen uses a client-server architecture. CLI clients (Python, TypeScript) and a VSCode extension interact with a backend API server, which then communicates with an AI model for README generation and Git commit message creation. User profile data is stored securely in a Supabase database.
+Dokugen uses a client-server architecture. CLI clients (Python, TypeScript) interact with a backend API server, which then communicates with an AI model for README generation and Git commit message creation. User profile data is stored securely in a Supabase database.
 
 ```mermaid
 flowchart LR
   subgraph Clients["Dokugen Clients"]
     TSCLI["TypeScript CLI"]
     PythonCLI["Python CLI"]
-    VSCodeExt["VSCode Extension"]
   end
 
   API["API Server (Node.js Express)"]
@@ -251,13 +248,11 @@ flowchart LR
 
   TSCLI --> API
   PythonCLI --> API
-  VSCodeExt --> API
   API --> AI
   API --> DB
 
   style TSCLI fill:#1f3a60,stroke:#3b82f6,stroke-width:2px,color:#fff
   style PythonCLI fill:#1f3a60,stroke:#3b82f6,stroke-width:2px,color:#fff
-  style VSCodeExt fill:#1f3a60,stroke:#3b82f6,stroke-width:2px,color:#fff
   style API fill:#4a1525,stroke:#ec4899,stroke-width:2px,color:#fff
   style AI fill:#5c1d24,stroke:#ef4444,stroke-width:2px,color:#fff
   style DB fill:#1a2d42,stroke:#3b82f6,stroke-width:2px,color:#fff
@@ -272,7 +267,7 @@ flowchart LR
 | **AI**       | [Google Gemini](https://ai.google.dev/)                                                                                                                 |
 | **Client**   | [TypeScript](https://www.typescriptlang.org/), [Python](https://www.python.org/), [Go](https://go.dev/)                                                 |
 | **Frontend** | [React](https://react.dev/), [Next.js](https://nextjs.org/) (likely in future plans or for a web dashboard)                                              |
-| **Dev Tools**| [VSCode Extension API](https://code.visualstudio.com/api), [pnpm](https://pnpm.io/)                                                                    |
+| **Dev Tools**| [pnpm](https://pnpm.io/)                                                                                                                                |
 
 ## Contributing
 
@@ -304,7 +299,6 @@ This project is licensed under the MIT License. See the [LICENSE](https://github
 [![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://go.dev/)
 [![Supabase](https://img.shields.io/badge/Supabase-181818?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
 [![Google Gemini](https://img.shields.io/badge/Google_Gemini-FF0000?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
-[![VSCode](https://img.shields.io/badge/VS_Code-007ACC?style=for-the-badge&logo=visual-studio-code&logoColor=white)](https://code.visualstudio.com/)
 [![Turborepo](https://img.shields.io/badge/Turborepo-EF4444?style=for-the-badge&logo=turborepo&logoColor=white)](https://turbo.build/)
 [![pnpm](https://img.shields.io/badge/pnpm-F69220?style=for-the-badge&logo=pnpm&logoColor=white)](https://pnpm.io/)
 [![Made in Nigeria](https://img.shields.io/badge/made%20in-nigeria-008751.svg?style=flat-square)](https://github.com/acekyd/made-in-nigeria)
