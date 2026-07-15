@@ -126,7 +126,7 @@ flowchart LR
   style PythonCLI fill:#1f3a60,stroke:#3b82f6,stroke-width:2px,color:#fff
   style API fill:#4a1525,stroke:#ec4899,stroke-width:2px,color:#fff
   style AI fill:#5c1d24,stroke:#ef4444,stroke-width:2px,color:#fff
-  style DB fill:#1a2d42,stroke:#3b82f6,stroke-width:2px,color:#fff
+  style DB fill:#022c22,stroke:#10b981,stroke-width:2px,color:#fff
 ```
 
 ---
