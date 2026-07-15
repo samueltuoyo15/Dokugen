@@ -1,4 +1,6 @@
 import { Router, Request, Response } from "express";
+import { v4 as uuidv4 } from "uuid";
+import { trackUser } from "../lib/supabaseTracker";
 import logger from "../utils/logger";
 
 const router = Router();
@@ -53,10 +55,15 @@ router.post(
   "/generate-commit",
   async (req: Request, res: Response): Promise<any> => {
     try {
-      const { diff, geminiApiKey } = req.body;
+      const { diff, geminiApiKey, userInfo } = req.body;
 
       if (!diff) {
         return res.status(400).json({ error: "No git diff provided" });
+      }
+
+      // Track usage fire-and-forget — never block commit generation
+      if (userInfo?.username && userInfo?.email) {
+        trackUser({ ...userInfo, id: userInfo.id || uuidv4() }).catch(() => {});
       }
 
       const apiKey = geminiApiKey || process.env.GOOGLE_GEMINI_API_KEY;

@@ -39,7 +39,7 @@ export const runInteractiveMenu = async (): Promise<void> => {
       { value: "generate", label: "Generate README", hint: `Scan ${projectName} and create a new README.md` },
       { value: "update", label: "Update README", hint: `Update an existing Dokugen-generated README for ${projectName}` },
       { value: "revert", label: "Revert README", hint: `Restore the previous Dokugen-generated README for ${projectName}` },
-      { value: "license", label: "Generate LICENSE", hint: `Generate a LICENSE file, ${projectName} shouldn't be pushed to GitHub unlicensed` },
+      { value: "license", label: "Generate LICENSE", hint: `Generate a LICENSE file. Without one, ${projectName} is copyright-protected by default but legally unclear, so contributors and companies will avoid it.` },
       { value: "aic", label: "AI Git Commit", hint: `Generate commit message and commit staged changes for ${projectName}` },
       { value: "help", label: "View Help", hint: "Show all available commands and options" },
       { value: "exit", label: "Exit" },

@@ -52,11 +52,13 @@ def cmd_aic(args):
 
         try:
             backend_domain = utils.get_backend_domain()
+            user_info = utils.get_user_info()
 
             response = requests.post(
                 f"{backend_domain}/api/generate-commit",
                 json={
                     "diff": diff,
+                    "userInfo": user_info,
                 },
                 timeout=30
             )
@@ -110,7 +112,7 @@ def cmd_aic(args):
                 try:
                     response = requests.post(
                         f"{backend_domain}/api/generate-commit",
-                        json={"diff": diff},
+                        json={"diff": diff, "userInfo": utils.get_user_info()},
                         timeout=30
                     )
                     if response.status_code != 200:

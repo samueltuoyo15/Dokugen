@@ -8,6 +8,7 @@ import { limiter } from "./middleware/rateLimiter";
 import healthRouter from "./routes/health";
 import readmeRouter from "./routes/readme";
 import commitRouter from "./routes/commit";
+import trackRouter from "./routes/track";
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use(limiter);
 app.use("/api", healthRouter);
 app.use("/api", readmeRouter);
 app.use("/api", commitRouter);
+app.use("/api", trackRouter);
 
 // Error Handling
 app.use((err: Error, req: Request, res: Response, next: Function) => {

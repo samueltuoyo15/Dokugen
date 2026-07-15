@@ -46,7 +46,7 @@ def main():
                     questionary.Choice(f"Generate README  - Scan {project_name} and create a new README.md", value="generate"),
                     questionary.Choice(f"Update README    - Update an existing Dokugen-generated README for {project_name}", value="update"),
                     questionary.Choice(f"Revert README    - Restore the previous Dokugen-generated README for {project_name}", value="revert"),
-                    questionary.Choice(f"Generate LICENSE - Generate a LICENSE file, {project_name} shouldn't be pushed to GitHub unlicensed", value="license"),
+                    questionary.Choice(f"Generate LICENSE - Without one, {project_name} is copyright-protected by default but legally unclear, so contributors and companies will avoid it.", value="license"),
                     questionary.Choice(f"AI Git Commit    - Generate commit message and commit staged changes for {project_name}", value="aic"),
                     questionary.Choice("View Help        - Show all available commands and options", value="help"),
                     questionary.Choice("Exit", value="exit"),

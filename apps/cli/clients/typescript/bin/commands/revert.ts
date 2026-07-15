@@ -2,8 +2,10 @@ import { Command } from "commander";
 import chalk from "chalk";
 import * as path from "path";
 import fs from "fs-extra";
+import axios from "axios";
 import { select, isCancel } from "@clack/prompts";
-import { checkAndUpdate } from "../helpers/network.js";
+import { getUserInfo } from "../helpers/git.js";
+import { checkAndUpdate, getBackendDomain } from "../helpers/network.js";
 import { getDokugenBackupPath } from "../helpers/fileOps.js";
 
 export function registerRevertCommand(program: Command) {
@@ -49,6 +51,14 @@ export function registerRevertCommand(program: Command) {
         console.log(
           chalk.green("README.md successfully reverted to the previous version!")
         );
+        // Fire-and-forget usage tracking
+        try {
+          const backendDomain = await getBackendDomain();
+          const userInfo = getUserInfo();
+          if (userInfo?.username && userInfo?.email) {
+            axios.post(`${backendDomain}/api/track`, { userInfo }).catch(() => {});
+          }
+        } catch { /* never block the user */ }
       } catch (error: any) {
         console.error(chalk.red("Failed to revert README:"), error.message);
         process.exit(1);

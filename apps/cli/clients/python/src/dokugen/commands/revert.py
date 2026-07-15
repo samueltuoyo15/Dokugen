@@ -1,5 +1,7 @@
 import os
 import sys
+import threading
+import requests
 import questionary
 from rich.console import Console
 from dokugen import utils
@@ -42,6 +44,22 @@ def cmd_revert(args):
         sys.exit(1)
 
     console.print("[green]README.md successfully reverted to the previous version![/green]")
+
+    # Fire-and-forget usage tracking
+    try:
+        backend_domain = utils.get_backend_domain()
+        user_info = utils.get_user_info()
+        if user_info and user_info.get("username") and user_info.get("email"):
+            threading.Thread(
+                target=lambda: requests.post(
+                    f"{backend_domain}/api/track",
+                    json={"userInfo": user_info},
+                    timeout=5
+                ),
+                daemon=True
+            ).start()
+    except Exception:
+        pass
 
 
 def register_revert_parser(subparsers):

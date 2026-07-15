@@ -208,6 +208,22 @@ def cmd_license(args):
         with open(license_path, "w", encoding="utf-8") as f:
             f.write(content)
         console.print(f"[green]\nLICENSE file generated ({license_type}) at {license_path}[/green]")
+        # Fire-and-forget usage tracking
+        try:
+            backend_domain = utils.get_backend_domain()
+            user_info = utils.get_user_info()
+            if user_info and user_info.get("username") and user_info.get("email"):
+                import threading
+                threading.Thread(
+                    target=lambda: __import__("requests").post(
+                        f"{backend_domain}/api/track",
+                        json={"userInfo": user_info},
+                        timeout=5
+                    ),
+                    daemon=True
+                ).start()
+        except Exception:
+            pass
     except Exception as e:
         console.print(f"[red]Failed to generate LICENSE: {e}[/red]")
         sys.exit(1)

@@ -4,7 +4,7 @@ import chalk from "chalk";
 import axios from "axios";
 import { createSpinner } from "nanospinner";
 import { select, text, isCancel } from "@clack/prompts";
-import { isGitRepository } from "../helpers/git.js";
+import { isGitRepository, getUserInfo } from "../helpers/git.js";
 import { getBackendDomain, checkAndUpdate } from "../helpers/network.js";
 
 export function registerAicCommand(program: Command) {
@@ -66,11 +66,13 @@ export function registerAicCommand(program: Command) {
         let commitMessage = "";
         try {
           const backendDomain = await getBackendDomain();
+          const userInfo = getUserInfo();
 
           const response = await axios.post<{ message: string }>(
             `${backendDomain}/api/generate-commit`,
             {
               diff,
+              userInfo,
             }
           );
 
@@ -145,6 +147,7 @@ export function registerAicCommand(program: Command) {
                 `${backendDomain}/api/generate-commit`,
                 {
                   diff,
+                  userInfo: getUserInfo(),
                 }
               );
               finalCommitMessage = response.data.message;
