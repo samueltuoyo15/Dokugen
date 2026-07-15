@@ -6,6 +6,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import argparse
 import questionary
+from importlib.metadata import version as _get_version
 from rich.console import Console
 from dokugen import utils
 from dokugen.commands.generate import cmd_generate, register_generate_parser, DOKUGEN_BANNER
@@ -19,12 +20,16 @@ console = Console()
 
 def main():
     try:
+        try:
+            __version__ = _get_version("dokugen")
+        except Exception:
+            __version__ = "unknown"
         project_name = os.path.basename(os.getcwd())
         parser = argparse.ArgumentParser(
             prog="dokugen",
             description=f"Automatically generate high-quality README for {project_name}",
         )
-        parser.add_argument("--version", "-v", action="version", version="%(prog)s 14.0.1")
+        parser.add_argument("--version", "-v", action="version", version=f"%(prog)s {__version__}")
 
         subparsers = parser.add_subparsers(dest="command")
 
@@ -38,7 +43,7 @@ def main():
         if len(sys.argv) == 1:
             utils.check_and_update()
             console.print(DOKUGEN_BANNER, style="#000080")
-            console.print("[blue]Welcome to Dokugen (v14.0.1) - Automatic README Generator\n[/blue]")
+            console.print(f"[blue]Welcome to Dokugen (v{__version__}) - Automatic README Generator\n[/blue]")
 
             action = questionary.select(
                 "What would you like to do?",

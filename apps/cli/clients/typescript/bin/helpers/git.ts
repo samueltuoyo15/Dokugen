@@ -29,7 +29,7 @@ export const getUserInfo = (): {
 
   return {
     username: os.userInfo().username || "",
-    email: process.env.USER || "",
+    email: "",
     osInfo: { platform: "Unknown", arch: "Unknown", release: "Unknown" },
   };
 };

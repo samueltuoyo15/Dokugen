@@ -2,7 +2,7 @@ import * as path from "path";
 import fs from "fs-extra";
 import chalk from "chalk";
 import axios from "axios";
-import { exec } from "child_process";
+import { execFile } from "child_process";
 import { Readable } from "stream";
 import { createSpinner } from "nanospinner";
 import { select, isCancel } from "@clack/prompts";
@@ -44,14 +44,15 @@ function openBrowser(url: string): void {
   const platform = process.platform;
   const isTermux = !!process.env.TERMUX_VERSION;
 
+  // Use execFile (not exec) to avoid shell injection via a crafted URL
   if (isTermux) {
-    exec(`termux-open-url "${url}"`);
+    execFile("termux-open-url", [url]);
   } else if (platform === "win32") {
-    exec(`start "" "${url}"`);
+    execFile("cmd", ["/c", "start", "", url]);
   } else if (platform === "darwin") {
-    exec(`open "${url}"`);
+    execFile("open", [url]);
   } else {
-    exec(`xdg-open "${url}"`);
+    execFile("xdg-open", [url]);
   }
 }
 

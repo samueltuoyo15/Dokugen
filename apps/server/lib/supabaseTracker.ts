@@ -61,7 +61,7 @@ export async function trackUser(userInfo: UserInfo | undefined, usageType?: stri
           [columnToIncrement]: 1
         }]);
     }
-    logger.info(`Updated Active user ${username}, ${email} (Type: ${usageType || "readme"})`);
+    logger.info({ username, emailDomain: email?.split("@")[1], usageType }, "Updated active user");
   } catch (error) {
     logger.error(error, "Supabase user tracking failed:");
   }

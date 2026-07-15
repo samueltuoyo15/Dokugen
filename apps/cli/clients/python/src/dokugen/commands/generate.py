@@ -97,6 +97,8 @@ def ask_social_handles():
             "linkedinUsername": linkedin_username,
             "twitterUsername": twitter_username,
         }
+    except KeyboardInterrupt:
+        raise
     except Exception:
         return {}
 
@@ -120,29 +122,25 @@ def prompt_myhappr():
         if answer is None or answer == "no":
             return
 
-        spinner = utils.create_ticking_spinner("Opening myhappr...")
-        spinner.__enter__()
-
         uri = None
         max_retries = 3
-        for attempt in range(1, max_retries + 1):
-            try:
-                res = requests.get("https://api.myhappr.com/api/v1/auth/google-auth", timeout=5)
-                if res.status_code == 200:
-                    data = res.json()
-                    uri = data.get("data", {}).get("uri")
-                    if uri:
+        with utils.create_ticking_spinner("Opening myhappr...") as spinner:
+            for attempt in range(1, max_retries + 1):
+                try:
+                    res = requests.get("https://api.myhappr.com/api/v1/auth/google-auth", timeout=5)
+                    if res.status_code == 200:
+                        data = res.json()
+                        uri = data.get("data", {}).get("uri")
+                        if uri:
+                            break
+                except Exception:
+                    if attempt == max_retries:
                         break
-            except Exception:
-                if attempt == max_retries:
-                    break
 
         if uri:
-            spinner.__exit__(None, None, None)
             console.print("[green]Browser opened. Make sure to complete account setup on myhappr.[/green]")
             open_browser(uri)
         else:
-            spinner.__exit__(None, None, None)
             console.print("[yellow]Something went wrong connecting to myhappr. Please try again later.[/yellow]")
     except Exception:
         pass
@@ -246,43 +244,41 @@ def generate_readme_remote(project_type, project_files, project_dir, existing_re
 
         import time
         start_time = time.time()
-        spinner = utils.create_ticking_spinner("Generating README...")
-        spinner.__enter__()
-
-        try:
-            response = requests.post(
-                f"{backend_domain}/api/generate-readme",
-                json=payload,
-                stream=True,
-                timeout=API_TIMEOUT,
-            )
-
-            if response.status_code != 200:
-                spinner.__exit__(None, None, None)
-                console.print(f"[red]Error {response.status_code}: {response.text}[/red]")
-                utils.restore_readme()
-                return None
-
-            # Write response with proper resource management
-            with open(readme_path, "w", encoding="utf-8") as f:
-                for line in response.iter_lines():
-                    if line:
-                        decoded = line.decode("utf-8")
-                        if decoded.startswith("data:"):
-                            json_str = decoded.replace("data: ", "").strip()
-                            try:
-                                data = json.loads(json_str)
-                                if "response" in data and isinstance(data["response"], str):
-                                    f.write(data["response"])
-                                    f.flush()
-                            except Exception:
-                                pass
-        finally:
-            spinner.__exit__(None, None, None)
+        response = None
+        with utils.create_ticking_spinner("Generating README...") as spinner:
             try:
-                response.close()
-            except Exception:
-                pass
+                response = requests.post(
+                    f"{backend_domain}/api/generate-readme",
+                    json=payload,
+                    stream=True,
+                    timeout=API_TIMEOUT,
+                )
+
+                if response.status_code != 200:
+                    console.print(f"[red]Error {response.status_code}: {response.text}[/red]")
+                    utils.restore_readme()
+                    return None
+
+                # Write response with proper resource management
+                with open(readme_path, "w", encoding="utf-8") as f:
+                    for line in response.iter_lines():
+                        if line:
+                            decoded = line.decode("utf-8")
+                            if decoded.startswith("data:"):
+                                json_str = decoded.replace("data: ", "").strip()
+                                try:
+                                    data = json.loads(json_str)
+                                    if "response" in data and isinstance(data["response"], str):
+                                        f.write(data["response"])
+                                        f.flush()
+                                except Exception:
+                                    pass
+            finally:
+                if response is not None:
+                    try:
+                        response.close()
+                    except Exception:
+                        pass
 
         elapsed_str = utils.format_elapsed_time(start_time)
         console.print(f"\n[green]README.md created successfully in {elapsed_str}[/green]")

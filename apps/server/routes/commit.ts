@@ -75,11 +75,12 @@ router.post(
       const prompt = buildCommitPrompt(diff);
 
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "x-goog-api-key": apiKey, // key in header, never in URL
           },
           body: JSON.stringify({
             contents: [
@@ -93,7 +94,7 @@ router.post(
 
       if (!response.ok) {
         const errorText = await response.text();
-        logger.error(`Gemini API error: ${response.statusText} - ${errorText}`);
+        logger.error(`Gemini API error: status=${response.status} ${response.statusText}`);
         let errorMessage = "Failed to generate commit message";
         try {
           const parsed = JSON.parse(errorText);

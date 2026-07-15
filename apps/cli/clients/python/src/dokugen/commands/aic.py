@@ -47,36 +47,32 @@ def cmd_aic(args):
             pass
 
         start_time = time.time()
-        spinner = utils.create_ticking_spinner("Analyzing staged changes...")
-        spinner.__enter__()
 
         try:
-            backend_domain = utils.get_backend_domain()
-            user_info = utils.get_user_info()
+            with utils.create_ticking_spinner("Analyzing staged changes...") as spinner:
+                backend_domain = utils.get_backend_domain()
+                user_info = utils.get_user_info()
 
-            response = requests.post(
-                f"{backend_domain}/api/generate-commit",
-                json={
-                    "diff": diff,
-                    "userInfo": user_info,
-                },
-                timeout=30
-            )
+                response = requests.post(
+                    f"{backend_domain}/api/generate-commit",
+                    json={
+                        "diff": diff,
+                        "userInfo": user_info,
+                    },
+                    timeout=30
+                )
 
-            if response.status_code != 200:
-                spinner.__exit__(None, None, None)
-                console.print(f"[red]Error {response.status_code}: {response.text}[/red]")
-                sys.exit(1)
+                if response.status_code != 200:
+                    console.print(f"[red]Error {response.status_code}: {response.text}[/red]")
+                    sys.exit(1)
 
-            commit_message = response.json().get("message")
-            if not commit_message:
-                raise Exception("No commit message generated from backend")
-        finally:
-            spinner.__exit__(None, None, None)
+                commit_message = response.json().get("message")
+                if not commit_message:
+                    raise Exception("No commit message generated from backend")
 
-        elapsed_str = utils.format_elapsed_time(start_time)
-        console.print(f"[green]Commit message generated successfully in {elapsed_str}:\n[/green]")
-        console.print(f"[green]\"{commit_message}\"\n[/green]")
+            elapsed_str = utils.format_elapsed_time(start_time)
+            console.print(f"[green]Commit message generated successfully in {elapsed_str}:\n[/green]")
+            console.print(f"[green]\"{commit_message}\"\n[/green]")
 
         final_commit_message = commit_message
 
@@ -107,23 +103,20 @@ def cmd_aic(args):
                 final_commit_message = edited.strip()
                 console.print(f"\n[green]Updated commit message:\n\"{final_commit_message}\"\n[/green]")
             elif action == "regenerate":
-                regen_spinner = utils.create_ticking_spinner("Regenerating commit message...")
-                regen_spinner.__enter__()
                 try:
-                    response = requests.post(
-                        f"{backend_domain}/api/generate-commit",
-                        json={"diff": diff, "userInfo": utils.get_user_info()},
-                        timeout=30
-                    )
-                    if response.status_code != 200:
-                        raise Exception(response.text)
-                    final_commit_message = response.json().get("message")
-                    if not final_commit_message:
-                        raise Exception("No commit message generated from backend")
-                    regen_spinner.__exit__(None, None, None)
+                    with utils.create_ticking_spinner("Regenerating commit message...") as regen_spinner:
+                        response = requests.post(
+                            f"{backend_domain}/api/generate-commit",
+                            json={"diff": diff, "userInfo": utils.get_user_info()},
+                            timeout=30
+                        )
+                        if response.status_code != 200:
+                            raise Exception(response.text)
+                        final_commit_message = response.json().get("message")
+                        if not final_commit_message:
+                            raise Exception("No commit message generated from backend")
                     console.print(f"[green]New commit message generated successfully:\n\"{final_commit_message}\"\n[/green]")
                 except Exception as e:
-                    regen_spinner.__exit__(None, None, None)
                     console.print(f"[red]Failed to regenerate commit message: {e}[/red]")
 
         console.print(f"[blue]> Running: git commit -m \"{final_commit_message}\"[/blue]")

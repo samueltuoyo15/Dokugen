@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+### [14.0.2] - 2026-07-15
+### Patches
+- **Leaderboard Tracking**: Added usage tracking pings to local `license`, `revert`, and `aic` commands across both TS and Python CLIs for accurate leaderboard stats.
+- **Server Hardening**: Enforced strict global request limits and payload size validation during decompression to prevent resource exhaustion.
+- **Rate-Limiter Security**: Hardened rate-limiting checks on sensitive routes.
+- **API Key Security**: Migrated backend AI request keys from URL parameters to secure headers to prevent proxy log exposure.
+- **Internal Diagnostics**: Removed sensitive internal process memory details from the public health endpoint.
+- **Resource Management**: Fixed socket leaks in the server keep-alive cron job.
+- **Cache Hardening**: Updated prompt caches to store SHA256 hashes of API keys instead of plaintext credentials.
+- **Logging Privacy**: Masked user metadata in database tracking logs and sanitized raw API responses from error logs.
+- **TS CLI Command Execution**: Switched local CLI commands from string shell execution to parameter arrays to eliminate shell injection vectors.
+- **Privacy Fallbacks**: Switched fallback parameters in Git configuration checks to use blank fallbacks instead of leaking environment details.
+- **Python CLI Resource Leaks**: Restructured spinner management to use context managers, preventing daemon threads from leaking on errors.
+- **Python Network Improvements**: Fixed double update checks on interactive menus and ensured all response connections are cleanly closed.
+- **Python CLI Maintenance**: Dynamic package version resolution using metadata.
+
 ### [14.0.1] - 2026-07-13
 ### Added
 - **Premium Colored Diagrams**: System Design Diagrams(Flowcharts) now look gorgeous on GitHub with theme-matched colors (instead of boring black-and-white). It auto-colors your tech stack—so Redis is red, Postgres is blue, MongoDB is green, and so on!

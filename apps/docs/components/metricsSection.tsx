@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
 import Image from "next/image"
 
 interface UserMetrics {
@@ -90,7 +90,11 @@ export default function MetricsSection() {
 
   const chartData = data?.activeUsers.map((user) => ({
     username: user.username,
-    usage_count: user.usage_count,
+    Total: user.usage_count,
+    READMEs: user.readme_usage || 0,
+    Commits: user.commit_usage || 0,
+    Licenses: user.license_usage || 0,
+    Reverts: user.revert_usage || 0,
     profileUrl: `https://github.com/${user.username}`
   })) || []
 
@@ -103,8 +107,8 @@ export default function MetricsSection() {
         </p>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-8 items-stretch">
-        <div className="flex-1 flex flex-col rounded-xl border border-zinc-200/80 bg-white overflow-hidden">
+      <div className="flex flex-col gap-8 w-full">
+        <div className="w-full flex flex-col rounded-xl border border-zinc-200/80 bg-white overflow-hidden">
           <div className="p-5 border-b border-zinc-100 bg-zinc-50/50">
             <h3 className="text-sm font-semibold text-zinc-800 uppercase tracking-wider">Leaderboard</h3>
           </div>
@@ -173,13 +177,13 @@ export default function MetricsSection() {
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col rounded-xl border border-zinc-200/80 bg-white p-6 min-h-[400px]">
+        <div className="w-full flex flex-col rounded-xl border border-zinc-200/80 bg-white p-6 min-h-[450px]">
           <div className="mb-8">
             <h3 className="text-sm font-semibold text-zinc-800 uppercase tracking-wider">Activity Trends</h3>
-            <p className="text-xs text-zinc-500 mt-1">Usage frequency by top users</p>
+            <p className="text-xs text-zinc-500 mt-1">Usage frequency by feature type per top user</p>
           </div>
 
-          <div className="flex-1 w-full h-full min-h-[300px]">
+          <div className="flex-1 w-full h-full min-h-[350px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f4f4f5" vertical={false} />
@@ -208,13 +212,47 @@ export default function MetricsSection() {
                   itemStyle={{ color: '#09090b' }}
                   labelStyle={{ color: '#71717a', marginBottom: '4px', display: 'block' }}
                 />
+                <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: '11px', fontFamily: 'sans-serif' }} />
                 <Line
-                  type="linear"
-                  dataKey="usage_count"
+                  type="monotone"
+                  dataKey="Total"
                   stroke="#7c3aed"
-                  strokeWidth={2}
+                  strokeWidth={3}
+                  name="Total Usage"
                   dot={{ r: 4, fill: '#ffffff', stroke: '#7c3aed', strokeWidth: 2 }}
                   activeDot={{ r: 6, fill: '#7c3aed', stroke: '#ffffff', strokeWidth: 2 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="READMEs"
+                  stroke="#10b981"
+                  strokeWidth={1.5}
+                  name="READMEs"
+                  dot={{ r: 3, fill: '#ffffff', stroke: '#10b981', strokeWidth: 1.5 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="Commits"
+                  stroke="#3b82f6"
+                  strokeWidth={1.5}
+                  name="Commits"
+                  dot={{ r: 3, fill: '#ffffff', stroke: '#3b82f6', strokeWidth: 1.5 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="Licenses"
+                  stroke="#f43f5e"
+                  strokeWidth={1.5}
+                  name="Licenses"
+                  dot={{ r: 3, fill: '#ffffff', stroke: '#f43f5e', strokeWidth: 1.5 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="Reverts"
+                  stroke="#f59e0b"
+                  strokeWidth={1.5}
+                  name="Reverts"
+                  dot={{ r: 3, fill: '#ffffff', stroke: '#f59e0b', strokeWidth: 1.5 }}
                 />
               </LineChart>
             </ResponsiveContainer>

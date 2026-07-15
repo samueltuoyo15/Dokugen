@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import express, { Router, Request, Response } from "express";
 import os from "os";
 import { v4 as uuidv4 } from "uuid";
 import { GoogleGenAI } from "@google/genai";
@@ -14,6 +14,8 @@ const router = Router();
 
 router.post(
   "/generate-readme",
+  // This route needs a much larger body limit for compressed codebase payloads
+  express.json({ limit: "500mb" }),
   async (req: Request, res: Response): Promise<any> => {
     try {
       const {
@@ -44,15 +46,22 @@ router.post(
       let existingReadme = rawExistingReadme;
 
       if (compressed) {
+        const MAX_DECOMPRESSED_BYTES = 50 * 1024 * 1024; // 50 MB
         if (rawFullCode) {
           const buffer      = Buffer.from(rawFullCode, "base64");
           const decompressed = await gunzipAsync(buffer);
-          fullCode           = decompressed.toString("utf-8");
+          if (decompressed.length > MAX_DECOMPRESSED_BYTES) {
+            return res.status(413).json({ error: "Payload too large after decompression (max 50 MB)" });
+          }
+          fullCode = decompressed.toString("utf-8");
         }
         if (rawExistingReadme) {
           const buffer      = Buffer.from(rawExistingReadme, "base64");
           const decompressed = await gunzipAsync(buffer);
-          existingReadme     = decompressed.toString("utf-8");
+          if (decompressed.length > MAX_DECOMPRESSED_BYTES) {
+            return res.status(413).json({ error: "Payload too large after decompression (max 50 MB)" });
+          }
+          existingReadme = decompressed.toString("utf-8");
         }
       }
 

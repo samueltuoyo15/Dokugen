@@ -24,6 +24,9 @@ current_readme_path = ""
 PACKAGE_NAME = "dokugen"
 PYPI_URL = f"https://pypi.org/pypi/{PACKAGE_NAME}/json"
 
+# Sentinel: prevents double check_and_update when interactive menu + subcommand both call it
+_update_checked = False
+
 
 def create_spinner(text):
     return Live(Spinner("dots", text=text), refresh_per_second=10)
@@ -114,16 +117,19 @@ def is_newer_version(latest, current):
 
 
 def check_and_update():
+    global _update_checked
+    if _update_checked:
+        return
+    _update_checked = True
     try:
         current_version = get_installed_version()
         if not current_version:
             return
 
-        response = requests.get(PYPI_URL, timeout=3)
-        if response.status_code != 200:
-            return
-
-        latest_version = response.json()["info"]["version"]
+        with requests.get(PYPI_URL, timeout=3) as response:
+            if response.status_code != 200:
+                return
+            latest_version = response.json()["info"]["version"]
 
         if is_newer_version(latest_version, current_version):
             console.print(
@@ -205,15 +211,15 @@ def get_user_info():
 
     return {
         "username": username,
-        "email": os.environ.get("USER", ""),
+        "email": "",
         "osInfo": os_info,
     }
 
 
 def check_internet_connection():
     try:
-        requests.get("https://www.google.com", timeout=5)
-        return True
+        with requests.get("https://www.google.com", timeout=5, stream=True) as r:
+            return True
     except Exception:
         return False
 
@@ -687,18 +693,18 @@ def extract_full_code(project_files, project_dir):
 
 def get_backend_domain():
     try:
-        r = requests.get("http://localhost:3000/api/health", timeout=0.5)
-        if r.status_code == 200 and r.json().get("status") == "Ok":
-            return "http://localhost:3000"
+        with requests.get("http://localhost:3000/api/health", timeout=0.5) as r:
+            if r.status_code == 200 and r.json().get("status") == "Ok":
+                return "http://localhost:3000"
     except Exception:
         pass
 
     try:
-        r = requests.get(
+        with requests.get(
             "https://dokugen-readme.vercel.app/api/get-server-url", timeout=5
-        )
-        if r.status_code == 200:
-            return r.json().get("domain")
+        ) as r:
+            if r.status_code == 200:
+                return r.json().get("domain")
     except Exception:
         pass
 

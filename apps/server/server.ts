@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from "express";
+import express, { Application, Request, Response, NextFunction } from "express";
 import helmet from "helmet";
 import cors from "cors";
 import cron from "node-cron";
@@ -20,12 +20,13 @@ app.use(
     origin: "*",
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["*"],
-    credentials: true,
+    // credentials:true is intentionally omitted — this is a public API with no cookies
   }),
 );
 app.use(helmet());
-app.use(express.json({ limit: "500mb" }));
-app.use(express.urlencoded({ limit: "500mb", extended: true }));
+// Global 10 MB limit — the /api/generate-readme route sets its own 500 MB override
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(limiter);
 
 // Register Routes
@@ -35,8 +36,9 @@ app.use("/api", commitRouter);
 app.use("/api", trackRouter);
 
 // Error Handling
-app.use((err: Error, req: Request, res: Response, next: Function) => {
-  console.error(err);
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  logger.error({ message: err.message, name: err.name }, "Unhandled error");
+  if (res.headersSent) return next(err);
   res.status(500).json({ error: "Internal Server Error" });
 });
 
@@ -47,9 +49,10 @@ app.listen(PORT, () => {
     const keepAliveUrl = `${process.env.BACKEND_DOMAIN}/api/health`;
     logger.info(`Performing self-ping to: ${keepAliveUrl}`);
     fetch(keepAliveUrl)
-      .then((res) =>
-        logger.info(`Keep-alive ping successful (Status: ${res.status})`),
-      )
+      .then(async (res) => {
+        await res.body?.cancel(); // drain body so socket is returned to pool
+        logger.info(`Keep-alive ping successful (Status: ${res.status})`);
+      })
       .catch((err) => logger.error("Keep-alive ping failed:", err));
   }, {});
   logger.info("Self-pinger initialized)");

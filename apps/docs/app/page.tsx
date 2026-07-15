@@ -199,7 +199,7 @@ export default function DocsPage() {
           </h1>
 
           <p className="text-lg md:text-xl text-zinc-500 mb-10 max-w-2xl mx-auto leading-relaxed font-light">
-            Writing READMEs is a chore, and keeping them updated is even worse. Dokugen takes that pain away by scanning your codebase to generate a beautiful, detailed README in seconds. It even keeps it perfectly updated every time you push code, so you can spend your time building, not formatting markdown.
+            Writing READMEs is a chore, and keeping them updated is even worse. Dokugen takes that pain away by scanning your codebase to generate a beautiful, detailed README in seconds. It lets you update it instantly as your code changes, so you can spend your time building, not formatting markdown.
           </p>
 
           <div className="mt-12 max-w-lg mx-auto">
@@ -295,17 +295,6 @@ export default function DocsPage() {
                     </code>
                   </p>
                 </div>
-              </div>
-
-              <div className="group bg-white p-8 rounded-2xl border border-zinc-200/80 hover:border-zinc-300 transition-all">
-                <h3 className="text-xl font-bold mb-3 text-zinc-950">
-                  2. Install Globally
-                </h3>
-                <p className="text-zinc-500 mb-6 leading-relaxed text-sm">
-                  Install Dokugen globally once, and use it forever across any
-                  project on your machine:
-                </p>
-                <Copy code="npm install -g dokugen" className="text-sm" />
               </div>
 
               <div className="group bg-white p-8 rounded-2xl border border-zinc-200/80 hover:border-zinc-300 transition-all">
@@ -411,7 +400,7 @@ export default function DocsPage() {
                     License Generation
                   </h3>
                   <p className="text-[#be123c] leading-relaxed text-sm font-normal">
-                    Unlicensed code is dead code—companies won't touch it, and developers won't contribute. Protect your intellectual property and welcome contributors in seconds. Automatically detect the author and year, generate a compliant LICENSE, and get a human-readable summary so everyone feels safe using your work.
+                    Unlicensed code is dead code, companies won't touch it, and developers won't contribute. Protect your intellectual property and welcome contributors in seconds. Automatically detect the author and year, generate a compliant LICENSE, and get a human-readable summary so everyone feels safe using your work.
                   </p>
                 </div>
               </div>
@@ -426,7 +415,7 @@ export default function DocsPage() {
                     Zero-Config Experience
                   </h3>
                   <p className="text-[#4338ca] leading-relaxed text-sm font-normal">
-                    No login, no API keys to copy, and zero setup friction. We believe you should experience value in less than 30 seconds. Just run Dokugen in your project and see the magic immediately—no strings attached.
+                    No login, no API keys to copy, and zero setup friction. We believe you should experience value in less than 30 seconds. Just run Dokugen in your project and see the magic immediately, with no strings attached.
                   </p>
                 </div>
               </div>
@@ -534,7 +523,7 @@ export default function DocsPage() {
                   <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">
                     dokugen aic
                   </code>{" "}
-                  stages your files, reads the git diff, and writes Conventional Commits using Gemini—then commits and optionally pushes with one confirmation. Look professional without the cognitive load.
+                  stages your files, reads the git diff, and writes Conventional Commits using Gemini, then commits and optionally pushes with one confirmation. Look professional without the cognitive load.
                 </p>
               </div>
               <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
@@ -664,17 +653,12 @@ export default function DocsPage() {
                 <div className="flex-1 w-full flex flex-col">
                   <div className="mb-4 text-center md:text-left">
                     <h4 className="text-sm font-bold text-zinc-800 mb-1">GitHub Sponsors</h4>
-                    <p className="text-zinc-400 text-[11px]">For international sponsors worldwide</p>
+                    <p className="text-zinc-400 text-[11px]">
+                      Support Samuel Tuoyo directly on GitHub Sponsors to help fund Dokugen development if you are outside Africa.
+                    </p>
                   </div>
-                  <div className="bg-white border border-zinc-200/80 rounded-2xl shadow-sm h-[480px] p-6 flex flex-col justify-between items-center text-center">
-                    <div className="mt-4">
-                      <Github className="w-10 h-10 text-zinc-800 mx-auto mb-3" />
-                      <h5 className="font-bold text-zinc-900 text-sm mb-2">Global Sponsorship</h5>
-                      <p className="text-zinc-500 text-xs leading-relaxed max-w-[240px]">
-                        Support Samuel Tuoyo directly on GitHub Sponsors to help fund Dokugen development.
-                      </p>
-                    </div>
-                    <div className="w-full max-w-[360px] my-auto flex justify-center items-center">
+                  <div className="bg-white border border-zinc-200/80 rounded-2xl shadow-sm h-[480px] p-6 flex flex-col justify-center items-center text-center">
+                    <div className="w-full max-w-[360px] flex justify-center items-center">
                       <a
                         href="https://github.com/sponsors/samueltuoyo15"
                         target="_blank"
@@ -702,9 +686,6 @@ export default function DocsPage() {
                         </div>
                       </a>
                     </div>
-                    <span className="text-[10px] text-zinc-400 font-mono">
-                      github.com/sponsors/samueltuoyo15
-                    </span>
                   </div>
                 </div>
                 
@@ -712,7 +693,9 @@ export default function DocsPage() {
                 <div className="flex-1 w-full flex flex-col">
                   <div className="mb-4 text-center md:text-left">
                     <h4 className="text-sm font-bold text-zinc-800 mb-1">Myhappr Tip Card</h4>
-                    <p className="text-zinc-400 text-[11px]">For African local card & mobile money transfers</p>
+                    <p className="text-zinc-400 text-[11px]">
+                      Support Samuel Tuoyo directly on Myhappr Tip Card to help fund Dokugen development if you are in Africa.
+                    </p>
                   </div>
                   <SupportCard />
                 </div>

@@ -10,8 +10,7 @@ export const limiter = rateLimit({
   skip: (req: Request) => {
     return (
       req.path === "/health" ||
-      req.path === "/api/health" ||
-      !!req.body?.geminiApiKey
+      req.path === "/api/health"
     );
   },
 });

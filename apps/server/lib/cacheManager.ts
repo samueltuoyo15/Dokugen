@@ -1,4 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
+import { createHash } from "crypto";
 import { getSystemInstruction } from "../prompts/systemInstruction";
 import logger from "../utils/logger";
 
@@ -80,7 +81,9 @@ export async function getCachedContentName(
   }
 
   const withDiagrams = !!options.includeDiagrams;
-  const cacheKey     = `${apiKey}:${withDiagrams}`;
+  // Hash the key so plaintext API keys are never stored in process memory
+  const keyHash  = createHash("sha256").update(apiKey).digest("hex").slice(0, 16);
+  const cacheKey = `${keyHash}:${withDiagrams}`;
   const existing     = cacheStore.get(cacheKey);
 
   // Return the existing cache if it still has more than REFRESH_BUFFER_MS left.
