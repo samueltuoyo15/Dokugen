@@ -131,7 +131,7 @@ export function registerAicCommand(program: Command) {
           } else if (action === "edit") {
             const edited = await text({
               message: "Edit commit message:",
-              defaultValue: finalCommitMessage,
+              initialValue: finalCommitMessage,
               placeholder: "Enter new commit message",
             });
 

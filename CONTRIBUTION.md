@@ -155,6 +155,34 @@ This handles the backend logic and API requests.
 
 ---
 
+### Working on the VSCode Extension (`apps/vscode-extension`)
+
+If you are working on implementing the VSCode extension to let users run Dokugen directly from their editor:
+
+#### Goal & Tasks Checklist
+- **Command Implementation**: Ensure all core Dokugen features are available as editor commands:
+  - `Dokugen: Generate Readme` (generate)
+  - `Dokugen: Update Readme` (update)
+  - `Dokugen: Revert Readme` (revert)
+  - `Dokugen: AI Git Commit` (aic)
+  - `Dokugen: Generate License` (license)
+- **Interactive UI**: Build input boxes and quick picks matching the CLI choices (Project Type, Setup Instructions, etc.).
+- **Output View**: Stream logs/progress to a native VSCode Output Channel instead of the terminal.
+- **File Integration**: Create generated files (like `README.md` or `LICENSE`) in the active workspace root and open them automatically upon completion.
+
+#### Development Workflow
+1. **Navigate to the Extension Directory**:
+    ```bash
+    cd apps/vscode-extension
+    ```
+2. **Open in VSCode**:
+    Open the `apps/vscode-extension` folder in a new VSCode window.
+3. **Launch & Debug**:
+    - Press `F5` to run the compile task and launch a new **Extension Development Host** window.
+    - In the host window, open the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`) and search for `Dokugen` commands to test them.
+
+---
+
 ## Submission Guidelines
 
 -   **Issues**: Before starting any major work, please open an issue to discuss what you want to change. Alternatively, you can browse existing [Open Issues](https://github.com/samueltuoyo15/Dokugen/issues) and comment on one you'd like to tackle.

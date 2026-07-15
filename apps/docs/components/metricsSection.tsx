@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
 import Image from "next/image"
+import { ArrowDown, ArrowUpDown, FileText, GitCommit, Award, RotateCcw } from "lucide-react"
 
 interface UserMetrics {
   id: string
@@ -67,6 +68,7 @@ const GitHubUserLink = ({ username }: { username: string }) => {
 export default function MetricsSection() {
   const [currentPage, setCurrentPage] = useState(1)
   const [sortBy, setSortBy] = useState<string>("usage_count")
+  const [activeChartMetric, setActiveChartMetric] = useState<string>("all")
   const [hiddenLines, setHiddenLines] = useState<Record<string, boolean>>({
     Total: false,
     READMEs: false,
@@ -140,42 +142,67 @@ export default function MetricsSection() {
                   <th className="px-6 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide">User</th>
                   <th
                     onClick={() => handleSortChange("usage_count")}
-                    className="px-6 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors"
+                    className="px-6 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
                   >
-                    <span className="inline-flex items-center justify-end gap-1 w-full">
-                      Total {sortBy === "usage_count" && "↓"}
+                    <span className="inline-flex items-center justify-end gap-1.5 w-full">
+                      Total
+                      {sortBy === "usage_count" ? (
+                        <ArrowDown className="w-3.5 h-3.5 text-zinc-800" />
+                      ) : (
+                        <ArrowUpDown className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
+                      )}
                     </span>
                   </th>
                   <th
                     onClick={() => handleSortChange("readme_usage")}
-                    className="hidden sm:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors"
+                    className="hidden sm:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
                   >
-                    <span className="inline-flex items-center justify-end gap-1 w-full">
-                      READMEs {sortBy === "readme_usage" && "↓"}
+                    <span className="inline-flex items-center justify-end gap-1.5 w-full">
+                      READMEs
+                      {sortBy === "readme_usage" ? (
+                        <ArrowDown className="w-3.5 h-3.5 text-zinc-800" />
+                      ) : (
+                        <ArrowUpDown className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
+                      )}
                     </span>
                   </th>
                   <th
                     onClick={() => handleSortChange("commit_usage")}
-                    className="hidden sm:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors"
+                    className="hidden sm:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
                   >
-                    <span className="inline-flex items-center justify-end gap-1 w-full">
-                      Commits {sortBy === "commit_usage" && "↓"}
+                    <span className="inline-flex items-center justify-end gap-1.5 w-full">
+                      Commits
+                      {sortBy === "commit_usage" ? (
+                        <ArrowDown className="w-3.5 h-3.5 text-zinc-800" />
+                      ) : (
+                        <ArrowUpDown className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
+                      )}
                     </span>
                   </th>
                   <th
                     onClick={() => handleSortChange("license_usage")}
-                    className="hidden md:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors"
+                    className="hidden md:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
                   >
-                    <span className="inline-flex items-center justify-end gap-1 w-full">
-                      Licenses {sortBy === "license_usage" && "↓"}
+                    <span className="inline-flex items-center justify-end gap-1.5 w-full">
+                      Licenses
+                      {sortBy === "license_usage" ? (
+                        <ArrowDown className="w-3.5 h-3.5 text-zinc-800" />
+                      ) : (
+                        <ArrowUpDown className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
+                      )}
                     </span>
                   </th>
                   <th
                     onClick={() => handleSortChange("revert_usage")}
-                    className="hidden md:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors"
+                    className="hidden md:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
                   >
-                    <span className="inline-flex items-center justify-end gap-1 w-full">
-                      Reverts {sortBy === "revert_usage" && "↓"}
+                    <span className="inline-flex items-center justify-end gap-1.5 w-full">
+                      Reverts
+                      {sortBy === "revert_usage" ? (
+                        <ArrowDown className="w-3.5 h-3.5 text-zinc-800" />
+                      ) : (
+                        <ArrowUpDown className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
+                      )}
                     </span>
                   </th>
                 </tr>
@@ -233,9 +260,69 @@ export default function MetricsSection() {
         </div>
 
         <div className="w-full flex flex-col rounded-xl border border-zinc-200/80 bg-white p-6">
-          <div className="mb-8">
-            <h3 className="text-sm font-semibold text-zinc-800 uppercase tracking-wider">Activity Trends</h3>
-            <p className="text-xs text-zinc-500 mt-1">Usage frequency by feature type per top user</p>
+          <div className="mb-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h3 className="text-sm font-semibold text-zinc-800 uppercase tracking-wider">Activity Trends</h3>
+              <p className="text-xs text-zinc-500 mt-1">Usage frequency by feature type per top user. Click tabs to isolate metrics.</p>
+            </div>
+            
+            <div className="flex flex-wrap gap-1 bg-zinc-100 p-1 rounded-xl border border-zinc-200/40">
+              <button
+                onClick={() => setActiveChartMetric("all")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold select-none transition-all cursor-pointer ${
+                  activeChartMetric === "all"
+                    ? "bg-white text-zinc-900 shadow-sm border border-zinc-200/20"
+                    : "text-zinc-500 hover:text-zinc-900"
+                }`}
+              >
+                <Award className="w-3.5 h-3.5 text-zinc-600" />
+                All Features
+              </button>
+              <button
+                onClick={() => setActiveChartMetric("READMEs")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold select-none transition-all cursor-pointer ${
+                  activeChartMetric === "READMEs"
+                    ? "bg-white text-emerald-600 shadow-sm border border-emerald-200/20"
+                    : "text-zinc-500 hover:text-emerald-600"
+                }`}
+              >
+                <FileText className="w-3.5 h-3.5 text-emerald-500" />
+                READMEs
+              </button>
+              <button
+                onClick={() => setActiveChartMetric("Commits")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold select-none transition-all cursor-pointer ${
+                  activeChartMetric === "Commits"
+                    ? "bg-white text-blue-600 shadow-sm border border-blue-200/20"
+                    : "text-zinc-500 hover:text-blue-600"
+                }`}
+              >
+                <GitCommit className="w-3.5 h-3.5 text-blue-500" />
+                Commits
+              </button>
+              <button
+                onClick={() => setActiveChartMetric("Licenses")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold select-none transition-all cursor-pointer ${
+                  activeChartMetric === "Licenses"
+                    ? "bg-white text-rose-600 shadow-sm border border-rose-200/20"
+                    : "text-zinc-500 hover:text-rose-600"
+                }`}
+              >
+                <Award className="w-3.5 h-3.5 text-rose-500" />
+                Licenses
+              </button>
+              <button
+                onClick={() => setActiveChartMetric("Reverts")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold select-none transition-all cursor-pointer ${
+                  activeChartMetric === "Reverts"
+                    ? "bg-white text-amber-600 shadow-sm border border-amber-200/20"
+                    : "text-zinc-500 hover:text-amber-600"
+                }`}
+              >
+                <RotateCcw className="w-3.5 h-3.5 text-amber-500" />
+                Reverts
+              </button>
+            </div>
           </div>
 
           <div className="w-full" style={{ height: 350 }}>
@@ -294,48 +381,58 @@ export default function MetricsSection() {
                     )
                   }}
                 />
-                <Bar
-                  hide={hiddenLines.READMEs}
-                  dataKey="READMEs"
-                  stackId="a"
-                  fill="#10b981"
-                  name="READMEs"
-                  radius={[0, 0, 0, 0]}
-                />
-                <Bar
-                  hide={hiddenLines.Commits}
-                  dataKey="Commits"
-                  stackId="a"
-                  fill="#3b82f6"
-                  name="Commits"
-                  radius={[0, 0, 0, 0]}
-                />
-                <Bar
-                  hide={hiddenLines.Licenses}
-                  dataKey="Licenses"
-                  stackId="a"
-                  fill="#f43f5e"
-                  name="Licenses"
-                  radius={[0, 0, 0, 0]}
-                />
-                <Bar
-                  hide={hiddenLines.Reverts}
-                  dataKey="Reverts"
-                  stackId="a"
-                  fill="#f59e0b"
-                  name="Reverts"
-                  radius={[4, 4, 0, 0]}
-                />
-                <Line
-                  hide={hiddenLines.Total}
-                  type="monotone"
-                  dataKey="Total"
-                  stroke="#7c3aed"
-                  strokeWidth={3}
-                  name="Total Usage"
-                  dot={{ r: 4, fill: '#ffffff', stroke: '#7c3aed', strokeWidth: 2 }}
-                  activeDot={{ r: 6, fill: '#7c3aed', stroke: '#ffffff', strokeWidth: 2 }}
-                />
+                {(activeChartMetric === "all" || activeChartMetric === "READMEs") && (
+                  <Bar
+                    hide={hiddenLines.READMEs}
+                    dataKey="READMEs"
+                    stackId={activeChartMetric === "all" ? "a" : undefined}
+                    fill="#10b981"
+                    name="READMEs"
+                    radius={activeChartMetric === "all" ? [0, 0, 0, 0] : [4, 4, 0, 0]}
+                  />
+                )}
+                {(activeChartMetric === "all" || activeChartMetric === "Commits") && (
+                  <Bar
+                    hide={hiddenLines.Commits}
+                    dataKey="Commits"
+                    stackId={activeChartMetric === "all" ? "a" : undefined}
+                    fill="#3b82f6"
+                    name="Commits"
+                    radius={activeChartMetric === "all" ? [0, 0, 0, 0] : [4, 4, 0, 0]}
+                  />
+                )}
+                {(activeChartMetric === "all" || activeChartMetric === "Licenses") && (
+                  <Bar
+                    hide={hiddenLines.Licenses}
+                    dataKey="Licenses"
+                    stackId={activeChartMetric === "all" ? "a" : undefined}
+                    fill="#f43f5e"
+                    name="Licenses"
+                    radius={activeChartMetric === "all" ? [0, 0, 0, 0] : [4, 4, 0, 0]}
+                  />
+                )}
+                {(activeChartMetric === "all" || activeChartMetric === "Reverts") && (
+                  <Bar
+                    hide={hiddenLines.Reverts}
+                    dataKey="Reverts"
+                    stackId={activeChartMetric === "all" ? "a" : undefined}
+                    fill="#f59e0b"
+                    name="Reverts"
+                    radius={[4, 4, 0, 0]}
+                  />
+                )}
+                {activeChartMetric === "all" && (
+                  <Line
+                    hide={hiddenLines.Total}
+                    type="monotone"
+                    dataKey="Total"
+                    stroke="#7c3aed"
+                    strokeWidth={3}
+                    name="Total Usage"
+                    dot={{ r: 4, fill: '#ffffff', stroke: '#7c3aed', strokeWidth: 2 }}
+                    activeDot={{ r: 6, fill: '#7c3aed', stroke: '#ffffff', strokeWidth: 2 }}
+                  />
+                )}
               </ComposedChart>
             </ResponsiveContainer>
           </div>
