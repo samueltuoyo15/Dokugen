@@ -701,11 +701,11 @@ def get_backend_domain():
 
     try:
         with requests.get(
-            "https://dokugen-readme.vercel.app/api/get-server-url", timeout=5
+            "https://dokugen.samueltuoyo.com/api/get-server-url", timeout=5
         ) as r:
             if r.status_code == 200:
                 return r.json().get("domain")
     except Exception:
         pass
 
-    return "https://dokugen-readme.vercel.app"
+    return "https://dokugen.samueltuoyo.com"

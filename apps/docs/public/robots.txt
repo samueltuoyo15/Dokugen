@@ -7,7 +7,7 @@ User-agent: *
 Disallow: /api/*
 
 # Host
-Host: https://dokugen-readme.vercel.app
+Host: https://dokugen.samueltuoyo.com
 
 # Sitemaps
-Sitemap: https://dokugen-readme.vercel.app/sitemap.xml
+Sitemap: https://dokugen.samueltuoyo.com/sitemap.xml

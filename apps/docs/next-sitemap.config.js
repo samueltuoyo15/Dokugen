@@ -1,6 +1,6 @@
 /** @type {import('next-sitemap').IConfig} */
 const config = {
-  siteUrl: 'https://dokugen-readme.vercel.app', 
+  siteUrl: 'https://dokugen.samueltuoyo.com', 
   generateRobotsTxt: true, 
   exclude: ['/api/*'], 
   changefreq: 'daily', 

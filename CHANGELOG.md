@@ -37,7 +37,7 @@ All notable changes to this project will be documented in this file.
 
 ### Patches
 - **Runaway Diagrams & Clutter**: Fixed the issue where flowcharts became too large and messy by attempting to render all client interactions and architectural details in a single giant diagram. The generator now splits actor tables and system summaries out of the flowchart flow, keeping the diagram legible and professional.
-- **Redirection of Badge URLs**: Pointed badge URL to `https://dokugen-readme.vercel.app` so they redirect to the website directly instead of the npm package, becuase we dont only support Typescript/Javascript projects.
+- **Redirection of Badge URLs**: Pointed badge URL to `https://dokugen.samueltuoyo.com` so they redirect to the website directly instead of the npm package, becuase we dont only support Typescript/Javascript projects.
 - **Runaway Spinner & 503 Lockup**: Fixed the annoying bug where the CLI spinner would spin forever if the backend timed out or threw a 503 error.
 - **Strict Omit Rules for Social Handles**: Fixed the AI occasionally generating placeholder links if you left your LinkedIn/X handles blank. It now deletes them entirely so your Author section stays clean.
 - **Markdown 4-Space Paragraph Indentation Ban**: Blocked the AI from indenting standard paragraphs with 4 spaces, which previously broke hyperlink rendering by triggering preformatted code-block mode.

@@ -80,11 +80,11 @@ export const getBackendDomain = async (): Promise<string> => {
 
   try {
     const response = await axios.get<{ domain: string }>(
-      "https://dokugen-readme.vercel.app/api/get-server-url",
+      "https://dokugen.samueltuoyo.com/api/get-server-url",
       { timeout: 5000 }
     );
     return response.data.domain;
   } catch (err) {
-    return "https://dokugen-readme.vercel.app";
+    return "https://dokugen.samueltuoyo.com";
   }
 };

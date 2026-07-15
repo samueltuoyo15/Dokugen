@@ -30,7 +30,7 @@ interface ApiResponse {
 
 const fetchMetrics = async (page: number, sortBy: string = "usage_count"): Promise<ApiResponse> => {
   try {
-    const response = await fetch(`https://dokugen-readme.vercel.app/api/active-users?page=${page}&limit=10&sortBy=${sortBy}`)
+    const response = await fetch(`https://dokugen.samueltuoyo.com/api/active-users?page=${page}&limit=10&sortBy=${sortBy}`)
     if (!response.ok) {
       throw new Error(`Failed to fetch metrics: ${response.statusText}`)
     }
