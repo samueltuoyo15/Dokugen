@@ -106,13 +106,14 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
       - **Simple Participant Labels**: Do NOT use technical code names like "ClientApp", "Go Gin Server", or "Gorilla Websocket". Use simple, real-world terminology like "New User", "Existing User", "Signaling Server", "Database".
       - **Architecture diagram**: Show ONLY the top-level boundaries: the client, the server/API, the database, and any major external services. Do NOT list every React component, every route handler, or every internal module by name. If the system has many components, group them into logical layers (e.g. "Frontend", "Backend Services", "Data Layer") rather than listing each one individually.
       - **Sequence diagrams**: Show ONLY the 3-5 most important steps in the flow. Skip internal self-calls, loops, and implementation details. Use plain, short actor names. If the flow involves many actors, group related services into a single participant (e.g. "Backend" instead of listing every microservice).
-      - **Premium Inline Styling**: Apply beautiful, custom color styling to flowchart nodes and sequence diagram participants to make them look premium, stunning, and modern on GitHub (using deep dark backgrounds, stroke outlines, and white text). Match colors exactly to the brand/entity type (do not use generic colors; use accurate brand-aligned colors and ball out to make it look premium):
-        - **Redis / Caching**: Use deep red theme (e.g. 'fill:#4c0519,stroke:#ef4444,stroke-width:2px,color:#fff').
-        - **PostgreSQL / SQL Databases / SQLite**: Use deep blue/postgres theme (e.g. 'fill:#0f172a,stroke:#3b82f6,stroke-width:2px,color:#fff').
-        - **Supabase / MongoDB / Green Databases**: Use rich green/emerald theme (e.g. 'fill:#022c22,stroke:#10b981,stroke-width:2px,color:#fff').
-        - **Firebase / Amber Services**: Use dark amber/orange theme (e.g. 'fill:#451a03,stroke:#f59e0b,stroke-width:2px,color:#fff').
-        - **Web Clients / Frontend**: Use deep navy/blue theme (e.g. 'fill:#1e1b4b,stroke:#6366f1,stroke-width:2px,color:#fff').
-        - **APIs / Backend Servers**: Use dark violet/purple theme (e.g. 'fill:#2e1065,stroke:#8b5cf6,stroke-width:2px,color:#fff').
+      - **Premium Inline Styling (Flowcharts Only)**: Apply beautiful, custom color styling to flowchart nodes to make them look premium, stunning, and modern on GitHub (using deep dark backgrounds, stroke outlines, and white text). Match colors exactly to the brand/entity type (do not use generic colors; use accurate brand-aligned colors and ball out to make it look premium):
+        - **Redis / Caching**: Use deep red theme (e.g. 'style Redis fill:#4c0519,stroke:#ef4444,stroke-width:2px,color:#fff').
+        - **PostgreSQL / SQL Databases / SQLite**: Use deep blue/postgres theme (e.g. 'style Postgres fill:#0f172a,stroke:#3b82f6,stroke-width:2px,color:#fff').
+        - **Supabase / MongoDB / Green Databases**: Use rich green/emerald theme (e.g. 'style Supabase fill:#022c22,stroke:#10b981,stroke-width:2px,color:#fff').
+        - **Firebase / Amber Services**: Use dark amber/orange theme (e.g. 'style Firebase fill:#451a03,stroke:#f59e0b,stroke-width:2px,color:#fff').
+        - **Web Clients / Frontend**: Use deep navy/blue theme (e.g. 'style WebClient fill:#1e1b4b,stroke:#6366f1,stroke-width:2px,color:#fff').
+        - **APIs / Backend Servers**: Use dark violet/purple theme (e.g. 'style API fill:#2e1065,stroke:#8b5cf6,stroke-width:2px,color:#fff').
+      - **NO STYLE DIRECTIVES IN SEQUENCE DIAGRAMS**: Mermaid sequence diagrams do NOT support \`style\` declarations (e.g. \`style NodeName fill:#...\`). Including them causes compilation syntax errors on GitHub. Never write any \`style\` declarations inside a \`sequenceDiagram\` block.
       - **Vary Layout Direction**: Choose the layout direction based on what the diagram is showing:
         - Use **LR** (left-to-right) for: pipeline flows, client --> server --> database architectures, horizontal request/response chains, peer-to-peer or WebRTC topologies. Example: \`flowchart LR\` for "Web Client --> API Server --> DB --> Cache".
         - Use **TD** (top-down) for: hierarchical structures, layered systems (e.g. monorepo with multiple clients under one server), decision trees.

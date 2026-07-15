@@ -71,26 +71,36 @@ router.post(
         return res.status(500).json({ error: "No Gemini API Key Provided" });
       }
 
-      const model = process.env.COMMIT_MODEL_NAME || "gemini-2.5-flash";
+      const primaryModel = process.env.COMMIT_MODEL_NAME || "gemini-2.5-flash";
+      const fallbackModel = process.env.COMMIT_FALLBACK_MODEL_NAME || "gemini-2.5-flash-lite";
       const prompt = buildCommitPrompt(diff);
 
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": apiKey, // key in header, never in URL
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [{ text: prompt }]
-              }
-            ]
-          }),
-        }
-      );
+      const makeRequest = async (modelName: string) => {
+        return fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-goog-api-key": apiKey,
+            },
+            body: JSON.stringify({
+              contents: [
+                {
+                  parts: [{ text: prompt }]
+                }
+              ]
+            }),
+          }
+        );
+      };
+
+      let response = await makeRequest(primaryModel);
+
+      if (!response.ok && primaryModel !== fallbackModel) {
+        logger.warn({ primaryModel, fallbackModel }, "Primary commit model failed - retrying with fallback model");
+        response = await makeRequest(fallbackModel);
+      }
 
       if (!response.ok) {
         const errorText = await response.text();

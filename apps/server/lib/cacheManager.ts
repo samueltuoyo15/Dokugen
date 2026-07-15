@@ -31,8 +31,8 @@ const REFRESH_BUFFER_MS = 5 * 60 * 1000;
  */
 export function getVersionedModelName(model: string): string {
   const versionMap: Record<string, string> = {
-    "gemini-2.5-flash":      "gemini-2.5-flash-001",
-    "gemini-2.5-pro":        "gemini-2.5-pro-001",
+    "gemini-2.5-flash":      "gemini-2.5-flash",
+    "gemini-2.5-pro":        "gemini-2.5-pro",
     "gemini-2.0-flash":      "gemini-2.0-flash-001",
     "gemini-2.0-flash-lite": "gemini-2.0-flash-lite-001",
     "gemini-1.5-flash":      "gemini-1.5-flash-001",
