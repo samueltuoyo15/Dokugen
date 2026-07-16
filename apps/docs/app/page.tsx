@@ -719,14 +719,14 @@ export default function DocsPage() {
                 
                 {/* Right hand side: Myhappr Tip Card */}
                 <div className="flex-1 w-full flex">
-                  <div className="bg-white border border-zinc-200/80 rounded-2xl shadow-sm p-5 flex flex-col w-full">
-                    <div className="mb-4 text-center md:text-left">
+                  <div className="bg-white border border-zinc-200/80 rounded-2xl shadow-sm p-0 sm:p-5 flex flex-col w-full">
+                    <div className="px-4 pt-4 pb-2 md:p-0 md:mb-4 text-center md:text-left">
                       <h4 className="text-sm font-bold text-zinc-800 mb-1">Myhappr Tip Card</h4>
                       <p className="text-zinc-400 text-[10px] leading-relaxed">
                         Support Samuel Tuoyo directly on Myhappr Tip Card to help fund Dokugen development if you are in Africa.
                       </p>
                     </div>
-                    <div className="flex-grow flex items-center justify-center">
+                    <div className="flex-grow flex items-center justify-center p-1 sm:p-0">
                       <SupportCard />
                     </div>
                   </div>

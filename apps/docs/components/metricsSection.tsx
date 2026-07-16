@@ -135,8 +135,8 @@ export default function MetricsSection() {
             <h3 className="text-sm font-semibold text-zinc-800 uppercase tracking-wider">Leaderboard</h3>
           </div>
 
-          <div className="flex-1 overflow-auto">
-            <table className="w-full text-left text-sm">
+          <div className="flex-1 overflow-x-auto w-full">
+            <table className="w-full min-w-[650px] text-left text-sm">
               <thead className="bg-zinc-50">
                 <tr>
                   <th className="px-6 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide">User</th>
@@ -155,7 +155,7 @@ export default function MetricsSection() {
                   </th>
                   <th
                     onClick={() => handleSortChange("readme_usage")}
-                    className="hidden sm:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
+                    className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
                   >
                     <span className="inline-flex items-center justify-end gap-1.5 w-full">
                       READMEs
@@ -168,7 +168,7 @@ export default function MetricsSection() {
                   </th>
                   <th
                     onClick={() => handleSortChange("commit_usage")}
-                    className="hidden sm:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
+                    className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
                   >
                     <span className="inline-flex items-center justify-end gap-1.5 w-full">
                       Commits
@@ -181,7 +181,7 @@ export default function MetricsSection() {
                   </th>
                   <th
                     onClick={() => handleSortChange("license_usage")}
-                    className="hidden md:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
+                    className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
                   >
                     <span className="inline-flex items-center justify-end gap-1.5 w-full">
                       Licenses
@@ -194,7 +194,7 @@ export default function MetricsSection() {
                   </th>
                   <th
                     onClick={() => handleSortChange("revert_usage")}
-                    className="hidden md:table-cell px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
+                    className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
                   >
                     <span className="inline-flex items-center justify-end gap-1.5 w-full">
                       Reverts
@@ -218,16 +218,16 @@ export default function MetricsSection() {
                         {user.usage_count.toLocaleString()}
                       </span>
                     </td>
-                    <td className="hidden sm:table-cell px-4 py-3 text-right text-zinc-600 font-mono text-xs">
+                    <td className="px-4 py-3 text-right text-zinc-600 font-mono text-xs">
                       {(user.readme_usage ?? 0).toLocaleString()}
                     </td>
-                    <td className="hidden sm:table-cell px-4 py-3 text-right text-zinc-600 font-mono text-xs">
+                    <td className="px-4 py-3 text-right text-zinc-600 font-mono text-xs">
                       {(user.commit_usage ?? 0).toLocaleString()}
                     </td>
-                    <td className="hidden md:table-cell px-4 py-3 text-right text-zinc-600 font-mono text-xs">
+                    <td className="px-4 py-3 text-right text-zinc-600 font-mono text-xs">
                       {(user.license_usage ?? 0).toLocaleString()}
                     </td>
-                    <td className="hidden md:table-cell px-4 py-3 text-right text-zinc-600 font-mono text-xs">
+                    <td className="px-4 py-3 text-right text-zinc-600 font-mono text-xs">
                       {(user.revert_usage ?? 0).toLocaleString()}
                     </td>
                   </tr>
