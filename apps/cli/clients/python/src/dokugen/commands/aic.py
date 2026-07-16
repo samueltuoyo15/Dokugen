@@ -48,31 +48,30 @@ def cmd_aic(args):
 
         start_time = time.time()
 
-        try:
-            with utils.create_ticking_spinner("Analyzing staged changes...") as spinner:
-                backend_domain = utils.get_backend_domain()
-                user_info = utils.get_user_info()
+        with utils.create_ticking_spinner("Analyzing staged changes...") as spinner:
+            backend_domain = utils.get_backend_domain()
+            user_info = utils.get_user_info()
 
-                response = requests.post(
-                    f"{backend_domain}/api/generate-commit",
-                    json={
-                        "diff": diff,
-                        "userInfo": user_info,
-                    },
-                    timeout=30
-                )
+            response = requests.post(
+                f"{backend_domain}/api/generate-commit",
+                json={
+                    "diff": diff,
+                    "userInfo": user_info,
+                },
+                timeout=30
+            )
 
-                if response.status_code != 200:
-                    console.print(f"[red]Error {response.status_code}: {response.text}[/red]")
-                    sys.exit(1)
+            if response.status_code != 200:
+                console.print(f"[red]Error {response.status_code}: {response.text}[/red]")
+                sys.exit(1)
 
-                commit_message = response.json().get("message")
-                if not commit_message:
-                    raise Exception("No commit message generated from backend")
+            commit_message = response.json().get("message")
+            if not commit_message:
+                raise Exception("No commit message generated from backend")
 
-            elapsed_str = utils.format_elapsed_time(start_time)
-            console.print(f"[green]Commit message generated successfully in {elapsed_str}:\n[/green]")
-            console.print(f"[green]\"{commit_message}\"\n[/green]")
+        elapsed_str = utils.format_elapsed_time(start_time)
+        console.print(f"[green]Commit message generated successfully in {elapsed_str}:\n[/green]")
+        console.print(f"[green]\"{commit_message}\"\n[/green]")
 
         final_commit_message = commit_message
 
