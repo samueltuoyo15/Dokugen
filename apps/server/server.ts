@@ -36,6 +36,10 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Dokugen API is running");
 });
 
+app.get("/test-restart", (req: Request, res: Response) => {
+  res.send("Auto-redeploy via Zeabur GraphQL API is working! 🚀");
+});
+
 
 app.get("/test-ci", (req: Request, res: Response) =>  {
   res.send("Docker and Github Actions deployment works perfectly!")

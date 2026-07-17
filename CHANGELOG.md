@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+### [14.0.4] - 2026-07-17
+### Fixed
+- **Python CLI `aic` parsing crash**: Removed redundant invalid nested `try` statement in Python CLI client for Git commits.
+
 ### [14.0.3] - 2026-07-15
 ### Patches
 - **Interactive Leaderboard Sorting**: Implemented server-side and client-side sorting/ranking by Total, READMEs, Commits, Licenses, and Reverts on the Project Analytics dashboard.

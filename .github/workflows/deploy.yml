@@ -41,3 +41,16 @@ jobs:
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Trigger Zeabur Redeploy via GraphQL API
+        env:
+          ZEABUR_API_TOKEN: ${{ secrets.ZEABUR_API_TOKEN }}
+          SERVICE_ID: ${{ secrets.ZEABUR_SERVICE_ID }}
+          ENVIRONMENT_ID: ${{ secrets.ZEABUR_ENVIRONMENT_ID }}
+        if: env.ZEABUR_API_TOKEN != '' && env.SERVICE_ID != '' && env.ENVIRONMENT_ID != ''
+        run: |
+          curl --request POST \
+            --url https://api.zeabur.com/graphql \
+            --header "Authorization: Bearer ${{ secrets.ZEABUR_API_TOKEN }}" \
+            --header "Content-Type: application/json" \
+            --data "{\"query\":\"mutation { restartService(serviceID: \\\"${{ secrets.ZEABUR_SERVICE_ID }}\\\", environmentID: \\\"${{ secrets.ZEABUR_ENVIRONMENT_ID }}\\\") }\"}"
