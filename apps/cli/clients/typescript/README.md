@@ -4,7 +4,7 @@
 
 [![Sponsor Dokugen](https://img.shields.io/badge/Sponsor-Dokugen-red?style=for-the-badge&logo=ko-fi&logoColor=white)](https://myhappr.xyz/samueltuoyo)
 
-Dokugen is a lightweight, AI-powered CLI tool that automatically generates and maintains `README.md` files and `LICENSE` files for your projects. It scans your codebase, understands what your project does, and produces clean, professional documentation — so you don't have to.
+Dokugen is a lightweight, AI-powered CLI tool that automatically generates and maintains `README.md` files and `LICENSE` files for your projects. It scans your codebase, understands what your project does, and produces clean, professional documentation, so you don't have to.
 
 ---
 
