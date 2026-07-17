@@ -34,7 +34,7 @@ app.use("/api", readmeRouter);
 app.use("/api", commitRouter);
 app.use("/api", trackRouter);
 
-app.get("/", (_req: Request, res: Response) => {
+app.get("/", (req: Request, res: Response) => {
   res.send("Dokugen API is running");
 });
 
