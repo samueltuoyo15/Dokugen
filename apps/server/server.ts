@@ -36,14 +36,6 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Dokugen API is running");
 });
 
-app.get("/test-restart", (req: Request, res: Response) => {
-  res.send("Auto-redeploy via Zeabur GraphQL API is working! 🚀");
-});
-
-
-app.get("/test-ci", (req: Request, res: Response) =>  {
-  res.send("Docker and Github Actions deployment works perfectly!")
-})
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   logger.error({ message: err.message, name: err.name }, "Unhandled error");
