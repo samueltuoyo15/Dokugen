@@ -5,7 +5,8 @@
     "audio": "node scripts/generate-audio.mjs",
     "studio": "remotion studio src/index.ts",
     "still": "remotion still src/index.ts DokugenMobileFilm out/preview.png --frame=630",
-    "render": "remotion render src/index.ts DokugenMobileFilm out/dokugen-mobile-film.mp4 --codec=h264 --crf=18 --audio-codec=aac"
+    "render": "remotion render src/index.ts DokugenMobileFilm out/dokugen-mobile-film.mp4 --codec=h264 --crf=18 --audio-codec=aac",
+    "render:4k": "remotion render src/index.ts DokugenMobileFilm out/dokugen-mobile-film-4k.mp4 --scale=2 --codec=h264 --crf=16 --audio-codec=aac"
   },
   "dependencies": {
     "@remotion/cli": "^4.0.0",

@@ -16,7 +16,7 @@ export const RemotionRoot = () => {
       <Composition
         id="DokugenMobileFilm"
         component={DokugenVertical}
-        durationInFrames={900}
+        durationInFrames={1730}
         fps={30}
         width={1080}
         height={1920}
