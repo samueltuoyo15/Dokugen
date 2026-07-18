@@ -1,0 +1,23 @@
+{
+  "name": "dokugen-launch-film",
+  "private": true,
+  "scripts": {
+    "audio": "node scripts/generate-audio.mjs",
+    "studio": "remotion studio src/index.ts",
+    "still": "remotion still src/index.ts DokugenMobileFilm out/preview.png --frame=630",
+    "render": "remotion render src/index.ts DokugenMobileFilm out/dokugen-mobile-film.mp4 --codec=h264 --crf=18 --audio-codec=aac"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.0",
+    "@remotion/media": "^4.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "remotion": "^4.0.0",
+    "tslib": "^2.8.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.9.0"
+  }
+}

@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+### [14.0.5] - 2026-07-18
+### Fixed
+- **Windows OAuth URL Truncation**: Fixed a bug in the TypeScript CLI where query parameters in the Google OAuth URL (specifically `response_type`) were truncated on Windows because `cmd.exe /c start` interpreted the `&` character as a command separator. Shell metacharacters are now properly escaped with carets (`^`) specifically on Windows.
+
 ### [14.0.4] - 2026-07-17
 ### Fixed
 - **Python CLI `aic` parsing crash**: Removed redundant invalid nested `try` statement in Python CLI client for Git commits.

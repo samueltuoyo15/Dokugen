@@ -48,7 +48,9 @@ function openBrowser(url: string): void {
   if (isTermux) {
     execFile("termux-open-url", [url]);
   } else if (platform === "win32") {
-    execFile("cmd", ["/c", "start", "", url]);
+    // Escape special shell characters to prevent cmd.exe from splitting the URL at '&'
+    const escapedUrl = url.replace(/[&^<>|]/g, "^$&");
+    execFile("cmd", ["/c", "start", "", escapedUrl]);
   } else if (platform === "darwin") {
     execFile("open", [url]);
   } else {
