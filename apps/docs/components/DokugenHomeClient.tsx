@@ -123,29 +123,6 @@ export default function DokugenHomeClient() {
     staleTime: 1000 * 60 * 10
   })
 
-  const { data: statsData } = useQuery<{
-    totalUsers: number
-    totalGenerations: number
-    totalReadmes: number
-    totalCommits: number
-  }>({
-    queryKey: ["siteStats"],
-    queryFn: async () => {
-      try {
-        const res = await fetch("/api/stats")
-        if (!res.ok) {
-          const fallbackRes = await fetch("https://dokugen.samueltuoyo.com/api/stats")
-          if (!fallbackRes.ok) return { totalUsers: 238, totalGenerations: 2136, totalReadmes: 2084, totalCommits: 49 }
-          return fallbackRes.json()
-        }
-        return res.json()
-      } catch {
-        return { totalUsers: 238, totalGenerations: 2136, totalReadmes: 2084, totalCommits: 49 }
-      }
-    },
-    staleTime: 1000 * 60 * 5,
-  })
-
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -211,17 +188,6 @@ export default function DokugenHomeClient() {
               width={70}
               alt="Smile Logo"
             />
-            {/* Slanted GitHub Stars Badge - Responsive (inline under logo on mobile, absolute on desktop) */}
-            {starsCount !== undefined && (
-              <a
-                href="https://github.com/samueltuoyo15/Dokugen"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="sm:absolute sm:-top-1 sm:-right-24 mt-3 sm:mt-0 mx-auto sm:mx-0 bg-yellow-100 text-yellow-800 text-[10px] px-2.5 py-1 rounded-full border border-yellow-200 font-bold rotate-[-6deg] sm:rotate-[12deg] hover:scale-105 transition-transform shadow-sm flex items-center gap-1 font-mono selection:bg-yellow-800 selection:text-white whitespace-nowrap w-fit"
-              >
-                ★ {starsCount.toLocaleString()} stars!
-              </a>
-            )}
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-black mb-6 tracking-tight text-zinc-900 max-w-3xl mx-auto leading-[1.15]">
@@ -229,35 +195,11 @@ export default function DokugenHomeClient() {
             <span className="highlight highlight-purple">beautiful</span> and <span className="highlight highlight-yellow">accurate</span> READMEs
           </h1>
 
-          <p className="text-lg md:text-xl text-zinc-500 mb-8 max-w-2xl mx-auto leading-relaxed font-light">
+          <p className="text-lg md:text-xl text-zinc-500 mb-10 max-w-2xl mx-auto leading-relaxed font-light">
             Writing READMEs is a chore, and keeping them updated is even worse. Dokugen takes that pain away by scanning your codebase to generate a beautiful, detailed README in seconds. It lets you update it instantly as your code changes, so you can spend your time building, not formatting markdown.
           </p>
 
-          {/* Social Proof Live Stats Pills */}
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-10 text-xs sm:text-sm font-medium text-zinc-600">
-            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-zinc-200/80 shadow-xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="font-bold text-zinc-900">
-                {(statsData?.totalUsers ?? 238).toLocaleString()}
-              </span>{" "}
-              Active Developers
-            </div>
-
-            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-zinc-200/80 shadow-xs">
-              <Zap className="w-4 h-4 text-purple-600" />
-              <span className="font-bold text-zinc-900">
-                {(statsData?.totalGenerations ?? 2136).toLocaleString()}
-              </span>{" "}
-              Generations
-            </div>
-
-            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-zinc-200/80 shadow-xs">
-              <Globe className="w-4 h-4 text-blue-500" />
-              <span>100% Free & Open Source</span>
-            </div>
-          </div>
-
-          <div className="mt-8 max-w-lg mx-auto">
+          <div className="mt-12 max-w-lg mx-auto">
             <div className="relative group">
               <input
                 type="text"
@@ -385,6 +327,40 @@ export default function DokugenHomeClient() {
                   file to check the final output.
                 </p>
               </div>
+            </div>
+          </motion.div>
+        )}
+
+        {!searchQuery && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="mt-24"
+          >
+            <div className="bg-white p-3 rounded-3xl border border-zinc-200/80 shadow-sm">
+              <div className="bg-zinc-50 rounded-2xl overflow-hidden border border-zinc-100 relative">
+                {/* macOS control dots */}
+                <div className="flex items-center gap-1.5 px-4 py-3 border-b border-zinc-100 bg-zinc-50">
+                  <div className="w-3 h-3 rounded-full bg-rose-400"></div>
+                  <div className="w-3 h-3 rounded-full bg-amber-400"></div>
+                  <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
+                  <div className="text-[11px] text-zinc-400 font-mono mx-auto pr-10 select-none">Demo.gif</div>
+                </div>
+                <video
+                  src="/Demo.mp4"
+                  muted
+                  autoPlay
+                  loop
+                  playsInline
+                  className="w-full h-full object-cover opacity-95 hover:opacity-100 transition-opacity duration-500"
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              <p className="text-center text-zinc-400 mt-4 mb-1 text-xs uppercase tracking-widest font-bold">
+                Dokugen in Action
+              </p>
             </div>
           </motion.div>
         )}
@@ -538,6 +514,15 @@ export default function DokugenHomeClient() {
           </motion.div>
         )}
 
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="mt-32"
+        >
+          <MetricsSection />
+        </motion.div>
+
         {!searchQuery && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -652,47 +637,6 @@ export default function DokugenHomeClient() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="mt-32"
-        >
-          <div className="bg-white p-3 rounded-3xl border border-zinc-200/80">
-            <div className="bg-zinc-50 rounded-2xl overflow-hidden border border-zinc-100 relative">
-              {/* macOS control dots */}
-              <div className="flex items-center gap-1.5 px-4 py-3 border-b border-zinc-100 bg-zinc-50">
-                <div className="w-3 h-3 rounded-full bg-rose-400"></div>
-                <div className="w-3 h-3 rounded-full bg-amber-400"></div>
-                <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
-                <div className="text-[11px] text-zinc-400 font-mono mx-auto pr-10 select-none">Demo.gif</div>
-              </div>
-              <video
-                src="/Demo.mp4"
-                muted
-                autoPlay
-                loop
-                playsInline
-                className="w-full h-full object-cover opacity-95 hover:opacity-100 transition-opacity duration-500"
-              >
-                Your browser does not support the video tag.
-              </video>
-            </div>
-            <p className="text-center text-zinc-400 mt-4 mb-1 text-xs uppercase tracking-widest font-bold">
-              Dokugen in Action
-            </p>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.2 }}
-          className="mt-32"
-        >
-          <MetricsSection />
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1 }}
           className="mt-32 pb-8 border-t border-zinc-200 pt-16 w-full"
         >
@@ -747,10 +691,12 @@ export default function DokugenHomeClient() {
                         Support Dokugen
                       </p>
                       <div className="flex flex-col items-center justify-center my-auto">
-                        <img
+                        <Image
                           src="https://github.com/samueltuoyo15.png"
                           alt="Samuel Tuoyo"
-                          className="w-20 h-20 rounded-full border-2 border-zinc-200 shrink-0 mb-4 shadow-sm"
+                          width={80}
+                          height={80}
+                          className="rounded-full border-2 border-zinc-200 shrink-0 mb-4 shadow-sm"
                         />
                         <h5 className="font-bold text-zinc-800 text-lg leading-snug group-hover:text-blue-600 transition-colors duration-200 max-w-[280px]">
                           Sponsor Samuel Tuoyo on GitHub Sponsors

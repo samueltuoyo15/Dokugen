@@ -5,7 +5,7 @@ import axios from "axios";
 import { createSpinner } from "nanospinner";
 import { select, text, isCancel } from "@clack/prompts";
 import { isGitRepository, getUserInfo } from "../helpers/git.js";
-import { getBackendDomain, checkAndUpdate } from "../helpers/network.js";
+import { getBackendDomain, checkAndUpdate, checkInternetConnection } from "../helpers/network.js";
 
 export function registerAicCommand(program: Command) {
   program
@@ -20,6 +20,17 @@ export function registerAicCommand(program: Command) {
         console.log(
           chalk.red(
             "Opps... No Git repository found. Please navigate to a project directory that has a Git repository, or initialize one using 'git init'."
+          )
+        );
+        process.exit(1);
+      }
+
+      if (!(await checkInternetConnection())) {
+        const rawUsername = getUserInfo()?.username;
+        const username = rawUsername ? rawUsername.replace(/\d+/g, "") : "";
+        console.log(
+          chalk.red(
+            `Opps... ${username} kindly check your device or pc internet connection and try again.`
           )
         );
         process.exit(1);
@@ -175,7 +186,17 @@ export function registerAicCommand(program: Command) {
           console.log(chalk.green("Push successful"));
         }
       } catch (error: any) {
-        console.error(chalk.red("Commit failed:"), error.response?.data?.error || error.message);
+        if (error.code === "ENOTFOUND" || error.code === "EAI_AGAIN" || error.code === "ECONNREFUSED" || !error.response) {
+          const rawUsername = getUserInfo()?.username;
+          const username = rawUsername ? rawUsername.replace(/\d+/g, "") : "";
+          console.log(
+            chalk.red(
+              `Opps... ${username} kindly check your device or pc internet connection and try again.`
+            )
+          );
+        } else {
+          console.error(chalk.red("Commit failed:"), error.response?.data?.error || error.message);
+        }
         process.exit(1);
       }
     });

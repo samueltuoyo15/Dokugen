@@ -4,7 +4,7 @@ import { useState, useRef } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
 import Image from "next/image"
-import { ArrowDown, ArrowUpDown, FileText, GitCommit, Award, RotateCcw } from "lucide-react"
+import { ArrowDown, ArrowUpDown, FileText, GitCommit, Award, RotateCcw, Users, Flame, Code2 } from "lucide-react"
 
 interface UserMetrics {
   id: string
@@ -30,7 +30,10 @@ interface ApiResponse {
 
 const fetchMetrics = async (page: number, sortBy: string = "usage_count"): Promise<ApiResponse> => {
   try {
-    const response = await fetch(`https://dokugen.samueltuoyo.com/api/active-users?page=${page}&limit=10&sortBy=${sortBy}`)
+    let response = await fetch(`/api/active-users?page=${page}&limit=10&sortBy=${sortBy}`)
+    if (!response.ok) {
+      response = await fetch(`https://dokugen.samueltuoyo.com/api/active-users?page=${page}&limit=10&sortBy=${sortBy}`)
+    }
     if (!response.ok) {
       throw new Error(`Failed to fetch metrics: ${response.statusText}`)
     }
@@ -99,6 +102,44 @@ export default function MetricsSection() {
     Reverts: false,
   })
 
+  const { data: starsCount } = useQuery<number>({
+    queryKey: ["githubStars"],
+    queryFn: async () => {
+      try {
+        const res = await fetch("https://api.github.com/repos/samueltuoyo15/Dokugen")
+        if (!res.ok) return 301
+        const data = await res.json()
+        return data.stargazers_count
+      } catch {
+        return 301
+      }
+    },
+    staleTime: 1000 * 60 * 10,
+  })
+
+  const { data: statsData } = useQuery<{
+    totalUsers: number
+    totalGenerations: number
+    totalReadmes: number
+    totalCommits: number
+  }>({
+    queryKey: ["siteStats"],
+    queryFn: async () => {
+      try {
+        const res = await fetch("/api/stats")
+        if (!res.ok) {
+          const fallbackRes = await fetch("https://dokugen.samueltuoyo.com/api/stats")
+          if (!fallbackRes.ok) return { totalUsers: 238, totalGenerations: 2137, totalReadmes: 2084, totalCommits: 49 }
+          return fallbackRes.json()
+        }
+        return res.json()
+      } catch {
+        return { totalUsers: 238, totalGenerations: 2137, totalReadmes: 2084, totalCommits: 49 }
+      }
+    },
+    staleTime: 1000 * 60 * 5,
+  })
+
   const toggleLine = (dataKey: string) => {
     setHiddenLines((prev) => ({
       ...prev,
@@ -140,7 +181,7 @@ export default function MetricsSection() {
   )
 
   const chartData = data?.activeUsers.map((user) => ({
-    username: user.username,
+    name: user.username,
     Total: user.usage_count,
     READMEs: user.readme_usage || 0,
     Commits: user.commit_usage || 0,
@@ -151,11 +192,70 @@ export default function MetricsSection() {
 
   return (
     <div className="mt-20 space-y-10 font-sans">
-      <div className="flex flex-col space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight text-zinc-900">Project Analytics</h2>
-        <p className="text-zinc-500 text-sm max-w-lg">
-          Real-time insights into active developers using dokugen and usage statistics.
-        </p>
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col space-y-2">
+          <h2 className="text-3xl font-bold tracking-tight text-zinc-900">Project Analytics</h2>
+          <p className="text-zinc-500 text-sm max-w-lg">
+            Real-time insights into active developers using dokugen and usage statistics.
+          </p>
+        </div>
+
+        {/* Social Proof Live Stats Pills */}
+        <div className="grid grid-cols-2 sm:flex sm:flex-row sm:flex-wrap items-center gap-2 sm:gap-3 shrink-0">
+          {/* GitHub Stars Pill */}
+          <a
+            href="https://github.com/samueltuoyo15/Dokugen"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 sm:gap-2.5 bg-yellow-50/90 px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-full border border-yellow-200/90 hover:border-yellow-400 transition-all shrink-0 group text-yellow-950 shadow-2xs col-span-1"
+          >
+            <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-yellow-400 text-yellow-950 flex items-center justify-center font-bold text-[10px] sm:text-xs shrink-0 shadow-2xs">
+              ★
+            </div>
+            <span className="text-yellow-950 text-[10px] sm:text-xs md:text-sm whitespace-nowrap overflow-hidden text-ellipsis">
+              <strong className="font-extrabold font-mono">
+                {(starsCount ?? 301).toLocaleString()}
+              </strong>{" "}
+              Stars on GitHub
+            </span>
+          </a>
+
+          {/* Active Developers Pill */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 bg-white px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-full border border-zinc-200/90 shadow-2xs hover:border-emerald-300 transition-all shrink-0 group col-span-1">
+            <div className="flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-50 border border-emerald-200/70 text-emerald-600 shrink-0">
+              <Users className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-emerald-600" />
+            </div>
+            <span className="text-zinc-700 text-[10px] sm:text-xs md:text-sm whitespace-nowrap overflow-hidden text-ellipsis">
+              <strong className="font-extrabold text-zinc-950 font-mono">
+                {(statsData?.totalUsers ?? 238).toLocaleString()}
+              </strong>{" "}
+              Active Devs
+            </span>
+          </div>
+
+          {/* Generations Pill */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 bg-gradient-to-r from-purple-50/90 via-indigo-50/80 to-purple-50/90 px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-full border border-purple-200/80 hover:border-purple-300 transition-all shrink-0 col-span-1">
+            <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 text-white flex items-center justify-center shadow-2xs shrink-0">
+              <Flame className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-white/20 text-white" />
+            </div>
+            <span className="text-purple-950 font-medium text-[10px] sm:text-xs md:text-sm whitespace-nowrap overflow-hidden text-ellipsis">
+              <strong className="font-extrabold text-purple-950 font-mono">
+                {(statsData?.totalGenerations ?? 2137).toLocaleString()}
+              </strong>{" "}
+              Generations
+            </span>
+          </div>
+
+          {/* 100% Free & Open Source Pill */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 bg-zinc-950 text-white px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-full border border-zinc-800 hover:border-zinc-700 transition-all shrink-0 shadow-xs col-span-1">
+            <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-zinc-800 text-amber-400 flex items-center justify-center border border-zinc-700/60 shrink-0">
+              <Code2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+            </div>
+            <span className="font-semibold text-zinc-100 text-[10px] sm:text-xs md:text-sm whitespace-nowrap overflow-hidden text-ellipsis">
+              100% Free and Open Source
+            </span>
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-col gap-8 w-full">

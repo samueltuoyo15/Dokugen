@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+### [14.0.6] - 2026-07-20
+### Fixed
+- **CLI Connection Handling**: Improved offline detection and user-friendly error messages across all subcommands (`aic`, `license`, `revert`) when internet is disconnected.
+- **AI Stream Fallback**: Enhanced backend reliability during peak demand to seamlessly failover models without interrupting generations.
+- **Leaderboard Navigation**: Added smooth auto-scroll to the top of the leaderboard when switching pages.
+- **Avatar & Favicon Rendering**: Fixed avatar badges for display names with spaces and updated site favicon to SVG.
+
+### Added
+- **Live Community Stats**: Added real-time active developer and generation metrics to the public landing page.
+
 ### [14.0.5] - 2026-07-18
 ### Fixed
 - **Windows OAuth URL Truncation**: Fixed a bug in the TypeScript CLI where query parameters in the Google OAuth URL (specifically `response_type`) were truncated on Windows because `cmd.exe /c start` interpreted the `&` character as a command separator. Shell metacharacters are now properly escaped with carets (`^`) specifically on Windows.

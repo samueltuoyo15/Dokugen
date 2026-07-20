@@ -1,18 +1,19 @@
-import { supabase } from "../lib/supabase.mjs"
-import { VercelRequest, VercelResponse } from "@vercel/node"
+import { supabase } from "../../../lib/supabase.mjs"
+import { NextResponse } from "next/server"
 
-export default async (req: VercelRequest, res: VercelResponse) => {
-  res.setHeader("Access-Control-Allow-Origin", "*")
-  res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300, stale-while-revalidate=600")
+export const dynamic = 'force-dynamic';
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).end()
-  }
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+    },
+  })
+}
 
-  if (req.method !== "GET") {
-    return res.status(405).json({ message: "Method not allowed" })
-  }
-
+export async function GET() {
   try {
     const { data, error, count } = await supabase
       .from("active_users")
@@ -34,15 +35,21 @@ export default async (req: VercelRequest, res: VercelResponse) => {
       }
     }
 
-    return res.status(200).json({
+    return NextResponse.json({
       totalUsers: count || 0,
       totalGenerations,
       totalReadmes,
       totalCommits,
       totalLicenses,
+    }, {
+      status: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=600",
+      }
     })
   } catch (error) {
     console.error("Error Fetching Stats:", error)
-    return res.status(500).json({ message: "Failed to fetch stats" })
+    return NextResponse.json({ message: "Failed to fetch stats" }, { status: 500 })
   }
 }

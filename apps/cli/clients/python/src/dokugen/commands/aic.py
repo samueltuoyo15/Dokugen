@@ -16,6 +16,12 @@ def cmd_aic(args):
         console.print("[red]Opps... No Git repository found. Please navigate to a project directory that has a Git repository, or initialize one using 'git init'.[/red]")
         sys.exit(1)
 
+    if not utils.check_internet_connection():
+        raw_username = utils.get_user_info().get("username", "")
+        username = "".join([i for i in raw_username if not i.isdigit()]) if raw_username else ""
+        console.print(f"[red]Opps... {username} kindly check your device or pc internet connection and try again.[/red]")
+        sys.exit(1)
+
     try:
         try:
             subprocess.run(["git", "config", "core.autocrlf", "true"], capture_output=True)
@@ -58,20 +64,22 @@ def cmd_aic(args):
                     "diff": diff,
                     "userInfo": user_info,
                 },
-                timeout=30
+                timeout=30,
             )
 
-            if response.status_code != 200:
-                console.print(f"[red]Error {response.status_code}: {response.text}[/red]")
-                sys.exit(1)
+        if response.status_code != 200:
+            err_msg = response.json().get("error", "Failed to generate commit message")
+            console.print(f"[red]Failed to generate commit message: {err_msg}[/red]")
+            sys.exit(1)
 
-            commit_message = response.json().get("message")
-            if not commit_message:
-                raise Exception("No commit message generated from backend")
+        commit_message = response.json().get("message", "").strip()
+        if not commit_message:
+            console.print("[red]No commit message generated from backend[/red]")
+            sys.exit(1)
 
         elapsed_str = utils.format_elapsed_time(start_time)
-        console.print(f"[green]Commit message generated successfully in {elapsed_str}:\n[/green]")
-        console.print(f"[green]\"{commit_message}\"\n[/green]")
+        console.print(f"[green]Commit message generated successfully in {elapsed_str}[/green]")
+        console.print(f'[green]"{commit_message}"\n[/green]')
 
         final_commit_message = commit_message
 
@@ -79,54 +87,65 @@ def cmd_aic(args):
             action = questionary.select(
                 "What would you like to do?",
                 choices=[
-                    questionary.Choice("Accept & Commit", value="commit"),
-                    questionary.Choice("Edit message", value="edit"),
-                    questionary.Choice("Regenerate message", value="regenerate"),
-                    questionary.Choice("Cancel", value="cancel"),
-                ]
+                    "Accept & Commit",
+                    "Edit message",
+                    "Regenerate message",
+                    "Cancel",
+                ],
             ).ask()
 
-            if action == "cancel" or action is None:
+            if action is None or action == "Cancel":
                 console.print("[yellow]Commit cancelled.[/yellow]")
                 sys.exit(0)
 
-            if action == "commit":
+            if action == "Accept & Commit":
                 break
-            elif action == "edit":
+            elif action == "Edit message":
                 edited = questionary.text(
                     "Edit commit message:",
-                    default=final_commit_message
+                    default=final_commit_message,
                 ).ask()
+
                 if edited is None:
                     continue
                 final_commit_message = edited.strip()
-                console.print(f"\n[green]Updated commit message:\n\"{final_commit_message}\"\n[/green]")
-            elif action == "regenerate":
-                try:
-                    with utils.create_ticking_spinner("Regenerating commit message...") as regen_spinner:
+                console.print(f'\n[green]Updated commit message:\n"{final_commit_message}"\n[/green]')
+            elif action == "Regenerate message":
+                with utils.create_ticking_spinner("Regenerating commit message...") as spinner:
+                    try:
                         response = requests.post(
                             f"{backend_domain}/api/generate-commit",
-                            json={"diff": diff, "userInfo": utils.get_user_info()},
-                            timeout=30
+                            json={
+                                "diff": diff,
+                                "userInfo": utils.get_user_info(),
+                            },
+                            timeout=30,
                         )
-                        if response.status_code != 200:
-                            raise Exception(response.text)
-                        final_commit_message = response.json().get("message")
-                        if not final_commit_message:
-                            raise Exception("No commit message generated from backend")
-                    console.print(f"[green]New commit message generated successfully:\n\"{final_commit_message}\"\n[/green]")
-                except Exception as e:
-                    console.print(f"[red]Failed to regenerate commit message: {e}[/red]")
+                        if response.status_code == 200:
+                            final_commit_message = response.json().get("message", "").strip()
+                            console.print("[green]New commit message generated successfully[/green]")
+                            console.print(f'[green]"{final_commit_message}"\n[/green]')
+                        else:
+                            console.print(f"[red]Failed to regenerate: {response.text}[/red]")
+                    except Exception as err:
+                        console.print(f"[red]Failed to regenerate: {err}[/red]")
 
-        console.print(f"[blue]> Running: git commit -m \"{final_commit_message}\"[/blue]")
-        subprocess.run(["git", "commit", "-m", final_commit_message], check=True)
-        console.print("\n[green]Commit successful[/green]")
+        res = subprocess.run(["git", "commit", "-m", final_commit_message])
+        if res.returncode != 0:
+            console.print(f"[red]Git commit failed with exit status {res.returncode}[/red]")
+            sys.exit(1)
+        console.print("[green]\nCommit successful[/green]")
 
         if getattr(args, "push", False):
             console.print("[blue]> Running: git push[/blue]")
             subprocess.run(["git", "push"], check=True)
             console.print("[green]Push successful[/green]")
 
+    except (requests.exceptions.RequestException, requests.exceptions.ConnectionError):
+        raw_username = utils.get_user_info().get("username", "")
+        username = "".join([i for i in raw_username if not i.isdigit()]) if raw_username else ""
+        console.print(f"[red]Opps... {username} kindly check your device or pc internet connection and try again.[/red]")
+        sys.exit(1)
     except Exception as e:
         console.print(f"[red]Commit failed: {e}[/red]")
         sys.exit(1)
