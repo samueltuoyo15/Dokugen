@@ -2,6 +2,7 @@
 const config = {
   siteUrl: 'https://dokugen.samueltuoyo.com', 
   generateRobotsTxt: true, 
+  generateIndexSitemap: false,
   exclude: ['/api/*'], 
   changefreq: 'daily', 
   priority: 0.8, 
@@ -14,5 +15,4 @@ const config = {
   }
 };
 
-
-export default config
+export default config;

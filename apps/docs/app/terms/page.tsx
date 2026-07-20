@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { motion } from "framer-motion"
-import { ArrowLeft } from "lucide-react"
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { ArrowLeft } from "lucide-react";
 
 export default function TermsPage() {
     return (
