@@ -123,7 +123,7 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
 
       ### Where to place diagrams:
 
-      1. **Architecture / System Design section** (after Features, before API docs):
+      1. **Architecture / System Design section** (placed IMMEDIATELY AFTER Overview, BEFORE Features):
          - One high-level architecture diagram showing the major top-level components only (e.g. Client, Server, Database, External API). No subgraphs listing internal sub-components.
 
       2. **Inside the Features section** — pick at most 1-3 KEY business-critical features and add a short sequence diagram beneath the feature description:

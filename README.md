@@ -6,6 +6,88 @@
 
 Dokugen is a helpful tool that automatically creates and updates README files for your projects. It takes a look at your codebase, figures out what your project does, and then writes a clear, detailed README so you don't have to spend time doing it yourself. It's built to make sure your project always has professional and accurate documentation.
 
+## System Architecture / Design
+
+Dokugen uses a client-server architecture. CLI clients (Python, TypeScript) interact with a backend API server, which then communicates with DeepSeek AI for README generation and Git commit message creation. User profile data is stored securely in a Supabase database.
+
+```mermaid
+flowchart LR
+  subgraph Clients["Dokugen Clients"]
+    TSCLI["TypeScript CLI"]
+    PythonCLI["Python CLI"]
+  end
+
+  API["API Server (Node.js Express)"]
+  AI["AI Model (DeepSeek)"]
+  DB[("Supabase Database")]
+
+  TSCLI --> API
+  PythonCLI --> API
+  API --> AI
+  API --> DB
+
+  style TSCLI fill:#1f3a60,stroke:#3b82f6,stroke-width:2px,color:#fff
+  style PythonCLI fill:#1f3a60,stroke:#3b82f6,stroke-width:2px,color:#fff
+  style API fill:#4a1525,stroke:#ec4899,stroke-width:2px,color:#fff
+  style AI fill:#5c1d24,stroke:#ef4444,stroke-width:2px,color:#fff
+  style DB fill:#022c22,stroke:#10b981,stroke-width:2px,color:#fff
+```
+
+## Features
+
+*   **Interactive Menu**: Run `dokugen` with no arguments to navigate all tool actions through a console prompt, making it easy to use for new and experienced developers.
+
+    ```mermaid
+    sequenceDiagram
+      actor User
+      participant CLI as "Dokugen CLI"
+      User->>CLI: Run "dokugen"
+      CLI->>CLI: Display interactive options
+      CLI->>User: Select action (Generate, Update, Commit)
+      User->>CLI: Choose an action
+      CLI->>CLI: Execute selected command
+    ```
+
+*   **Smart Updates**: Re-run the generation process without losing your manual modifications. Only auto-generated blocks get updated, ensuring your personalized content remains.
+
+    ```mermaid
+    sequenceDiagram
+      actor User
+      participant CLI as "Dokugen CLI"
+      participant API as "API Server"
+      participant AI as "AI Model"
+      User->>CLI: Run "dokugen update"
+      CLI->>API: Send project data + existing README
+      API->>AI: Analyze code and README
+      AI->>API: Return updated README sections
+      API->>CLI: Send updated content
+      CLI->>User: Write merged README.md
+    ```
+
+*   **AI-Powered Commits**: Automatically stages changes and generates conventional commit messages using AI, based on your staged files. This helps maintain a consistent and clear commit history.
+
+    ```mermaid
+    sequenceDiagram
+      actor User
+      participant CLI as "Dokugen CLI"
+      participant Git as "Local Git"
+      participant API as "API Server"
+      participant AI as "AI Model"
+      User->>CLI: Run "dokugen aic"
+      CLI->>Git: Get staged changes (diff)
+      CLI->>API: Send diff for analysis
+      API->>AI: Request commit message
+      AI->>API: Return generated message
+      API->>CLI: Send commit message
+      CLI->>User: Confirm / Edit message
+      User->>CLI: Accept message
+      CLI->>Git: Commit changes
+    ```
+
+*   **Compressed Uploads**: Efficiently packages codebases with 70–90% upload size compression to support analyzing larger projects without hitting API size limits.
+
+*   **Language & Framework Agnostic**: Works out of the box with any programming language or framework (JavaScript, TypeScript, Python, Rust, Go, Java, PHP, C++, Django, React, etc.). You don't need Node.js or Python to be the main language of your codebase; simply install the Dokugen CLI globally using Node (`npm`/`pnpm`/`yarn`) or Python (`pip`/`uv`) on your system, and run it in any project folder.
+
 ## Installation
 
 This project is a monorepo. Here's how to get it running:
@@ -66,9 +148,9 @@ The server requires environment variables to run.
     PORT=3000
     NODE_ENV=development
     BACKEND_DOMAIN=http://localhost:3000
-    GOOGLE_GEMINI_API_KEY=your_gemini_api_key_here
     DEEPSEEK_API_KEY=your_deepseek_api_key_here
     README_MODEL_NAME=deepseek-v4-flash
+    COMMIT_MODEL_NAME=deepseek-v4-flash
     SUPABASE_CLIENT_URL=your_supabase_url
     SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
     SUPABASE_SECRET_KEY=your_supabase_secret_key
@@ -175,88 +257,6 @@ dokugen aic --push
 Accidentally generated something you didn't like? Restore your previous README instantly from our automatic backup.
 ```bash
 dokugen revert
-```
-
-## Features
-
-*   **Interactive Menu**: Run `dokugen` with no arguments to navigate all tool actions through a console prompt, making it easy to use for new and experienced developers.
-
-    ```mermaid
-    sequenceDiagram
-      actor User
-      participant CLI as "Dokugen CLI"
-      User->>CLI: Run "dokugen"
-      CLI->>CLI: Display interactive options
-      CLI->>User: Select action (Generate, Update, Commit)
-      User->>CLI: Choose an action
-      CLI->>CLI: Execute selected command
-    ```
-
-*   **Smart Updates**: Re-run the generation process without losing your manual modifications. Only auto-generated blocks get updated, ensuring your personalized content remains.
-
-    ```mermaid
-    sequenceDiagram
-      actor User
-      participant CLI as "Dokugen CLI"
-      participant API as "API Server"
-      participant AI as "AI Model"
-      User->>CLI: Run "dokugen update"
-      CLI->>API: Send project data + existing README
-      API->>AI: Analyze code and README
-      AI->>API: Return updated README sections
-      API->>CLI: Send updated content
-      CLI->>User: Write merged README.md
-    ```
-
-*   **AI-Powered Commits**: Automatically stages changes and generates conventional commit messages using AI, based on your staged files. This helps maintain a consistent and clear commit history.
-
-    ```mermaid
-    sequenceDiagram
-      actor User
-      participant CLI as "Dokugen CLI"
-      participant Git as "Local Git"
-      participant API as "API Server"
-      participant AI as "AI Model"
-      User->>CLI: Run "dokugen aic"
-      CLI->>Git: Get staged changes (diff)
-      CLI->>API: Send diff for analysis
-      API->>AI: Request commit message
-      AI->>API: Return generated message
-      API->>CLI: Send commit message
-      CLI->>User: Confirm / Edit message
-      User->>CLI: Accept message
-      CLI->>Git: Commit changes
-    ```
-
-*   **Compressed Uploads**: Efficiently packages codebases with 70–90% upload size compression to support analyzing larger projects without hitting API size limits.
-
-*   **Language & Framework Agnostic**: Works out of the box with any programming language or framework (JavaScript, TypeScript, Python, Rust, Go, Java, PHP, C++, Django, React, etc.). You don't need Node.js or Python to be the main language of your codebase; simply install the Dokugen CLI globally using Node (`npm`/`pnpm`/`yarn`) or Python (`pip`/`uv`) on your system, and run it in any project folder.
-
-## System Architecture / Design
-
-Dokugen uses a client-server architecture. CLI clients (Python, TypeScript) interact with a backend API server, which then communicates with an AI model for README generation and Git commit message creation. User profile data is stored securely in a Supabase database.
-
-```mermaid
-flowchart LR
-  subgraph Clients["Dokugen Clients"]
-    TSCLI["TypeScript CLI"]
-    PythonCLI["Python CLI"]
-  end
-
-  API["API Server (Node.js Express)"]
-  AI["AI Model (DeepSeek)"]
-  DB[("Supabase Database")]
-
-  TSCLI --> API
-  PythonCLI --> API
-  API --> AI
-  API --> DB
-
-  style TSCLI fill:#1f3a60,stroke:#3b82f6,stroke-width:2px,color:#fff
-  style PythonCLI fill:#1f3a60,stroke:#3b82f6,stroke-width:2px,color:#fff
-  style API fill:#4a1525,stroke:#ec4899,stroke-width:2px,color:#fff
-  style AI fill:#5c1d24,stroke:#ef4444,stroke-width:2px,color:#fff
-  style DB fill:#022c22,stroke:#10b981,stroke-width:2px,color:#fff
 ```
 
 ## Technologies Used
