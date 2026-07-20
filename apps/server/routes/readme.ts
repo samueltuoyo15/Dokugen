@@ -149,13 +149,28 @@ router.post(
         }
       };
 
+      const isRateLimitedOrOverloaded = (err: any): boolean => {
+        if (!err) return false;
+        const status = err.status || err.code;
+        const msg = typeof err.message === "string" ? err.message : JSON.stringify(err);
+        return (
+          status === 503 ||
+          status === 429 ||
+          msg.includes("503") ||
+          msg.includes("429") ||
+          msg.includes("UNAVAILABLE") ||
+          msg.includes("RESOURCE_EXHAUSTED") ||
+          msg.includes("Quota exceeded") ||
+          msg.includes("Too Many Requests")
+        );
+      };
+
       try {
         await streamChunks(streamResult);
       } catch (streamError: any) {
-        const is503 = streamError?.status === 503 || streamError?.message?.includes("503") || streamError?.message?.includes("UNAVAILABLE");
-        if (is503 && fallbackAlias !== modelAlias) {
-          // Primary model is overloaded - silently retry with fallback model.
-          logger.warn({ primaryModel: modelAlias, fallbackModel: fallbackAlias }, "Primary model 503 - retrying with fallback model");
+        if (isRateLimitedOrOverloaded(streamError) && fallbackAlias !== modelAlias) {
+          // Primary model is rate-limited or overloaded - silently retry with fallback model.
+          logger.warn({ primaryModel: modelAlias, fallbackModel: fallbackAlias, err: streamError.message }, "Primary model rate-limited/503 - retrying with fallback model");
           const fallbackStream = await buildStream(fallbackAlias);
           await streamChunks(fallbackStream);
         } else {
@@ -169,20 +184,34 @@ router.post(
       }
     } catch (error: any) {
       logger.error(error, "Error generating readme");
+      const isOverloaded = (err: any): boolean => {
+        if (!err) return false;
+        const status = err.status || err.code;
+        const msg = typeof err.message === "string" ? err.message : JSON.stringify(err);
+        return (
+          status === 503 ||
+          status === 429 ||
+          msg.includes("503") ||
+          msg.includes("429") ||
+          msg.includes("UNAVAILABLE") ||
+          msg.includes("RESOURCE_EXHAUSTED") ||
+          msg.includes("Quota exceeded") ||
+          msg.includes("Too Many Requests")
+        );
+      };
+
       // If SSE headers were already sent we cannot call res.status().json() -
       // doing so causes ERR_HTTP_HEADERS_SENT. Instead, send an error event
       // through the stream and close it gracefully.
       if (res.headersSent) {
-        const is503 = error?.status === 503 || error?.message?.includes("503") || error?.message?.includes("UNAVAILABLE");
-        const message = is503
+        const message = isOverloaded(error)
           ? "The AI model is currently experiencing high demand. Please try again in a moment."
           : "An error occurred while generating the README.";
         res.write(`data: ${JSON.stringify({ error: message })}\n\n`);
         res.end();
       } else {
-        const is503 = error?.status === 503 || error?.message?.includes("503") || error?.message?.includes("UNAVAILABLE");
-        res.status(is503 ? 503 : 500).json({
-          error: is503
+        res.status(isOverloaded(error) ? 503 : 500).json({
+          error: isOverloaded(error)
             ? "The AI model is currently experiencing high demand. Please try again in a moment."
             : "Error generating readme",
         });

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
 import Image from "next/image"
@@ -44,6 +44,27 @@ const fetchMetrics = async (page: number, sortBy: string = "usage_count"): Promi
 const GitHubUserLink = ({ username }: { username: string }) => {
   if (!username) return null
 
+  const isGitHubHandle = !username.includes(" ")
+
+  if (!isGitHubHandle) {
+    const initials = username
+      .split(" ")
+      .filter(Boolean)
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2)
+
+    return (
+      <div className="flex items-center gap-3 text-zinc-600 font-medium text-sm select-none">
+        <div className="w-8 h-8 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center font-semibold text-xs text-zinc-600">
+          {initials}
+        </div>
+        <span>{username}</span>
+      </div>
+    )
+  }
+
   return (
     <a
       href={`https://github.com/${username}`}
@@ -69,6 +90,7 @@ export default function MetricsSection() {
   const [currentPage, setCurrentPage] = useState(1)
   const [sortBy, setSortBy] = useState<string>("usage_count")
   const [activeChartMetric, setActiveChartMetric] = useState<string>("all")
+  const leaderboardRef = useRef<HTMLDivElement>(null)
   const [hiddenLines, setHiddenLines] = useState<Record<string, boolean>>({
     Total: false,
     READMEs: false,
@@ -87,6 +109,13 @@ export default function MetricsSection() {
   const handleSortChange = (column: string) => {
     setSortBy(column)
     setCurrentPage(1)
+  }
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage)
+    if (leaderboardRef.current) {
+      leaderboardRef.current.scrollIntoView({ behavior: "smooth", block: "start" })
+    }
   }
 
   const { data, error, isLoading } = useQuery<ApiResponse>({
@@ -130,7 +159,7 @@ export default function MetricsSection() {
       </div>
 
       <div className="flex flex-col gap-8 w-full">
-        <div className="w-full flex flex-col rounded-xl border border-zinc-200/80 bg-white overflow-hidden">
+        <div ref={leaderboardRef} className="w-full flex flex-col rounded-xl border border-zinc-200/80 bg-white overflow-hidden scroll-mt-24">
           <div className="p-5 border-b border-zinc-100 bg-zinc-50/50">
             <h3 className="text-sm font-semibold text-zinc-800 uppercase tracking-wider">Leaderboard</h3>
           </div>
@@ -238,7 +267,7 @@ export default function MetricsSection() {
 
           <div className="p-4 border-t border-zinc-100 flex justify-between items-center bg-zinc-50/50">
             <button
-              onClick={() => setCurrentPage(prev => prev - 1)}
+              onClick={() => handlePageChange(currentPage - 1)}
               disabled={!data?.pagination.hasPrev}
               className="px-3 py-1.5 text-xs font-semibold text-zinc-600 hover:text-zinc-900 disabled:opacity-30 disabled:hover:text-zinc-600 transition-colors"
             >
@@ -250,7 +279,7 @@ export default function MetricsSection() {
             </span>
 
             <button
-              onClick={() => setCurrentPage(prev => prev + 1)}
+              onClick={() => handlePageChange(currentPage + 1)}
               disabled={!data?.pagination.hasNext}
               className="px-3 py-1.5 text-xs font-semibold text-zinc-600 hover:text-zinc-900 disabled:opacity-30 disabled:hover:text-zinc-600 transition-colors"
             >

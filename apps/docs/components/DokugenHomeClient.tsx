@@ -123,6 +123,29 @@ export default function DokugenHomeClient() {
     staleTime: 1000 * 60 * 10
   })
 
+  const { data: statsData } = useQuery<{
+    totalUsers: number
+    totalGenerations: number
+    totalReadmes: number
+    totalCommits: number
+  }>({
+    queryKey: ["siteStats"],
+    queryFn: async () => {
+      try {
+        const res = await fetch("/api/stats")
+        if (!res.ok) {
+          const fallbackRes = await fetch("https://dokugen.samueltuoyo.com/api/stats")
+          if (!fallbackRes.ok) return { totalUsers: 238, totalGenerations: 2136, totalReadmes: 2084, totalCommits: 49 }
+          return fallbackRes.json()
+        }
+        return res.json()
+      } catch {
+        return { totalUsers: 238, totalGenerations: 2136, totalReadmes: 2084, totalCommits: 49 }
+      }
+    },
+    staleTime: 1000 * 60 * 5,
+  })
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -206,11 +229,35 @@ export default function DokugenHomeClient() {
             <span className="highlight highlight-purple">beautiful</span> and <span className="highlight highlight-yellow">accurate</span> READMEs
           </h1>
 
-          <p className="text-lg md:text-xl text-zinc-500 mb-10 max-w-2xl mx-auto leading-relaxed font-light">
+          <p className="text-lg md:text-xl text-zinc-500 mb-8 max-w-2xl mx-auto leading-relaxed font-light">
             Writing READMEs is a chore, and keeping them updated is even worse. Dokugen takes that pain away by scanning your codebase to generate a beautiful, detailed README in seconds. It lets you update it instantly as your code changes, so you can spend your time building, not formatting markdown.
           </p>
 
-          <div className="mt-12 max-w-lg mx-auto">
+          {/* Social Proof Live Stats Pills */}
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-10 text-xs sm:text-sm font-medium text-zinc-600">
+            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-zinc-200/80 shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span className="font-bold text-zinc-900">
+                {(statsData?.totalUsers ?? 238).toLocaleString()}
+              </span>{" "}
+              Active Developers
+            </div>
+
+            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-zinc-200/80 shadow-xs">
+              <Zap className="w-4 h-4 text-purple-600" />
+              <span className="font-bold text-zinc-900">
+                {(statsData?.totalGenerations ?? 2136).toLocaleString()}
+              </span>{" "}
+              Generations
+            </div>
+
+            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-zinc-200/80 shadow-xs">
+              <Globe className="w-4 h-4 text-blue-500" />
+              <span>100% Free & Open Source</span>
+            </div>
+          </div>
+
+          <div className="mt-8 max-w-lg mx-auto">
             <div className="relative group">
               <input
                 type="text"
