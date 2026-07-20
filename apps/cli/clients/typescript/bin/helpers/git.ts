@@ -9,28 +9,44 @@ export const getUserInfo = (): {
 } => {
   let gitName = "";
   let gitEmail = "";
+
+  const osInfo = {
+    platform: os.platform() || "unknown",
+    arch: os.arch() || "unknown",
+    release: os.release() || "unknown",
+  };
+
   try {
-    gitName =
-      execSync("git config --get user.name", { encoding: "utf-8" }).trim() ??
-      "";
-    gitEmail =
-      execSync("git config --get user.email", { encoding: "utf-8" }).trim() ??
-      "";
-    const osInfo = {
-      platform: os.platform() || "unknown",
-      arch: os.arch() || "unknown",
-      release: os.release() || "unknown",
-    };
-    if (gitName && gitEmail && osInfo)
-      return { username: gitName, email: gitEmail, osInfo };
-  } catch {
-    console.log(chalk.yellow("Git User Info not found. Using Defaults......"));
+    gitName = execSync("git config --get user.name", { encoding: "utf-8" }).trim();
+  } catch {}
+
+  try {
+    gitEmail = execSync("git config --get user.email", { encoding: "utf-8" }).trim();
+  } catch {}
+
+  let username = gitName;
+
+  if (!username && gitEmail && gitEmail.includes("@users.noreply.github.com")) {
+    const match = gitEmail.match(/^(?:\d+\+)?([^@]+)@users\.noreply\.github\.com$/i);
+    if (match && match[1]) {
+      username = match[1];
+    }
+  }
+
+  if (!username) {
+    try {
+      username = os.userInfo()?.username || "";
+    } catch {}
+  }
+
+  if (!username) {
+    username = "Unknown";
   }
 
   return {
-    username: os.userInfo().username || "",
-    email: "",
-    osInfo: { platform: "Unknown", arch: "Unknown", release: "Unknown" },
+    username,
+    email: gitEmail,
+    osInfo,
   };
 };
 

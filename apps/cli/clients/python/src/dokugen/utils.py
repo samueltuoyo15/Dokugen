@@ -189,11 +189,29 @@ def get_user_info():
         git_name = subprocess.check_output(
             ["git", "config", "--get", "user.name"], encoding="utf-8"
         ).strip()
+    except Exception:
+        pass
+
+    try:
         git_email = subprocess.check_output(
             ["git", "config", "--get", "user.email"], encoding="utf-8"
         ).strip()
-    except subprocess.CalledProcessError:
-        console.print("[yellow]Git User Info not found. Using Defaults......[/yellow]")
+    except Exception:
+        pass
+
+    username = git_name
+    if not username and git_email and "@users.noreply.github.com" in git_email:
+        parts = git_email.split("@")[0]
+        if "+" in parts:
+            username = parts.split("+", 1)[1]
+        else:
+            username = parts
+
+    if not username:
+        try:
+            username = os.getlogin()
+        except Exception:
+            username = "Unknown"
 
     os_info = {
         "platform": platform.system() or "unknown",
@@ -201,17 +219,9 @@ def get_user_info():
         "release": platform.release() or "unknown",
     }
 
-    if git_name and git_email:
-        return {"username": git_name, "email": git_email, "osInfo": os_info}
-
-    try:
-        username = os.getlogin()
-    except Exception:
-        username = "Unknown"
-
     return {
         "username": username,
-        "email": "",
+        "email": git_email,
         "osInfo": os_info,
     }
 
