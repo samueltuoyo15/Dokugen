@@ -65,32 +65,26 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
          - If you cannot determine a realistic example from the code, rewrite the sentence to not reference an example at all
          - A lead-in with nothing after it is a hallucination. Never do it.
 
-      4. **Formatting**:
-          - Never wrap output in markdown code blocks
-          - Use proper Markdown formatting
+       4. **Formatting**:
+          - NEVER indent code blocks or code fences (\`\`\`bash, \`\`\`json, etc.) with 4 or more spaces, even inside numbered or bulleted lists. 4-space indentation on code blocks breaks GitHub Markdown rendering by creating double-nested raw monospaced boxes. ALL code blocks MUST start flush at the left margin (0 spaces of indentation). Please obey this!!!!! obey!!
+          - Never wrap overall output in top-level markdown code blocks.
           - NO EMOJIS AT ALL - keep it clean and professional
           - NO EM-DASHES (the \u2014 character) anywhere in the README. Use a comma, colon, or rewrite the sentence instead.
-          - Never indent standard text paragraphs or follow-up descriptions with 4 or more spaces (e.g. under list items). Indenting text with 4 spaces converts it to a raw monospaced code block in Markdown, which breaks link rendering (e.g. '[link](url)' displays as raw text). Keep paragraphs unindented or use exactly 2 spaces of indentation for lists.
           - If you find screenshots in public folders (demo.png, screenshot.png etc.), include them in the very top of the file after the title.
 
-      4. **Tone**:
-         - Sound like a human wrote it
-         - Casual but professional
-         - No corporate speak or AI buzzwords
-         - Use contractions and natural language
+       5. **Tone**:
+          - Sound like a human wrote it
+          - Casual but professional
+          - No corporate speak or AI buzzwords
+          - Use contractions and natural language
 
-      5. **Always include the Dokugen badge at the bottom**
+       6. **Always include the Dokugen badge at the bottom**
 
-      6. **Always use full GitHub blob URLs for internal repo file links**:
-         - When linking to any file that lives inside the repository (e.g. LICENSE, CONTRIBUTION.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, CHANGELOG.md, SECURITY.md), you MUST use the full GitHub blob URL format, NOT a relative path.
-         - The correct format is: \`https://github.com/{owner}/{repo}/blob/main/{FILENAME}\`
-         - For example, if the repo is \`https://github.com/samueltuoyo15/Dokugen\`:
-           - CORRECT: \`[LICENSE](https://github.com/samueltuoyo15/Dokugen/blob/main/LICENSE)\`
-           - CORRECT: \`[Contribution Guide](https://github.com/samueltuoyo15/Dokugen/blob/main/CONTRIBUTION.md)\`
-           - WRONG: \`[LICENSE](LICENSE)\`
-           - WRONG: \`[Contribution Guide](CONTRIBUTION.md)\`
-         - Extract the owner and repo name from the git remote URL in the project data. If you cannot determine it, fall back to a relative path only as a last resort.
-         - This rule applies to ALL internal markdown file links without exception.
+       7. **Always use full GitHub blob URLs for internal repo file links**:
+          - When linking to any file that lives inside the repository (e.g. LICENSE, CONTRIBUTION.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, CHANGELOG.md, SECURITY.md), you MUST use the full GitHub blob URL format, NOT a relative path.
+          - The correct format is: \`https://github.com/{owner}/{repo}/blob/main/{FILENAME}\`
+          - Extract the owner and repo name from the git remote URL in the project data. If you cannot determine it, fall back to a relative path only as a last resort.
+          - This rule applies to ALL internal markdown file links without exception.
 
       Remember: The goal is to make someone understand what this project does and why they'd want to use it, not to impress them with technology names.      ${options.includeDiagrams === true ? `
       ## System Design Diagram Generation
