@@ -2,6 +2,7 @@ import express, { Application, Request, Response, NextFunction } from "express";
 import helmet from "helmet";
 import cors from "cors";
 import dotenv from "dotenv";
+import fs from "fs";
 import logger from "./utils/logger";
 import { limiter } from "./middleware/rateLimiter";
 import healthRouter from "./routes/health";
@@ -10,6 +11,17 @@ import commitRouter from "./routes/commit";
 import trackRouter from "./routes/track";
 
 dotenv.config();
+
+if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON && !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  const credPath = "/tmp/google-service-account.json";
+  try {
+    fs.writeFileSync(credPath, process.env.GOOGLE_SERVICE_ACCOUNT_JSON, "utf-8");
+    process.env.GOOGLE_APPLICATION_CREDENTIALS = credPath;
+    logger.info("Google Cloud service account credentials written from env var");
+  } catch (err) {
+    logger.error({ err }, "Failed to write Google Cloud service account credentials");
+  }
+}
 
 const app: Application = express();
 

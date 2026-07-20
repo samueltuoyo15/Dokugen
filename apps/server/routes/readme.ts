@@ -36,10 +36,7 @@ router.post(
         "Generate README request received"
       );
 
-      const apiKey = geminiApiKey || process.env.GOOGLE_GEMINI_API_KEY;
-      if (!apiKey) {
-        return res.status(500).json({ error: "No API Key Provided" });
-      }
+
 
       
       let fullCode      = rawFullCode;
@@ -101,12 +98,16 @@ router.post(
       const modelAlias     = process.env.README_MODEL_NAME || "gemini-2.5-flash";
       const fallbackAlias  = process.env.README_FALLBACK_MODEL || "gemini-2.5-flash";
       const versionedModel = getVersionedModelName(modelAlias);
-      const ai             = new GoogleGenAI({ apiKey });
+      const ai             = new GoogleGenAI({
+        vertexai: true,
+        project:  process.env.GOOGLE_CLOUD_PROJECT!,
+        location: process.env.GOOGLE_CLOUD_LOCATION || "us-central1",
+      });
 
       // Helper: build the stream for a given model alias.
       const buildStream = async (alias: string) => {
         const versioned = getVersionedModelName(alias);
-        const cacheName = await getCachedContentName(apiKey, options, alias);
+        const cacheName = await getCachedContentName(options, alias);
         if (cacheName) {
           logger.info({ cacheName }, "Generating README with context cache");
           return ai.models.generateContentStream({
