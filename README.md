@@ -67,7 +67,8 @@ The server requires environment variables to run.
     NODE_ENV=development
     BACKEND_DOMAIN=http://localhost:3000
     GOOGLE_GEMINI_API_KEY=your_gemini_api_key_here
-    MODEL_NAME=gemini-2.5-flash
+    DEEPSEEK_API_KEY=your_deepseek_api_key_here
+    README_MODEL_NAME=deepseek-v4-flash
     SUPABASE_CLIENT_URL=your_supabase_url
     SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
     SUPABASE_SECRET_KEY=your_supabase_secret_key
@@ -243,7 +244,7 @@ flowchart LR
   end
 
   API["API Server (Node.js Express)"]
-  AI["AI Model (Google Gemini)"]
+  AI["AI Model (DeepSeek)"]
   DB[("Supabase Database")]
 
   TSCLI --> API
@@ -264,7 +265,7 @@ flowchart LR
 | :--------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Monorepo** | [Turborepo](https://turbo.build/)                                                                                                                       |
 | **Backend**  | [TypeScript](https://www.typescriptlang.org/), [Node.js](https://nodejs.org/), [Express.js](https://expressjs.com/), [Supabase](https://supabase.com/) |
-| **AI**       | [Google Gemini](https://ai.google.dev/)                                                                                                                 |
+| **AI**       | [DeepSeek](https://www.deepseek.com/)                                                                                                                   |
 | **Client**   | [TypeScript](https://www.typescriptlang.org/), [Python](https://www.python.org/), [Go](https://go.dev/)                                                 |
 | **Frontend** | [React](https://react.dev/), [Next.js](https://nextjs.org/) (likely in future plans or for a web dashboard)                                              |
 | **Dev Tools**| [pnpm](https://pnpm.io/)                                                                                                                                |
@@ -298,7 +299,7 @@ This project is licensed under the MIT License. See the [LICENSE](https://github
 [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://go.dev/)
 [![Supabase](https://img.shields.io/badge/Supabase-181818?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
-[![Google Gemini](https://img.shields.io/badge/Google_Gemini-FF0000?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
+[![DeepSeek](https://img.shields.io/badge/DeepSeek-4B6BFB?style=for-the-badge&logo=deepseek&logoColor=white)](https://www.deepseek.com/)
 [![Turborepo](https://img.shields.io/badge/Turborepo-EF4444?style=for-the-badge&logo=turborepo&logoColor=white)](https://turbo.build/)
 [![pnpm](https://img.shields.io/badge/pnpm-F69220?style=for-the-badge&logo=pnpm&logoColor=white)](https://pnpm.io/)
 [![Made in Nigeria](https://img.shields.io/badge/made%20in-nigeria-008751.svg?style=flat-square)](https://github.com/acekyd/made-in-nigeria)

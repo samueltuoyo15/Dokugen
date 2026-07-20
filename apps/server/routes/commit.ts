@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import { GoogleGenAI } from "@google/genai";
+import OpenAI from "openai";
 import { trackUser } from "../lib/supabaseTracker";
 import logger from "../utils/logger";
 
@@ -56,70 +56,36 @@ router.post(
   "/generate-commit",
   async (req: Request, res: Response): Promise<any> => {
     try {
-      const { diff, geminiApiKey, userInfo } = req.body;
+      const { diff, userInfo } = req.body;
 
       if (!diff) {
         return res.status(400).json({ error: "No git diff provided" });
       }
 
-      // Track usage fire-and-forget — never block commit generation
       if (userInfo?.username && userInfo?.email) {
         trackUser({ ...userInfo, id: userInfo.id || uuidv4() }, "commit").catch(() => {});
       }
 
-
-
-      const primaryModel  = process.env.COMMIT_MODEL_NAME || "gemini-2.5-flash";
-      const fallbackModel = process.env.COMMIT_FALLBACK_MODEL_NAME || "gemini-2.5-flash-lite";
-      const prompt        = buildCommitPrompt(diff);
-
-      const ai = new GoogleGenAI({
-        vertexai: true,
-        project:  process.env.GOOGLE_CLOUD_PROJECT!,
-        location: process.env.GOOGLE_CLOUD_LOCATION || "us-central1",
-      });
-
-      const makeRequest = async (modelName: string): Promise<string> => {
-        const result = await ai.models.generateContent({
-          model: modelName,
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-        });
-        return result.text ?? "chore: update code";
-      };
-
-      const isRateLimitedOrOverloaded = (err: any): boolean => {
-        if (!err) return false;
-        const status = err.status || err.code;
-        const msg = typeof err.message === "string" ? err.message : JSON.stringify(err);
-        return (
-          status === 503 ||
-          status === 429 ||
-          msg.includes("503") ||
-          msg.includes("429") ||
-          msg.includes("UNAVAILABLE") ||
-          msg.includes("RESOURCE_EXHAUSTED") ||
-          msg.includes("Quota exceeded") ||
-          msg.includes("Too Many Requests")
-        );
-      };
-
-      let message: string;
-      try {
-        message = await makeRequest(primaryModel);
-      } catch (primaryErr: any) {
-        if (isRateLimitedOrOverloaded(primaryErr) && fallbackModel !== primaryModel) {
-          logger.warn(
-            { primaryModel, fallbackModel },
-            "Primary commit model rate-limited/overloaded - retrying with fallback model"
-          );
-          message = await makeRequest(fallbackModel);
-        } else {
-          throw primaryErr;
-        }
+      const apiKey = process.env.DEEPSEEK_API_KEY;
+      if (!apiKey) {
+        return res.status(500).json({ error: "No DeepSeek API Key Provided" });
       }
 
-      // Cleanup quotes if LLM outputs them
-      const cleanMessage = message.trim().replace(/^[\"']|[\"']$/g, "");
+      const modelName = process.env.COMMIT_MODEL_NAME || "deepseek-v4-flash";
+      const prompt = buildCommitPrompt(diff);
+
+      const openai = new OpenAI({
+        apiKey,
+        baseURL: "https://api.deepseek.com",
+      });
+
+      const completion = await openai.chat.completions.create({
+        model: modelName,
+        messages: [{ role: "user", content: prompt }],
+      });
+
+      const message = completion.choices[0]?.message?.content?.trim() || "chore: update code";
+      const cleanMessage = message.replace(/^["']|["']$/g, "");
 
       return res.status(200).json({ message: cleanMessage });
     } catch (error: any) {

@@ -16,7 +16,7 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
       The Overview should answer: "What does this thing actually do and what problem does it solve?"
 
       BAD (too technical, lists technologies):
-      "This project is a robust TypeScript Node.js Fastify backend service that intelligently processes data. It leverages Google Gemini AI for advanced data extraction and the docx library for generating professionally formatted documents."
+      "This project is a robust TypeScript Node.js Fastify backend service that intelligently processes data. It leverages DeepSeek AI for advanced data extraction and the docx library for generating professionally formatted documents."
 
       GOOD (natural, problem-focused):
       "This project helps you do X by doing Y. It takes your input, processes it, and gives you back exactly what you need. No complicated setup, just straightforward functionality that works."
