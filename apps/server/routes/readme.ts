@@ -100,7 +100,7 @@ router.post(
         options
       );
 
-      const modelName = process.env.README_MODEL_NAME || "deepseek-v4-flash";
+      const modelName = process.env.README_MODEL_NAME || "deepseek-v4-pro";
 
       trackUser({ username, email, id, osInfo }, "readme").catch(() => {});
 
@@ -124,12 +124,29 @@ router.post(
       res.setHeader("Cache-Control", "no-cache");
       res.setHeader("Connection", "keep-alive");
 
+      let isFirstText = true;
+      let initialBuffer = "";
+
       for await (const chunk of stream) {
         if (clientDisconnected) break;
         const text = chunk.choices[0]?.delta?.content || "";
-        if (text) {
+        if (!text) continue;
+
+        if (isFirstText) {
+          initialBuffer += text;
+          if (initialBuffer.length >= 20 || initialBuffer.includes("\n")) {
+            initialBuffer = initialBuffer.replace(/^```(?:markdown)?\s*\n?/i, "");
+            isFirstText = false;
+            res.write(`data: ${JSON.stringify({ response: initialBuffer })}\n\n`);
+          }
+        } else {
           res.write(`data: ${JSON.stringify({ response: text })}\n\n`);
         }
+      }
+
+      if (isFirstText && initialBuffer && !clientDisconnected) {
+        initialBuffer = initialBuffer.replace(/^```(?:markdown)?\s*\n?/i, "");
+        res.write(`data: ${JSON.stringify({ response: initialBuffer })}\n\n`);
       }
 
       if (!clientDisconnected) {

@@ -149,7 +149,7 @@ The server requires environment variables to run.
     NODE_ENV=development
     BACKEND_DOMAIN=http://localhost:3000
     DEEPSEEK_API_KEY=your_deepseek_api_key_here
-    README_MODEL_NAME=deepseek-v4-flash
+    README_MODEL_NAME=deepseek-v4-pro
     COMMIT_MODEL_NAME=deepseek-v4-flash
     SUPABASE_CLIENT_URL=your_supabase_url
     SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
