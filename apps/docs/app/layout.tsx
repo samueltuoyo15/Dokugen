@@ -57,10 +57,10 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/smile_logo.svg", type: "image/svg+xml" },
+      { url: "/dokugen_logo.svg", type: "image/svg+xml" },
     ],
-    shortcut: "/smile_logo.svg",
-    apple: "/smile_logo.svg",
+    shortcut: "/dokugen_logo.svg",
+    apple: "/dokugen_logo.svg",
   },
 };
 
@@ -72,7 +72,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" type="image/svg+xml" href="/smile_logo.svg" />
+        <link rel="icon" type="image/svg+xml" href="/dokugen_logo.svg" />
         <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

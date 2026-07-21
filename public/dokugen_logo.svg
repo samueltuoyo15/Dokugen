@@ -1,0 +1,15 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Document Fold Backing (Dark Zinc) -->
+  <path d="M64 48C64 39.1634 71.1634 32 80 32H156L208 84V208C208 216.837 200.837 224 192 224H80C71.1634 224 64 216.837 64 208V48Z" fill="#18181B"/>
+  
+  <!-- Folded Corner Accent -->
+  <path d="M156 32V72C156 78.6274 161.373 84 168 84H208L156 32Z" fill="#27272A"/>
+  
+  <!-- Stylized "D" & Terminal Slash (Emerald Green) -->
+  <path d="M96 80H128C145.673 80 160 94.3269 160 112C160 129.673 145.673 144 128 144H96V80Z" stroke="#10B981" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Terminal Prompt Chevron (Emerald Green) -->
+  <path d="M96 176L116 192L96 208" stroke="#10B981" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Cursor Line -->
+  <line x1="128" y1="208" x2="148" y2="208" stroke="#10B981" stroke-width="12" stroke-linecap="round"/>
+</svg>

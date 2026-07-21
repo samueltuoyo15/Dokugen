@@ -1,5 +1,5 @@
 import { CopyIcon, CopyCheckIcon } from "lucide-react"
-import { useState, MouseEvent } from "react"
+import { useState } from "react"
 import { cn } from "@/lib/utils"
 
 interface CopyProps {
@@ -10,7 +10,7 @@ interface CopyProps {
 const Copy = ({code, className}: CopyProps) => {
     const [copied, setCopied] = useState(false)
 
-    const handleCopy = (e?: MouseEvent<HTMLDivElement>) => {
+    const handleCopy = () => {
         navigator.clipboard.writeText(code)
         setCopied(true)
 

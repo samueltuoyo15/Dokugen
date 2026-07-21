@@ -19,7 +19,7 @@ import {
   Globe,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import MetricsSection from "@/components/metricsSection";
 import Copy from "@/components/Copy";
 import { useQuery } from "@tanstack/react-query";
@@ -105,7 +105,6 @@ const searchableContent = [
 export default function DokugenHomeClient() {
   const [searchQuery, setSearchQuery] = useState("");
   const heroRef = useRef<HTMLDivElement>(null);
-  const [heroInView, setHeroInView] = useState(false);
 
   const { data: starsCount } = useQuery<number>({
     queryKey: ["githubStars"],
@@ -122,22 +121,7 @@ export default function DokugenHomeClient() {
     staleTime: 1000 * 60 * 10
   })
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setHeroInView(entry.isIntersecting);
-      },
-      { threshold: 0.1 }
-    );
 
-    if (heroRef.current) {
-      observer.observe(heroRef.current);
-    }
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
 
 
 
@@ -157,15 +141,7 @@ export default function DokugenHomeClient() {
           transition={{ duration: 0.8 }}
           className="text-center mb-24"
         >
-          <div className="relative inline-block mb-6">
-            <Image
-              src="/smile_logo.svg"
-              className="block text-center mx-auto mb-2 opacity-90"
-              height={70}
-              width={70}
-              alt="Smile Logo"
-            />
-          </div>
+
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-black mb-6 tracking-tight text-zinc-900 max-w-3xl mx-auto leading-[1.15]">
             The easiest way to generate <br />
