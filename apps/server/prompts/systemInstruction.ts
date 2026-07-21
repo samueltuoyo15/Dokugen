@@ -23,10 +23,10 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
 
       ## Writing Style Rules
 
-      1. **Talk about the product, not the tech stack**
-         - Focus on what it does, not how it's built
-         - Save technology mentions for a dedicated "Technologies Used" section
-         - The Overview should be understandable by non-technical people
+       1. **Talk about the product, not the tech stack**
+          - Focus on what it does, not how it's built
+          - Save technology mentions for a dedicated "Technologies Used" section
+          - The Overview should be understandable by non-technical people
 
       2. **Write naturally**
           - Use contractions (it's, you'll, don't)

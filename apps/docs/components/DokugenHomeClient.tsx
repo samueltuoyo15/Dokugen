@@ -22,7 +22,6 @@ import { motion } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 import MetricsSection from "@/components/metricsSection";
 import Copy from "@/components/Copy";
-import confetti from "canvas-confetti";
 import { useQuery } from "@tanstack/react-query";
 
 const searchableContent = [
@@ -140,29 +139,7 @@ export default function DokugenHomeClient() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!heroInView) return;
 
-    // Gentle infinite confetti shower from corners when hero is in view
-    const interval = setInterval(() => {
-      confetti({
-        particleCount: 2,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0, y: 0.9 },
-        colors: ['#7c3aed', '#38bdf8', '#10b981', '#fbbf24', '#f43f5e']
-      });
-      confetti({
-        particleCount: 2,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1, y: 0.9 },
-        colors: ['#7c3aed', '#38bdf8', '#10b981', '#fbbf24', '#f43f5e']
-      });
-    }, 400);
-
-    return () => clearInterval(interval);
-  }, [heroInView]);
 
   const filteredContent = searchableContent.filter(
     (item) =>
