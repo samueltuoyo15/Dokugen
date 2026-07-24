@@ -8,6 +8,7 @@ import healthRouter from "./routes/health";
 import readmeRouter from "./routes/readme";
 import commitRouter from "./routes/commit";
 import trackRouter from "./routes/track";
+import changelogRouter from "./routes/changelog";
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use("/api", healthRouter);
 app.use("/api", readmeRouter);
 app.use("/api", commitRouter);
 app.use("/api", trackRouter);
+app.use("/api", changelogRouter);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Dokugen API is running");
