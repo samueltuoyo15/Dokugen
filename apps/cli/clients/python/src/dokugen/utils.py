@@ -702,12 +702,17 @@ def extract_full_code(project_files, project_dir):
 
 
 def get_backend_domain():
-    try:
-        with requests.get("http://localhost:3000/api/health", timeout=0.5) as r:
-            if r.status_code == 200 and r.json().get("status") == "Ok":
-                return "http://localhost:3000"
-    except Exception:
-        pass
+    env_domain = os.environ.get("BACKEND_DOMAIN")
+    if env_domain:
+        return env_domain
+
+    for port in ["3000", "3002", "3001"]:
+        try:
+            with requests.get(f"http://localhost:{port}/api/health", timeout=0.5) as r:
+                if r.status_code == 200 and r.json().get("status") == "Ok":
+                    return f"http://localhost:{port}"
+        except Exception:
+            pass
 
     try:
         with requests.get(
