@@ -86,6 +86,8 @@ flowchart LR
 
 *   **Compressed Uploads**: Efficiently packages codebases with 70–90% upload size compression to support analyzing larger projects without hitting API size limits.
 
+*   **AI CHANGELOG Generator**: Analyzes your Git commit history and automatically generates or updates a clean `CHANGELOG.md` adhering to Keep a Changelog standards out-of-the-box.
+
 *   **Language & Framework Agnostic**: Works out of the box with any programming language or framework (JavaScript, TypeScript, Python, Rust, Go, Java, PHP, C++, Django, React, etc.). You don't need Node.js or Python to be the main language of your codebase; simply install the Dokugen CLI globally using Node (`npm`/`pnpm`/`yarn`) or Python (`pip`/`uv`) on your system, and run it in any project folder.
 
 ## Installation
@@ -262,6 +264,16 @@ dokugen revert
 #### AI CHANGELOG Generator (`changelog`)
 
 Analyze your Git commit history and automatically generate or update a structured `CHANGELOG.md` adhering to Keep a Changelog standards.
+
+> **Note**: `dokugen changelog` works out-of-the-box using Dokugen's server key! Optionally, if you wish to use your own custom OpenRouter key, set `OPENROUTER_API_KEY` in your environment:
+> ```bash
+> # Windows (PowerShell):
+> $env:OPENROUTER_API_KEY="your_custom_api_key"
+> 
+> # macOS / Linux / Termux:
+> export OPENROUTER_API_KEY=your_custom_api_key
+> ```
+
 ```bash
 dokugen changelog
 ```

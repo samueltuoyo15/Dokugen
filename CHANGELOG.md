@@ -2,20 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [14.0.7 - 14.0.8] - 2026-07-25
 
 ### Added
-- AI-powered CHANGELOG generation API route with programmatic merging support
-- Changelog command and interactive menu for both TypeScript and Python CLI interfaces
-- Graceful handling of missing Supabase configuration with changelog tracking
-- Enhanced local server port discovery with optimized token limits for AI completions
+- AI-powered CHANGELOG generation.
+- `dokugen changelog` command and interactive menu option across TypeScript and Python CLI interfaces
+- Social preview card generator command (`dokugen og`) added in Beta
+- OpenRouter integration requiring user-provided `OPENROUTER_API_KEY` for zero-cost server operation
 
 ### Fixed
-- Safeguard TypeScript CLI postinstall script by checking for dist directory before execution
-- Non-destructive changelog merging to preserve existing entries during programmatic updates
+- Safeguarded TypeScript CLI `postinstall` script to check for `dist/` directory before execution
+- Non-destructive changelog merging logic to preserve manual changelog history
 
-### Changed
-- Updated Next.js configuration for improved build compatibility
+### Thanks
+- Special thanks to [@patrickaigbogun](https://github.com/patrickaigbogun) for contributing the initial AI CHANGELOG feature and Supabase safeguards!
 
 ### [14.0.6] - 2026-07-20
 ### Fixed
@@ -34,6 +34,8 @@ All notable changes to this project will be documented in this file.
 ### [14.0.4] - 2026-07-17
 ### Fixed
 - **Python CLI `aic` parsing crash**: Removed redundant invalid nested `try` statement in Python CLI client for Git commits.
+### Thanks
+- Special thanks to [@mavinren](https://github.com/mavinren) for spotting and fixing this issue.
 
 ### [14.0.3] - 2026-07-15
 ### Patches

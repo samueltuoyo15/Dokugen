@@ -1,6 +1,6 @@
 {
   "name": "Dokugen dashboard",
-  "version": "14.0.6",
+  "version": "14.0.8",
   "private": true,
   "type": "module",
   "scripts": {

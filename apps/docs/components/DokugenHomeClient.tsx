@@ -577,6 +577,20 @@ export default function DokugenHomeClient() {
               </div>
               <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
                 <h3 className="text-lg font-bold mb-3 text-zinc-950">
+                  How does the AI CHANGELOG generator work?
+                </h3>
+                <p className="text-zinc-600 leading-relaxed text-sm">
+                  Running <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">dokugen changelog</code> analyzes your commit history and generates or updates a clean <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-xs font-mono border border-zinc-200/60">CHANGELOG.md</code> adhering to Keep a Changelog standards. It works out-of-the-box with zero setup! Optionally, if you wish to use your own custom OpenRouter API key, set it in your environment:
+                </p>
+                <div className="mt-3 bg-zinc-900 text-zinc-100 p-3 rounded-lg text-xs font-mono space-y-1">
+                  <p className="text-zinc-400"># Windows (PowerShell):</p>
+                  <p>$env:OPENROUTER_API_KEY=&quot;your_api_key_here&quot;</p>
+                  <p className="text-zinc-400 mt-2"># macOS / Linux / Termux:</p>
+                  <p>export OPENROUTER_API_KEY=your_api_key_here</p>
+                </div>
+              </div>
+              <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
+                <h3 className="text-lg font-bold mb-3 text-zinc-950">
                   What is the smart update command?
                 </h3>
                 <p className="text-zinc-600 leading-relaxed text-sm">

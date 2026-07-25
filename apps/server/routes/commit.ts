@@ -66,31 +66,58 @@ router.post(
         trackUser({ ...userInfo, id: userInfo.id || uuidv4() }, "commit").catch(() => {});
       }
 
-      const apiKey = process.env.DEEPSEEK_API_KEY || process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY;
-      if (!apiKey) {
-        return res.status(500).json({ error: "No API Key Provided" });
+      const prompt = buildCommitPrompt(diff);
+      let message = "";
+
+      // 1. Primary Attempt: OpenRouter ($0 Cost)
+      if (process.env.OPENROUTER_API_KEY) {
+        try {
+          const openrouter = new OpenAI({
+            apiKey: process.env.OPENROUTER_API_KEY,
+            baseURL: process.env.OPENROUTER_BASE_URL || "https://openrouter.ai/api/v1",
+            defaultHeaders: {
+              "HTTP-Referer": "https://dokugen.samueltuoyo.com",
+              "X-Title": "Dokugen",
+            },
+          });
+
+          const completion = await openrouter.chat.completions.create({
+            model: process.env.OPENROUTER_COMMIT_MODEL || "openrouter/free",
+            messages: [{ role: "user", content: prompt }],
+            max_tokens: 300,
+          });
+
+          message = completion.choices[0]?.message?.content?.trim() || "";
+        } catch (err: any) {
+          logger.warn(err, "OpenRouter commit generation failed, falling back to DeepSeek...");
+        }
       }
 
-      const isOpenRouter = apiKey.startsWith("sk-or-v1-");
-      const baseURL = process.env.DEEPSEEK_BASE_URL || process.env.OPENAI_BASE_URL || (isOpenRouter ? "https://openrouter.ai/api/v1" : "https://api.deepseek.com");
-      const modelName = process.env.MODEL_NAME || process.env.COMMIT_MODEL_NAME || (isOpenRouter ? "meta-llama/llama-3.3-70b-instruct:free" : "deepseek-chat");
+      // 2. Fallback Attempt: DeepSeek
+      if (!message && process.env.DEEPSEEK_API_KEY) {
+        try {
+          const deepseek = new OpenAI({
+            apiKey: process.env.DEEPSEEK_API_KEY,
+            baseURL: process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com",
+          });
 
-      const prompt = buildCommitPrompt(diff);
+          const completion = await deepseek.chat.completions.create({
+            model: process.env.COMMIT_MODEL_NAME || "deepseek-v4-flash",
+            messages: [{ role: "user", content: prompt }],
+            max_tokens: 300,
+          });
 
-      const openai = new OpenAI({
-        apiKey,
-        baseURL,
-      });
+          message = completion.choices[0]?.message?.content?.trim() || "";
+        } catch (err: any) {
+          logger.error(err, "DeepSeek commit generation failed");
+        }
+      }
 
-      const completion = await openai.chat.completions.create({
-        model: modelName,
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: 300,
-      });
+      if (!message) {
+        message = "chore: update code";
+      }
 
-      const message = completion.choices[0]?.message?.content?.trim() || "chore: update code";
       const cleanMessage = message.replace(/^["']|["']$/g, "");
-
       return res.status(200).json({ message: cleanMessage });
     } catch (error: any) {
       logger.error(error, "Error generating commit message");

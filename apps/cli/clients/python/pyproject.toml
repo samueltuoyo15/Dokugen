@@ -1,6 +1,6 @@
 [project]
 name = "dokugen"
-version = "14.0.6"
+version = "14.0.8"
 description = "Automatically generate high-quality README for your application"
 readme = "README.md"
 requires-python = ">=3.8"

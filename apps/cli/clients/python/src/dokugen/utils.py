@@ -702,7 +702,7 @@ def extract_full_code(project_files, project_dir):
 
 
 def get_backend_domain():
-    env_domain = os.environ.get("BACKEND_DOMAIN")
+    env_domain = os.environ.get("DOKUGEN_LOCAL_BACKEND_DOMAIN") or os.environ.get("BACKEND_DOMAIN")
     if env_domain:
         return env_domain
 

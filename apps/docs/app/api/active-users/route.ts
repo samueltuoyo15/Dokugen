@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
   const limit = parseInt(searchParams.get("limit") || "10")
   const sortBy = searchParams.get("sortBy") || "usage_count"
 
-  const allowedSorts = ["usage_count", "readme_usage", "commit_usage", "license_usage", "revert_usage"]
+  const allowedSorts = ["usage_count", "readme_usage", "commit_usage", "license_usage", "revert_usage", "changelog_usage"]
   const sortColumn = allowedSorts.includes(sortBy) ? sortBy : "usage_count"
 
   const startIndex = (page - 1) * limit
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
   try {
     const { data, error, count } = await supabase
       .from("active_users")
-      .select("username, usage_count, readme_usage, commit_usage, license_usage, revert_usage", { count: 'exact' })
+      .select("username, usage_count, readme_usage, commit_usage, license_usage, revert_usage, changelog_usage", { count: 'exact' })
       .order(sortColumn, { ascending: false })
       .range(startIndex, endIndex)
 

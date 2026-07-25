@@ -15,6 +15,7 @@ interface UserMetrics {
   commit_usage?: number
   license_usage?: number
   revert_usage?: number
+  changelog_usage?: number
 }
 
 interface ApiResponse {
@@ -100,6 +101,7 @@ export default function MetricsSection() {
     Commits: false,
     Licenses: false,
     Reverts: false,
+    Changelogs: false,
   })
 
   const { data: starsCount } = useQuery<number>({
@@ -187,6 +189,7 @@ export default function MetricsSection() {
     Commits: user.commit_usage || 0,
     Licenses: user.license_usage || 0,
     Reverts: user.revert_usage || 0,
+    Changelogs: user.changelog_usage || 0,
     profileUrl: `https://github.com/${user.username}`
   })) || []
 
@@ -334,6 +337,19 @@ export default function MetricsSection() {
                       )}
                     </span>
                   </th>
+                  <th
+                    onClick={() => handleSortChange("changelog_usage")}
+                    className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
+                  >
+                    <span className="inline-flex items-center justify-end gap-1.5 w-full">
+                      Changelogs
+                      {sortBy === "changelog_usage" ? (
+                        <ArrowDown className="w-3.5 h-3.5 text-zinc-800" />
+                      ) : (
+                        <ArrowUpDown className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
+                      )}
+                    </span>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
@@ -358,6 +374,9 @@ export default function MetricsSection() {
                     </td>
                     <td className="px-4 py-3 text-right text-zinc-600 font-mono text-xs">
                       {(user.revert_usage ?? 0).toLocaleString()}
+                    </td>
+                    <td className="px-4 py-3 text-right text-zinc-600 font-mono text-xs">
+                      {(user.changelog_usage ?? 0).toLocaleString()}
                     </td>
                   </tr>
                 ))}
@@ -450,6 +469,17 @@ export default function MetricsSection() {
               >
                 <RotateCcw className="w-3.5 h-3.5 text-amber-500" />
                 Reverts
+              </button>
+              <button
+                onClick={() => setActiveChartMetric("Changelogs")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold select-none transition-all cursor-pointer ${
+                  activeChartMetric === "Changelogs"
+                    ? "bg-white text-indigo-600 shadow-sm border border-indigo-200/20"
+                    : "text-zinc-500 hover:text-indigo-600"
+                }`}
+              >
+                <FileText className="w-3.5 h-3.5 text-indigo-500" />
+                Changelogs
               </button>
             </div>
           </div>
@@ -547,6 +577,16 @@ export default function MetricsSection() {
                     stackId={activeChartMetric === "all" ? "a" : undefined}
                     fill="#f59e0b"
                     name="Reverts"
+                    radius={activeChartMetric === "all" ? [0, 0, 0, 0] : [4, 4, 0, 0]}
+                  />
+                )}
+                {(activeChartMetric === "all" || activeChartMetric === "Changelogs") && (
+                  <Bar
+                    hide={hiddenLines.Changelogs}
+                    dataKey="Changelogs"
+                    stackId={activeChartMetric === "all" ? "a" : undefined}
+                    fill="#6366f1"
+                    name="Changelogs"
                     radius={[4, 4, 0, 0]}
                   />
                 )}

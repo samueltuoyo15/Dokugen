@@ -2,7 +2,7 @@
 
 ![Demo GIF](./public/Demo.gif)
 
-[![Sponsor Dokugen](https://img.shields.io/badge/Sponsor-Dokugen-red?style=for-the-badge&logo=ko-fi&logoColor=white)](https://myhappr.xyz/samueltuoyo)
+[![Sponsor Dokugen](https://img.shields.io/badge/Sponsor-Dokugen-red?style=for-the-badge&logo=ko-fi&logoColor=white)](https://myhappr.com/samueltuoyo)
 
 Dokugen is a lightweight, AI-powered CLI tool that automatically generates and maintains `README.md` files and `LICENSE` files for your projects. It scans your codebase, understands what your project does, and produces clean, professional documentation, so you don't have to.
 
@@ -91,6 +91,17 @@ Accidentally generated something you didn't like? Restore your previous `README.
 dokugen revert
 ```
 
+#### Generate CHANGELOG (`changelog`)
+
+Analyze your Git commit history and automatically generate or update a structured `CHANGELOG.md` adhering to Keep a Changelog standards.
+```bash
+dokugen changelog
+# or analyze up to a custom limit of commits
+dokugen changelog --limit 100
+# or specify a custom OpenRouter model
+dokugen changelog --model anthropic/claude-3.5-sonnet
+```
+
 ---
 
 ## Features
@@ -98,33 +109,11 @@ dokugen revert
 - **Interactive Menu**: Run `dokugen` with no arguments to navigate all tool actions through a beautiful console prompt, perfect for both new and experienced developers.
 - **Smart README Updates**: Re-run generation without losing your manual modifications. Only auto-generated blocks get updated; your custom content stays untouched.
 - **LICENSE Generator**: Pick from 6 popular open-source licenses and have a properly formatted `LICENSE` file created instantly, pre-filled with your author name and year.
+- **CHANGELOG Generator**: Automatically builds and prepends release notes by parsing your Git commit history since the last release tag.
 - **AI-Powered Commits**: Automatic staging and conventional commit message generation via Google Gemini, keeps your commit history clean and consistent.
 - **Compressed Uploads**: Efficiently packages codebases with 70–90% upload size compression to support analyzing larger projects without hitting API size limits.
 - **Language & Framework Agnostic**: Works out of the box with any programming language or framework (JavaScript, TypeScript, Python, Rust, Go, Java, PHP, C++, Django, React, etc.). You don't need Node.js or Python to be your codebase's main language; you can simply install Dokugen globally using Node (`npm`/`pnpm`/`yarn`) or Python (`pip`/`uv`), and run it in any directory.
 - **Custom Templates**: Use any public GitHub README as a structural template for your generated docs.
-
----
-
-## System Architecture
-
-Dokugen uses a client-server architecture. The TypeScript CLI sends your project data to a backend API, which uses Google Gemini to generate your README or commit messages. User profile data is stored securely in Supabase.
-
-```mermaid
-flowchart LR
-  TSCLI["TypeScript CLI (dokugen)"]
-  API["API Server (Node.js / Express)"]
-  AI["AI Model (Google Gemini)"]
-  DB[("Supabase Database")]
-
-  TSCLI --> API
-  API --> AI
-  API --> DB
-
-  style TSCLI fill:#1f3a60,stroke:#3b82f6,stroke-width:2px,color:#fff
-  style API fill:#4a1525,stroke:#ec4899,stroke-width:2px,color:#fff
-  style AI fill:#5c1d24,stroke:#ef4444,stroke-width:2px,color:#fff
-  style DB fill:#022c22,stroke:#10b981,stroke-width:2px,color:#fff
-```
 
 ---
 

@@ -14,7 +14,8 @@ export function registerChangelogCommand(program: Command) {
     .alias("ai-changelog")
     .description("AI-powered CHANGELOG generator and updater")
     .option("-v, --version-tag <version>", "Version header (e.g. v1.0.0)")
-    .option("-n, --limit <number>", "Number of git commits to analyze", "50")
+    .option("-n, --limit <number>", "Number of git commits to analyze", "200")
+    .option("-m, --model <modelName>", "Custom OpenRouter model (e.g. anthropic/claude-3.5-sonnet)")
     .option("-o, --outfile <filepath>", "Output changelog file path", "CHANGELOG.md")
     .action(async (options: any) => {
       await checkAndUpdate();
@@ -39,14 +40,29 @@ export function registerChangelogCommand(program: Command) {
         process.exit(1);
       }
 
+      let spinner: any = null;
       try {
-        const limit = parseInt(options.limit, 10) || 50;
-        let gitLogs = "";
-
+        let lastTag = "";
         try {
-          gitLogs = execSync(`git log -n ${limit} --pretty=format:"%h - %s (%an, %ad)" --date=short`, {
-            encoding: "utf-8",
-          }).trim();
+          lastTag = execSync("git describe --tags --abbrev=0", { encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+        } catch {}
+
+        let gitCmd = `git log --pretty=format:"%h - %s (%an, %ad)" --date=short`;
+        if (options.limit && options.limit !== "all") {
+          const limitNum = parseInt(options.limit, 10);
+          if (!isNaN(limitNum)) {
+            gitCmd = `git log -n ${limitNum} --pretty=format:"%h - %s (%an, %ad)" --date=short`;
+          }
+        } else if (lastTag) {
+          gitCmd = `git log ${lastTag}..HEAD --pretty=format:"%h - %s (%an, %ad)" --date=short`;
+        }
+
+        let gitLogs = "";
+        try {
+          gitLogs = execSync(gitCmd, { encoding: "utf-8" }).trim();
+          if (!gitLogs) {
+            gitLogs = execSync(`git log -n 200 --pretty=format:"%h - %s (%an, %ad)" --date=short`, { encoding: "utf-8" }).trim();
+          }
         } catch (err) {
           console.error(chalk.red("Failed to retrieve git log history:"), err);
           process.exit(1);
@@ -60,7 +76,7 @@ export function registerChangelogCommand(program: Command) {
         let version = options.versionTag;
         if (!version) {
           try {
-            version = execSync("git describe --tags --abbrev=0", { encoding: "utf-8" }).trim();
+            version = execSync("git describe --tags --abbrev=0", { encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"] }).trim();
           } catch {
             if (fs.existsSync("package.json")) {
               try {
@@ -83,7 +99,7 @@ export function registerChangelogCommand(program: Command) {
         }
 
         const startTime = Date.now();
-        const spinner = createSpinner(chalk.blue("Analyzing commit history and generating CHANGELOG...")).start();
+        spinner = createSpinner(chalk.blue("Analyzing commit history and generating CHANGELOG...")).start();
 
         const backendDomain = await getBackendDomain();
         const userInfo = getUserInfo();
@@ -95,6 +111,8 @@ export function registerChangelogCommand(program: Command) {
             version,
             existingChangelog,
             userInfo,
+            openrouterApiKey: process.env.OPENROUTER_API_KEY,
+            model: options.model || process.env.OPENROUTER_MODEL,
           }
         );
 
@@ -112,20 +130,25 @@ export function registerChangelogCommand(program: Command) {
           timeString = `${seconds}s`;
         }
 
-        spinner.success({
-          text: chalk.green(`CHANGELOG generated successfully in ${timeString}! Written to ${path.basename(outfile)}`),
-        });
+        spinner.stop();
+        console.log(chalk.green(`CHANGELOG generated successfully in ${timeString}! Written to ${path.basename(outfile)}`));
       } catch (error: any) {
-        if (error.code === "ENOTFOUND" || error.code === "EAI_AGAIN" || error.code === "ECONNREFUSED" || !error.response) {
+        if (spinner) {
+          spinner.stop();
+        }
+        const serverError = error.response?.data?.error;
+        if (serverError) {
+          console.log("\n" + chalk.blue(serverError));
+        } else if (error.code === "ENOTFOUND" || error.code === "EAI_AGAIN" || error.code === "ECONNREFUSED" || !error.response) {
           const rawUsername = getUserInfo()?.username;
           const username = rawUsername ? rawUsername.replace(/\d+/g, "") : "";
           console.log(
-            chalk.red(
+            "\n" + chalk.red(
               `Opps... ${username} kindly check your device or pc internet connection and try again.`
             )
           );
         } else {
-          console.error(chalk.red("Changelog generation failed:"), error.response?.data?.error || error.message);
+          console.log("\n" + chalk.red(error.message));
         }
         process.exit(1);
       }

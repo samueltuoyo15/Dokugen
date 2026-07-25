@@ -56,7 +56,7 @@ def main():
                     questionary.Choice(f"Update README    - Update an existing Dokugen-generated README for {project_name}", value="update"),
                     questionary.Choice(f"Revert README    - Restore the previous Dokugen-generated README for {project_name}", value="revert"),
                     questionary.Choice("Generate LICENSE - Protect your work and open the door to collaboration for {project_name}.", value="license"),
-                    questionary.Choice(f"Generate CHANGELOG - Analyze commit history and create/update CHANGELOG.md for {project_name}", value="changelog"),
+                    questionary.Choice(f"Generate CHANGELOG - Analyze commit history and update CHANGELOG.md for {project_name}", value="changelog"),
                     questionary.Choice(f"AI Git Commit    - Generate commit message and commit staged changes for {project_name}", value="aic"),
                     questionary.Choice("View Help        - Show all available commands and options", value="help"),
                     questionary.Choice("Exit", value="exit"),
@@ -75,7 +75,8 @@ def main():
                 push = False
                 force_new = False
                 version_tag = None
-                limit = 50
+                limit = "200"
+                model = None
                 outfile = "CHANGELOG.md"
 
             if action == "generate":

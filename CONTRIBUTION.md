@@ -16,7 +16,11 @@ Before submitting a pull request, please keep these basic rules in mind:
 
 1. **No Emojis**: Do not add emojis in your code, inline comments, commit messages, or PR titles.
 2. **Clean Up Debug Logs**: Remove temporary `console.log`, `print()`, debug code, or unused labels before submitting your code.
-3. **Test Your Code**: Make sure your changes compile and pass basic linting (`pnpm run lint`).
+3. **Test Your Edge Cases**: Don't just test the "happy path". Think about what could break your feature and test edge cases beforehand. For example, ask yourself:
+   - What happens if required environment variables or API keys are missing?
+   - What happens if inputs, git tags, or project files are missing or empty?
+   - What happens if the backend server is offline or internet disconnects?
+   - Does the CLI output clean, friendly error messages instead of raw terminal stack traces or fatal errors?
 4. **Clean Commit Messages**: Use simple, descriptive commit messages without emojis (for example: `feat(cli): add new option` or `fix(server): fix route response`).
 
 ---
@@ -76,6 +80,7 @@ Run `pnpm install` at the project root to install dependencies for all apps.
 ## Submitting Your Work
 
 1. If you're planning a big feature or fix, open an issue first so we can discuss it.
-2. Push your branch and open a Pull Request.
+2. In your Pull Request description, briefly list the edge cases you thought of and tested for your feature.
+3. Push your branch and open a Pull Request.
 
 Thanks again for helping out!

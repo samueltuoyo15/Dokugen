@@ -2,7 +2,7 @@
   "name": "vscode-extension",
   "displayName": "dokugen",
   "description": "README.md file generator",
-  "version": "14.0.6",
+  "version": "14.0.8",
   "engines": {
     "vscode": "^1.105.0"
   },

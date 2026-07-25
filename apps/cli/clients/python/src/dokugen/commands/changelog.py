@@ -23,12 +23,34 @@ def cmd_changelog(args):
         sys.exit(1)
 
     try:
-        limit = getattr(args, "limit", 50)
+        limit_val = getattr(args, "limit", "200")
+        last_tag = ""
         try:
-            git_logs = subprocess.check_output(
-                ["git", "log", f"-n{limit}", "--pretty=format:%h - %s (%an, %ad)", "--date=short"],
-                encoding="utf-8"
+            last_tag = subprocess.check_output(
+                ["git", "describe", "--tags", "--abbrev=0"],
+                encoding="utf-8",
+                stderr=subprocess.DEVNULL
             ).strip()
+        except Exception:
+            pass
+
+        git_cmd = ["git", "log", "--pretty=format:%h - %s (%an, %ad)", "--date=short"]
+        if limit_val and str(limit_val).lower() != "all":
+            try:
+                lim_num = int(limit_val)
+                git_cmd = ["git", "log", f"-n{lim_num}", "--pretty=format:%h - %s (%an, %ad)", "--date=short"]
+            except ValueError:
+                pass
+        elif last_tag:
+            git_cmd = ["git", "log", f"{last_tag}..HEAD", "--pretty=format:%h - %s (%an, %ad)", "--date=short"]
+
+        try:
+            git_logs = subprocess.check_output(git_cmd, encoding="utf-8").strip()
+            if not git_logs:
+                git_logs = subprocess.check_output(
+                    ["git", "log", "-n200", "--pretty=format:%h - %s (%an, %ad)", "--date=short"],
+                    encoding="utf-8"
+                ).strip()
         except Exception as e:
             console.print(f"[red]Failed to retrieve git log history: {e}[/red]")
             sys.exit(1)
@@ -40,7 +62,7 @@ def cmd_changelog(args):
         version = getattr(args, "version_tag", None)
         if not version:
             try:
-                version = subprocess.check_output(["git", "describe", "--tags", "--abbrev=0"], encoding="utf-8").strip()
+                version = subprocess.check_output(["git", "describe", "--tags", "--abbrev=0"], encoding="utf-8", stderr=subprocess.DEVNULL).strip()
             except Exception:
                 if os.path.exists("package.json"):
                     try:
@@ -65,24 +87,30 @@ def cmd_changelog(args):
                 pass
 
         start_time = time.time()
+        model_name = getattr(args, "model", None) or os.environ.get("OPENROUTER_MODEL")
         with utils.create_ticking_spinner("Analyzing commit history and generating CHANGELOG...") as spinner:
             backend_domain = utils.get_backend_domain()
             user_info = utils.get_user_info()
 
+            payload = {
+                "logs": git_logs,
+                "version": version,
+                "existingChangelog": existing_changelog,
+                "userInfo": user_info,
+                "openrouterApiKey": os.environ.get("OPENROUTER_API_KEY"),
+            }
+            if model_name:
+                payload["model"] = model_name
+
             response = requests.post(
                 f"{backend_domain}/api/generate-changelog",
-                json={
-                    "logs": git_logs,
-                    "version": version,
-                    "existingChangelog": existing_changelog,
-                    "userInfo": user_info,
-                },
+                json=payload,
                 timeout=60,
             )
 
         if response.status_code != 200:
             err_msg = response.json().get("error", "Failed to generate changelog")
-            console.print(f"[red]Failed to generate changelog: {err_msg}[/red]")
+            console.print(f"\n[blue]{err_msg}[/blue]")
             sys.exit(1)
 
         generated_content = response.json().get("changelog", "").strip()
@@ -121,9 +149,15 @@ def register_changelog_parser(subparsers):
     )
     changelog_parser.add_argument(
         "--limit", "-n",
-        type=int,
-        default=50,
-        help="Number of commits to analyze"
+        type=str,
+        default="200",
+        help="Number of commits to analyze or 'all'"
+    )
+    changelog_parser.add_argument(
+        "--model", "-m",
+        type=str,
+        default=None,
+        help="Custom OpenRouter model (e.g. anthropic/claude-3.5-sonnet)"
     )
     changelog_parser.add_argument(
         "--outfile", "-o",
