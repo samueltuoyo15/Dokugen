@@ -8,49 +8,44 @@ const router = Router();
 
 const buildCommitPrompt = (diff: string): string =>
   `
-CRITICAL INSTRUCTIONS - READ CAREFULLY:
-You are an expert Git commit message writer. You MUST follow ALL these rules:
+CRITICAL INSTRUCTIONS - READ CAREFULLY OR YOU WILL FAIL:
+You are an expert Git commit message writer. If you output ANYTHING other than a single conventional commit message you have completely failed your job. Do NOT ramble. Do NOT explain yourself. Do NOT list steps. Do NOT write multiple messages. Shut up and just write the damn commit message.
 
 1. FORMAT: Use Conventional Commits format: <type>(<scope>): <description>
    - type: MUST be one of: feat, fix, refactor, chore, docs, style, test, perf
-   - scope: Should be the module/file affected (e.g., "auth", "api", "ui", "config")
-   - description: Clear, imperative description in present tense
+   - scope: The primary module affected. If multiple modules changed, pick the most significant one.
+   - description: Clear, imperative description summarizing ALL changes as ONE unified statement
 
 2. DESCRIPTION REQUIREMENTS:
    - Start with an imperative verb (add, fix, remove, update, refactor, etc.)
-   - Be specific about what changed and the intent/behavior (e.g., say "fix(ui): close modal after click" instead of generic "update handler" or "fix bug")
+   - Summarize the overall intent of ALL changes in ONE sentence
+   - Be specific about what changed (e.g., "fix(auth): enforce non-null assertions and add BOQ validation across API")
    - AVOID generic descriptions (never output "update code", "modify file", "update handler", "refactor code", etc.)
    - Keep it under 150 characters total (including type and scope)
    - NO trailing punctuation
    - NO emojis ever
-   - MUST be a complete sentence
 
 3. MESSAGE STRUCTURE:
-   - The entire commit message must be exactly one to three lines, be very detailed.. even if it has to take you four lines go ahead!
+   - Output EXACTLY ONE single line. ONE commit message. NOT multiple. NOT a list.
    - Format: type(scope): description
    - Example: "feat(auth): add password reset functionality"
-   - Example: "fix(support): close dropdown checkbox when clicking outside"
-   - Example: "refactor(ui): simplify component state management"
+   - Example: "refactor(projects,quotations): add file validation and installment amount checks"
 
-4. QUALITY CHECKS - YOUR OUTPUT MUST PASS:
-   - Contains opening and closing parentheses
-   - Has a colon after the parentheses
-   - Description exists and is not empty
-   - Total length <= 150 characters
-   - No markdown formatting
-   - No code blocks
-
-5. FAILURE MODE:
+4. ABSOLUTE RULES:
+   - Output ONLY the commit message string. Nothing else.
+   - No explanations, no steps, no reasoning, no bullet points, no markdown
+   - If multiple files changed, write ONE summary message covering the main intent
    - If you cannot generate a proper message, return exactly: "chore: update code"
 
 YOUR TASK:
-Analyze this git diff like your life depends on it, pay close attention and generate exactly ONE proper commit message following all rules above.
+Analyze this git diff and generate exactly ONE conventional commit message summarizing all changes. I swear if you write more than one line or start explaining yourself I will replace you with a regex. Just. Write. The. Commit. Message.
 
 Git diff:
 ${diff}
 
-Commit message:
+ONE LINE. NOW. Commit message:
 `.trim();
+
 
 router.post(
   "/generate-commit",
@@ -66,57 +61,28 @@ router.post(
         trackUser({ ...userInfo, id: userInfo.id || uuidv4() }, "commit").catch(() => {});
       }
 
+      const apiKey = process.env.DEEPSEEK_API_KEY;
+      if (!apiKey) {
+        return res.status(500).json({ error: "No DeepSeek API Key Provided on Server" });
+      }
+
+      const baseURL = process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com";
+      const modelName = process.env.COMMIT_MODEL_NAME || "deepseek-v4-flash";
+
       const prompt = buildCommitPrompt(diff);
-      let message = "";
 
-      // 1. Primary Attempt: OpenRouter ($0 Cost)
-      if (process.env.OPENROUTER_API_KEY) {
-        try {
-          const openrouter = new OpenAI({
-            apiKey: process.env.OPENROUTER_API_KEY,
-            baseURL: process.env.OPENROUTER_BASE_URL || "https://openrouter.ai/api/v1",
-            defaultHeaders: {
-              "HTTP-Referer": "https://dokugen.samueltuoyo.com",
-              "X-Title": "Dokugen",
-            },
-          });
+      const openai = new OpenAI({
+        apiKey,
+        baseURL,
+      });
 
-          const completion = await openrouter.chat.completions.create({
-            model: process.env.OPENROUTER_COMMIT_MODEL || "openrouter/free",
-            messages: [{ role: "user", content: prompt }],
-            max_tokens: 300,
-          });
+      const completion = await openai.chat.completions.create({
+        model: modelName,
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 300,
+      });
 
-          message = completion.choices[0]?.message?.content?.trim() || "";
-        } catch (err: any) {
-          logger.warn(err, "OpenRouter commit generation failed, falling back to DeepSeek...");
-        }
-      }
-
-      // 2. Fallback Attempt: DeepSeek
-      if (!message && process.env.DEEPSEEK_API_KEY) {
-        try {
-          const deepseek = new OpenAI({
-            apiKey: process.env.DEEPSEEK_API_KEY,
-            baseURL: process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com",
-          });
-
-          const completion = await deepseek.chat.completions.create({
-            model: process.env.COMMIT_MODEL_NAME || "deepseek-v4-flash",
-            messages: [{ role: "user", content: prompt }],
-            max_tokens: 300,
-          });
-
-          message = completion.choices[0]?.message?.content?.trim() || "";
-        } catch (err: any) {
-          logger.error(err, "DeepSeek commit generation failed");
-        }
-      }
-
-      if (!message) {
-        message = "chore: update code";
-      }
-
+      const message = completion.choices[0]?.message?.content?.trim() || "chore: update code";
       const cleanMessage = message.replace(/^["']|["']$/g, "");
       return res.status(200).json({ message: cleanMessage });
     } catch (error: any) {
