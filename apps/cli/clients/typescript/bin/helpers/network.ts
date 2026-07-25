@@ -70,12 +70,19 @@ export const checkAndUpdate = async (): Promise<void> => {
 };
 
 export const getBackendDomain = async (): Promise<string> => {
-  try {
-    const localHealth = await axios.get<{ status?: string }>("http://localhost:3000/api/health", { timeout: 500 });
-    if (localHealth.status === 200 && localHealth.data?.status === "Ok") {
-      return "http://localhost:3000";
+  if (process.env.BACKEND_DOMAIN) {
+    return process.env.BACKEND_DOMAIN;
+  }
+
+  const ports = ["3000", "3002", "3001"];
+  for (const port of ports) {
+    try {
+      const localHealth = await axios.get<{ status?: string }>(`http://localhost:${port}/api/health`, { timeout: 500 });
+      if (localHealth.status === 200 && localHealth.data?.status === "Ok") {
+        return `http://localhost:${port}`;
+      }
+    } catch (err) {
     }
-  } catch (err) {
   }
 
   try {

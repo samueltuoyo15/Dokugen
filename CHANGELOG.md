@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+- AI-powered CHANGELOG generation API route with programmatic merging support
+- Changelog command and interactive menu for both TypeScript and Python CLI interfaces
+- Graceful handling of missing Supabase configuration with changelog tracking
+- Enhanced local server port discovery with optimized token limits for AI completions
+
+### Fixed
+- Safeguard TypeScript CLI postinstall script by checking for dist directory before execution
+- Non-destructive changelog merging to preserve existing entries during programmatic updates
+
+### Changed
+- Updated Next.js configuration for improved build compatibility
+
 ### [14.0.6] - 2026-07-20
 ### Fixed
 - **CLI Connection Handling**: Improved offline detection and user-friendly error messages across all subcommands (`aic`, `license`, `revert`) when internet is disconnected.

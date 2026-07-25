@@ -259,6 +259,18 @@ Accidentally generated something you didn't like? Restore your previous README i
 dokugen revert
 ```
 
+#### AI CHANGELOG Generator (`changelog`)
+
+Analyze your Git commit history and automatically generate or update a structured `CHANGELOG.md` adhering to Keep a Changelog standards.
+```bash
+dokugen changelog
+```
+
+You can also specify custom version tags or limit the commit search:
+```bash
+dokugen changelog --version-tag v1.2.0 --limit 30
+```
+
 ## Technologies Used
 
 | Category   | Technology                                                                                                                                              |
