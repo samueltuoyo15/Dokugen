@@ -66,22 +66,26 @@ router.post(
         trackUser({ ...userInfo, id: userInfo.id || uuidv4() }, "commit").catch(() => {});
       }
 
-      const apiKey = process.env.DEEPSEEK_API_KEY;
+      const apiKey = process.env.DEEPSEEK_API_KEY || process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY;
       if (!apiKey) {
-        return res.status(500).json({ error: "No DeepSeek API Key Provided" });
+        return res.status(500).json({ error: "No API Key Provided" });
       }
 
-      const modelName = process.env.COMMIT_MODEL_NAME || "deepseek-v4-flash";
+      const isOpenRouter = apiKey.startsWith("sk-or-v1-");
+      const baseURL = process.env.DEEPSEEK_BASE_URL || process.env.OPENAI_BASE_URL || (isOpenRouter ? "https://openrouter.ai/api/v1" : "https://api.deepseek.com");
+      const modelName = process.env.MODEL_NAME || process.env.COMMIT_MODEL_NAME || (isOpenRouter ? "meta-llama/llama-3.3-70b-instruct:free" : "deepseek-chat");
+
       const prompt = buildCommitPrompt(diff);
 
       const openai = new OpenAI({
         apiKey,
-        baseURL: "https://api.deepseek.com",
+        baseURL,
       });
 
       const completion = await openai.chat.completions.create({
         model: modelName,
         messages: [{ role: "user", content: prompt }],
+        max_tokens: 300,
       });
 
       const message = completion.choices[0]?.message?.content?.trim() || "chore: update code";
@@ -90,7 +94,8 @@ router.post(
       return res.status(200).json({ message: cleanMessage });
     } catch (error: any) {
       logger.error(error, "Error generating commit message");
-      return res.status(500).json({ error: "Internal Server Error" });
+      const errorMessage = error?.response?.data?.error?.message || error?.message || "Internal Server Error";
+      return res.status(500).json({ error: errorMessage });
     }
   },
 );

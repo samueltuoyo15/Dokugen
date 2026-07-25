@@ -40,6 +40,7 @@ export const runInteractiveMenu = async (): Promise<void> => {
       { value: "update", label: "Update README", hint: `Update an existing Dokugen-generated README for ${projectName}` },
       { value: "revert", label: "Revert README", hint: `Restore the previous Dokugen-generated README for ${projectName}` },
       { value: "license", label: "Generate LICENSE", hint: `Generate a LICENSE file. Protect your work and open the door to collaboration.` },
+     { value: "changelog", label: "Generate CHANGELOG", hint: `Analyze commit history and create/update CHANGELOG.md for ${projectName}` },
       { value: "aic", label: "AI Git Commit", hint: `Generate commit message and commit staged changes for ${projectName}` },
       { value: "og", label: "Generate Social Card (OG)", hint: `Create a beautiful 1200x630 preview card for Twitter & GitHub` },
       { value: "help", label: "View Help", hint: "Show all available commands and options" },

@@ -9,7 +9,7 @@ interface UserInfo {
 }
 
 export async function trackUser(userInfo: UserInfo | undefined, usageType?: string) {
-  if (!userInfo) return;
+  if (!supabase || !userInfo) return;
   const { username, email, osInfo } = userInfo;
   if (!email && !username) return;
 
@@ -23,6 +23,8 @@ export async function trackUser(userInfo: UserInfo | undefined, usageType?: stri
     columnToIncrement = "license_usage";
   } else if (usageType === "revert") {
     columnToIncrement = "revert_usage";
+  } else if (usageType === "changelog") {
+    columnToIncrement = "changelog_usage";
   }
 
   let formattedOsInfo: string | null = null;

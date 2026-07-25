@@ -15,6 +15,7 @@ from dokugen.commands.revert import cmd_revert, register_revert_parser
 from dokugen.commands.aic import cmd_aic, register_aic_parser
 from dokugen.commands.license import cmd_license, register_license_parser
 from dokugen.commands.og import cmd_og, register_og_parser
+from dokugen.commands.changelog import cmd_changelog, register_changelog_parser
 
 console = Console()
 
@@ -41,6 +42,7 @@ def main():
         register_license_parser(subparsers)
         register_aic_parser(subparsers)
         register_og_parser(subparsers)
+        register_changelog_parser(subparsers)
 
         if len(sys.argv) == 1:
             utils.check_and_update()
@@ -50,13 +52,13 @@ def main():
             action = questionary.select(
                 "What would you like to do?",
                 choices=[
-                    questionary.Choice(f"Generate README           - Scan {project_name} and create a new README.md", value="generate"),
-                    questionary.Choice(f"Update README             - Update an existing Dokugen-generated README for {project_name}", value="update"),
-                    questionary.Choice(f"Revert README             - Restore the previous Dokugen-generated README for {project_name}", value="revert"),
-                    questionary.Choice("Generate LICENSE          - Protect your work and open the door to collaboration.", value="license"),
-                    questionary.Choice(f"AI Git Commit             - Generate commit message and commit staged changes for {project_name}", value="aic"),
-                    questionary.Choice("Generate Social Card (OG) - Create a beautiful 1200x630 preview card for Twitter & GitHub", value="og"),
-                    questionary.Choice("View Help                 - Show all available commands and options", value="help"),
+                    questionary.Choice(f"Generate README  - Scan {project_name} and create a new README.md", value="generate"),
+                    questionary.Choice(f"Update README    - Update an existing Dokugen-generated README for {project_name}", value="update"),
+                    questionary.Choice(f"Revert README    - Restore the previous Dokugen-generated README for {project_name}", value="revert"),
+                    questionary.Choice("Generate LICENSE - Protect your work and open the door to collaboration for {project_name}.", value="license"),
+                    questionary.Choice(f"Generate CHANGELOG - Analyze commit history and create/update CHANGELOG.md for {project_name}", value="changelog"),
+                    questionary.Choice(f"AI Git Commit    - Generate commit message and commit staged changes for {project_name}", value="aic"),
+                    questionary.Choice("View Help        - Show all available commands and options", value="help"),
                     questionary.Choice("Exit", value="exit"),
                 ],
             ).ask()
@@ -72,6 +74,9 @@ def main():
                 overwrite = True
                 push = False
                 force_new = False
+                version_tag = None
+                limit = 50
+                outfile = "CHANGELOG.md"
 
             if action == "generate":
                 cmd_generate(Args())
@@ -81,6 +86,8 @@ def main():
                 cmd_revert(Args())
             elif action == "license":
                 cmd_license(Args())
+            elif action == "changelog":
+                cmd_changelog(Args())
             elif action == "aic":
                 cmd_aic(Args())
             elif action == "og":
@@ -98,6 +105,8 @@ def main():
                 cmd_revert(args)
             elif args.command == "license":
                 cmd_license(args)
+            elif args.command in ["changelog", "ai-changelog"]:
+                cmd_changelog(args)
             elif args.command in ["aic", "ai-commit"]:
                 cmd_aic(args)
             elif args.command == "og":
