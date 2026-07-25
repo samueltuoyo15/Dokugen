@@ -718,4 +718,4 @@ def get_backend_domain():
     except Exception:
         pass
 
-    return "https://dokugen.samueltuoyo.com"
+    return "https://api-dokugen.samueltuoyo.com"

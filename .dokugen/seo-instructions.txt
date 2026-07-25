@@ -1,0 +1,12 @@
+<!-- Open Graph Meta Tags (Copy & Paste into your HTML <head> or Next.js metadata) -->
+<meta property="og:title" content="Dokugen" />
+<meta property="og:description" content="Smart READMEs. AI-driven commits." />
+<meta property="og:image" content="https://yourdomain.com/.dokugen/card.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+
+<!-- Twitter Card Meta Tags -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Dokugen" />
+<meta name="twitter:description" content="Smart READMEs. AI-driven commits." />
+<meta name="twitter:image" content="https://yourdomain.com/.dokugen/card.png" />

@@ -197,7 +197,7 @@ export function buildUserPrompt(
              options.includeContributionGuideLine === true
                ? `
            - Include a short Contributing section.
-           - If a CONTRIBUTION.md, CONTRIBUTING.md, or similar file exists in the project files list, link to it using the full GitHub blob URL format: \`[Contribution Guide](${repoUrl ? repoUrl.replace(/\.git$/, "") + "/blob/main/CONTRIBUTION.md" : "https://github.com/<owner>/<repo>/blob/main/CONTRIBUTION.md"})\`. NEVER use a relative path like \`(CONTRIBUTION.md)\` or \`(./CONTRIBUTING.md)\`.
+           - If a CONTRIBUTION.md, CONTRIBUTING.md, or similar file exists in the project files list, link to it using a relative path format: \`[Contribution Guide](./CONTRIBUTION.md)\`.
            - Use clean, professional formatting without emojis.
            `
                : "<!-- SKIP SECTION: User Opted out of contributions guidelines. DO NOT ADD THIS SECTION. -->"
@@ -205,8 +205,7 @@ export function buildUserPrompt(
 
          - **License**:
             - CAREFULLY scan the project files list for ANY file named LICENSE, LICENSE.md, LICENSE.txt, COPYING, or similar. If found, identify the license type by reading the license file content in the code context (e.g. MIT, Apache 2.0, GPL-3.0, ISC) and write the License section explicitly naming the license type.
-            - Link to the LICENSE file using the full GitHub blob URL. If the repo URL is "${repoUrl || "https://github.com/<owner>/<repo>"}", the link must be: \`[LICENSE](${repoUrl ? repoUrl.replace(/\.git$/, "") + "/blob/main/LICENSE" : "https://github.com/<owner>/<repo>/blob/main/LICENSE"})\`
-            - NEVER use a relative path like \`[LICENSE](LICENSE)\` or \`[LICENSE](./LICENSE)\`. Always use the full blob URL.
+            - Link to the LICENSE file using a relative path format: \`[LICENSE](./LICENSE)\`.
             - Do NOT skip this section if a LICENSE file exists. Do NOT write vague filler text like "please refer to the repository for licensing details".
             - If absolutely no LICENSE file is found anywhere in the project files list, omit the License section entirely.
 
@@ -238,7 +237,7 @@ export function buildUserPrompt(
         - Write the Overview section naturally, explaining what the project does and what problem it solves.
         - Do NOT wrap the README in markdown code blocks (\`\`\`markdown or \`\`\`).
         - Do NOT indent regular paragraphs or explanation text under lists with 4 or more spaces. Keep they aligned to the margin (0 spaces) or indent with exactly 2 spaces if nesting. 4 spaces will trigger Markdown code-block mode and break all your link renderings.
-        - **INTERNAL FILE LINKS — BLOB URLS ONLY**: When linking to any file that lives inside the repository (LICENSE, CONTRIBUTION.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, CHANGELOG.md, etc.), ALWAYS use the full GitHub blob URL (e.g. \`https://github.com/owner/repo/blob/main/LICENSE\`). NEVER use relative paths like \`(LICENSE)\` or \`(./LICENSE)\`.
+        - **INTERNAL FILE LINKS — RELATIVE PATHS ONLY**: When linking to any file that lives inside the repository (LICENSE, CONTRIBUTION.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, CHANGELOG.md, etc.), ALWAYS use relative paths (e.g. \`./CONTRIBUTION.md\` or \`./LICENSE\`).
 
        ## Final Output:
        Generate the README.md content directly, without any additional explanations or wrapping.

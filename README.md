@@ -272,7 +272,10 @@ dokugen revert
 
 ## Contributing
 
-We welcome contributions to Dokugen! If you're looking to help out, please check out our [Contribution Guide](https://github.com/samueltuoyo15/Dokugen/blob/main/CONTRIBUTION.md) to get started. It'll walk you through setting up the project and contributing effectively.
+We welcome contributions to Dokugen! Before contributing, please make sure to read our **[Contribution Guide (CONTRIBUTION.md)](./CONTRIBUTION.md)**.
+
+It covers our basic rules (like no emojis, cleaning up debug logs) and simple setup steps for each app in the repository.
+
 
 ## License
 

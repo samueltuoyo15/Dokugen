@@ -80,11 +80,10 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
 
        6. **Always include the Dokugen badge at the bottom**
 
-       7. **Always use full GitHub blob URLs for internal repo file links**:
-          - When linking to any file that lives inside the repository (e.g. LICENSE, CONTRIBUTION.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, CHANGELOG.md, SECURITY.md), you MUST use the full GitHub blob URL format, NOT a relative path.
-          - The correct format is: \`https://github.com/{owner}/{repo}/blob/main/{FILENAME}\`
-          - Extract the owner and repo name from the git remote URL in the project data. If you cannot determine it, fall back to a relative path only as a last resort.
-          - This rule applies to ALL internal markdown file links without exception.
+       7. **Always use relative paths for internal repo file links**:
+          - When linking to any file that lives inside the repository (e.g. LICENSE, CONTRIBUTION.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, CHANGELOG.md, SECURITY.md), ALWAYS use relative path links (e.g. \`./CONTRIBUTION.md\` or \`./LICENSE\`).
+          - Relative paths work seamlessly across all branches, forks, and offline markdown viewers.
+          - This rule applies to ALL internal markdown file links.
 
       Remember: The goal is to make someone understand what this project does and why they'd want to use it, not to impress them with technology names.      ${options.includeDiagrams === true ? `
       ## System Design Diagram Generation

@@ -6,6 +6,7 @@ import { registerUpdateCommand } from "./commands/update.js";
 import { registerAicCommand } from "./commands/aic.js";
 import { registerRevertCommand } from "./commands/revert.js";
 import { registerLicenseCommand } from "./commands/license.js";
+import { registerOgCommand } from "./commands/og.js";
 import { runInteractiveMenu, isRunAsStandaloneBinary, waitForKeypress } from "./helpers/menu.js";
 import { CURRENT_VERSION } from "./helpers/constants.js";
 
@@ -25,6 +26,7 @@ registerUpdateCommand(program);
 registerAicCommand(program);
 registerRevertCommand(program);
 registerLicenseCommand(program);
+registerOgCommand(program);
 
 const main = async (): Promise<void> => {
   try {

@@ -154,7 +154,7 @@ wheels = [
 
 [[package]]
 name = "dokugen"
-version = "14.0.0"
+version = "14.0.6"
 source = { editable = "." }
 dependencies = [
     { name = "pathspec", version = "0.12.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },

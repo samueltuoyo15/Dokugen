@@ -1,191 +1,81 @@
 # Contributing to Dokugen
 
-First off, thank you for considering contributing to Dokugen! It's people like you that make the open-source community such an amazing place to learn, inspire, and create.
+Thanks for wanting to contribute to Dokugen! We appreciate your help making this project better.
 
-Currently, we are actively accepting contributions in these specific areas:
-
--   **CLI** (`apps/cli/clients`)
--   **Docs** (`apps/docs`)
--   **Server** (`apps/server`)
--   **VSCode Extension** (`apps/vscode-extension`)
+We accept contributions across these main parts of the project:
+- **CLI** (`apps/cli/clients`)
+- **Server** (`apps/server`)
+- **Docs** (`apps/docs`)
+- **VSCode Extension** (`apps/vscode-extension`)
 
 ---
 
-## Getting Started
+## Simple Guidelines
 
-To get started, you'll need to set up the project locally. Here is a step-by-step specific guide to help you navigate the codebase without getting overwhelmed.
+Before submitting a pull request, please keep these basic rules in mind:
+
+1. **No Emojis**: Do not add emojis in your code, inline comments, commit messages, or PR titles.
+2. **Clean Up Debug Logs**: Remove temporary `console.log`, `print()`, debug code, or unused labels before submitting your code.
+3. **Test Your Code**: Make sure your changes compile and pass basic linting (`pnpm run lint`).
+4. **Clean Commit Messages**: Use simple, descriptive commit messages without emojis (for example: `feat(cli): add new option` or `fix(server): fix route response`).
+
+---
+
+## Setup & App Workflows
 
 ### Prerequisites
+- **Node.js** (v18+)
+- **pnpm** (v9+ recommended)
 
--   **Node.js**: Version 18 or higher.
--   **pnpm**: Recommended package manager (but `npm` or `yarn` works too).
-
-### 1. Global Setup
-
-Before working on any specific part of the app, you need to clone the repo and install the dependencies for the entire workspace.
-
-1.  **Clone the Repository**:
-    ```bash
-    git clone https://github.com/samueltuoyo15/Dokugen.git
-    ```
-
-2.  **Enter the Project Root**:
-    ```bash
-    cd Dokugen
-    ```
-
-3.  **Install All Dependencies**:
-    We use a workspace structure, so installing at the root handles dependencies for all apps (Cli, Server, etc.) at once.
-    ```bash
-    pnpm install
-    # or
-    npm install
-    ```
+Run `pnpm install` at the project root to install dependencies for all apps.
 
 ---
 
-## Contribution Workflows
+### 1. CLI (`apps/cli/clients`)
 
-Depending on what you want to fix or improve, follow the specific workflow below.
+#### TypeScript CLI (`apps/cli/clients/typescript`)
+1. Go to `apps/cli/clients/typescript`.
+2. Make your edits in `bin/` or `src/`.
+3. Run `pnpm run build` to compile your TypeScript code into `dist/`.
+4. Test it locally by running `node dist/bin/dokugen.mjs`.
 
-### Working on the CLI (`apps/cli/clients`)
+#### Python CLI (`apps/cli/clients/python`)
+1. Go to `apps/cli/clients/python`.
+2. Set up a virtual environment: `python -m venv .venv` and activate it.
+3. Install editable mode: `pip install -e .`
+4. Test your commands using `dokugen`.
 
-This is the core command-line tool. If you are adding features or fixing bugs in the CLI:
-
-#### TypeScript CLI
-
-1.  **Navigate to the TypeScript CLI Directory**:
-    ```bash
-    cd apps/cli/clients/typescript
-    ```
-
-2.  **Make Your Changes**:
-    Edit the TypeScript source files in `bin/`.
-
-3.  **Build the Project (CRITICAL STEP)**:
-    Since the TS client is a TypeScript project, **you must compile your code** before you can run it. The `node` command cannot run TypeScript files directly (`.ts`), it needs the compiled JavaScript in the `dist/` folder.
-    
-    *Every time you make a TS change, run:*
-    ```bash
-    pnpm run build
-    # or
-    npm run build
-    ```
-    *This generates the `dist` folder.*
-
-4.  **Test Your Changes**:
-    Run the compiled CLI locally:
-    ```bash
-    node dist/bin/dokugen.mjs generate
-    # or for smart update:
-    node dist/bin/dokugen.mjs update
-    # or for commit message generation:
-    node dist/bin/dokugen.mjs aic
-    ```
-
-#### Python CLI
-
-1.  **Navigate to the Python CLI Directory**:
-    ```bash
-    cd apps/cli/clients/python
-    ```
-
-2.  **Set Up a Local Environment**:
-    We recommend using a Python virtual environment to manage dependencies locally:
-    ```bash
-    python -m venv .venv
-    # Activate virtual environment
-    # On Windows:
-    .venv\Scripts\activate
-    # On macOS/Linux:
-    source .venv/bin/activate
-    ```
-
-3.  **Install in Editable Mode**:
-    Install the package and its development dependencies:
-    ```bash
-    pip install -e .
-    ```
-
-4.  **Make Your Changes**:
-    Edit the Python source files in `src/dokugen/`.
-
-5.  **Test Your Changes**:
-    You can run the CLI commands directly:
-    ```bash
-    dokugen generate
-    # or for smart update:
-    dokugen update
-    # or for commit message generation:
-    dokugen aic
-    ```
+#### Go CLI (`apps/cli/clients/golang`)
+1. Go to `apps/cli/clients/golang`.
+2. Test your changes with `go run main.go` or `go build`.
 
 ---
 
-### Working on the Server (`apps/server`)
-
-This handles the backend logic and API requests.
-
-1.  **Navigate to the Server Directory**:
-    ```bash
-    cd apps/server
-    ```
-
-2.  **Environment Setup**:
-    You **must** create a `.env` file in `apps/server/` for the server to run. Copy the variables below:
-
-    ```env
-    PORT=3000
-    NODE_ENV=development
-    BACKEND_DOMAIN=http://localhost:3000
-    GOOGLE_GEMINI_API_KEY=your_gemini_api_key_here
-    MODEL_NAME=gemini-2.5-flash
-    SUPABASE_CLIENT_URL=your_supabase_url
-    SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
-    SUPABASE_SECRET_KEY=your_supabase_secret_key
-    ```
-    *(Note: Replace the placeholders with your actual API keys/URLs).*
-
-3.  **Build & Run**:
-    ```bash
-    npm run build
-    npm start
-    ```
-    *Alternatively, for development, you can run `npx ts-node server.ts` or `npm run dev`.*
+### 2. Server (`apps/server`)
+1. Go to `apps/server`.
+2. Create a `.env` file with your local API keys (Gemini, Supabase, etc.).
+3. Run `pnpm run dev` or `pnpm run build` to test the backend logic.
+4. Keep server responses and prompt templates clean without emojis.
 
 ---
 
-### Working on the VSCode Extension (`apps/vscode-extension`)
-
-If you are working on implementing the VSCode extension to let users run Dokugen directly from their editor:
-
-#### Goal & Tasks Checklist
-- **Command Implementation**: Ensure all core Dokugen features are available as editor commands:
-  - `Dokugen: Generate Readme` (generate)
-  - `Dokugen: Update Readme` (update)
-  - `Dokugen: Revert Readme` (revert)
-  - `Dokugen: AI Git Commit` (aic)
-  - `Dokugen: Generate License` (license)
-- **Interactive UI**: Build input boxes and quick picks matching the CLI choices (Project Type, Setup Instructions, etc.).
-- **Output View**: Stream logs/progress to a native VSCode Output Channel instead of the terminal.
-- **File Integration**: Create generated files (like `README.md` or `LICENSE`) in the active workspace root and open them automatically upon completion.
-
-#### Development Workflow
-1. **Navigate to the Extension Directory**:
-    ```bash
-    cd apps/vscode-extension
-    ```
-2. **Open in VSCode**:
-    Open the `apps/vscode-extension` folder in a new VSCode window.
-3. **Launch & Debug**:
-    - Press `F5` to run the compile task and launch a new **Extension Development Host** window.
-    - In the host window, open the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`) and search for `Dokugen` commands to test them.
+### 3. Docs (`apps/docs`)
+1. Go to `apps/docs`.
+2. Run `pnpm run dev` to preview the Next.js site locally.
+3. Run `pnpm run build` to make sure the site builds cleanly.
 
 ---
 
-## Submission Guidelines
+### 4. VSCode Extension (`apps/vscode-extension`)
+1. Go to `apps/vscode-extension` and open it in VSCode (`code .`).
+2. Press `F5` to open the Extension Development Host window.
+3. Test your commands from the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`).
 
--   **Issues**: Before starting any major work, please open an issue to discuss what you want to change. Alternatively, you can browse existing [Open Issues](https://github.com/samueltuoyo15/Dokugen/issues) and comment on one you'd like to tackle.
--   **Pull Requests**: specific to the area you worked on (`feat(cli): ...` or `fix(server): ...`).
+---
 
-Thank you for helping active this project! Happy Coding!
+## Submitting Your Work
+
+1. If you're planning a big feature or fix, open an issue first so we can discuss it.
+2. Push your branch and open a Pull Request.
+
+Thanks again for helping out!
