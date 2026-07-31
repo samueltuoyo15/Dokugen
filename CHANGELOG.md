@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [14.0.9] - 2026-07-31
+
+### Fixed
+- **Linux & WSL Browser Support**: Fixed an issue where browser links (such as setting up a Myhappr funding page) would fail to open when running Dokugen inside Ubuntu or WSL (Windows Subsystem for Linux).
+
 ## [14.0.7 - 14.0.8] - 2026-07-25
 
 ### Added

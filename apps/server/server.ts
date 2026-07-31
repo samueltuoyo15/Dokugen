@@ -34,6 +34,8 @@ app.use("/api", trackRouter);
 app.use("/api", ogRouter);
 app.use("/api", changelogRouter);
 
+
+
 app.get("/", (req: Request, res: Response) => {
   res.send("Dokugen API is running");
 });
@@ -45,6 +47,18 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 const PORT = process.env.PORT || "3000";
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   logger.info(`Dokugen running on port ${PORT}`);
 });
+
+const handleShutdown = (signal: string) => {
+  logger.info(`Received ${signal}. Shutting down gracefully...`);
+  server.close(() => {
+    logger.info("HTTP server closed.");
+    process.exit(0);
+  });
+};
+
+process.on("SIGTERM", () => handleShutdown("SIGTERM"));
+process.on("SIGINT", () => handleShutdown("SIGINT"));
+

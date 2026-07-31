@@ -32,6 +32,8 @@ RUN pnpm turbo run build --filter=dokugen-server...
 FROM base AS runner
 WORKDIR /app
 
+RUN apk add --no-cache tini
+
 # Don't run production containers as root for security
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 expressjs
@@ -48,5 +50,7 @@ EXPOSE 3000
 ENV PORT=3000
 ENV NODE_ENV=production
 
+ENTRYPOINT ["/sbin/tini", "--"]
 # Run the compiled server
 CMD ["node", "apps/server/dist/server.js"]
+

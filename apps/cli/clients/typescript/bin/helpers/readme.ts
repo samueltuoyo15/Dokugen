@@ -43,18 +43,45 @@ let currentReadmePath: string = "";
 function openBrowser(url: string): void {
   const platform = process.platform;
   const isTermux = !!process.env.TERMUX_VERSION;
+  const isWsl = !!process.env.WSL_DISTRO_NAME || !!process.env.WSL_INTEROP;
+
+  const fallback = () => {
+    console.log(chalk.yellow("\nCould not open browser automatically. Please open this URL manually:"));
+    console.log(chalk.cyan(url));
+  };
 
   // Use execFile (not exec) to avoid shell injection via a crafted URL
   if (isTermux) {
-    execFile("termux-open-url", [url]);
+    execFile("termux-open-url", [url], (err) => { if (err) fallback(); });
+  } else if (isWsl) {
+    execFile("wslview", [url], (err) => {
+      if (err) {
+        const escapedUrl = url.replace(/[&^<>|]/g, "^$&");
+        execFile("cmd.exe", ["/c", "start", "", escapedUrl], (err2) => {
+          if (err2) {
+            execFile("xdg-open", [url], (err3) => {
+              if (err3) fallback();
+            });
+          }
+        });
+      }
+    });
   } else if (platform === "win32") {
     // Escape special shell characters to prevent cmd.exe from splitting the URL at '&'
     const escapedUrl = url.replace(/[&^<>|]/g, "^$&");
-    execFile("cmd", ["/c", "start", "", escapedUrl]);
+    execFile("cmd", ["/c", "start", "", escapedUrl], (err) => { if (err) fallback(); });
   } else if (platform === "darwin") {
-    execFile("open", [url]);
+    execFile("open", [url], (err) => { if (err) fallback(); });
   } else {
-    execFile("xdg-open", [url]);
+    // Linux: try xdg-open first, fall back to printing the URL if unavailable
+    execFile("xdg-open", [url], (err) => {
+      if (err) {
+        // xdg-open failed (e.g. no display, not installed), try sensible-browser
+        execFile("sensible-browser", [url], (err2) => {
+          if (err2) fallback();
+        });
+      }
+    });
   }
 }
 

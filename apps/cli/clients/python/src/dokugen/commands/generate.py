@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import platform
 import requests
 import questionary
 import webbrowser
@@ -43,10 +44,40 @@ def open_browser(url):
             return
         except Exception:
             pass
-    try:
-        webbrowser.open(url)
-    except Exception:
-        pass
+
+    # Check for WSL (Windows Subsystem for Linux)
+    is_wsl = "WSL_DISTRO_NAME" in os.environ or "WSL_INTEROP" in os.environ or "microsoft" in platform.uname().release.lower()
+    if is_wsl:
+        for cmd in [["wslview", url], ["cmd.exe", "/c", "start", "", url.replace("&", "^&")], ["powershell.exe", "-c", "Start-Process", f'"{url}"']]:
+            try:
+                result = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                if result.returncode == 0:
+                    return
+            except Exception:
+                continue
+
+    # Try Python's built-in webbrowser module (cross-platform)
+    if not is_wsl:
+        try:
+            opened = webbrowser.open(url)
+            if opened:
+                return
+        except Exception:
+            pass
+
+    # Linux fallback: try sensible-browser or xdg-open directly
+    if os.name == "posix" and os.uname().sysname.lower() != "darwin":
+        for cmd in ["sensible-browser", "xdg-open"]:
+            try:
+                result = subprocess.run([cmd, url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                if result.returncode == 0:
+                    return
+            except Exception:
+                continue
+
+    # Final fallback: print the URL so the user can copy-paste it
+    console.print(f"\n[yellow]Could not open browser automatically. Please open this URL manually:[/yellow]")
+    console.print(f"[cyan underline]{url}[/cyan underline]")
 
 
 def ask_handle(field_name, saved_value):
