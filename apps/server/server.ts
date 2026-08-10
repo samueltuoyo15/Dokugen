@@ -2,8 +2,11 @@ import express, { Application, Request, Response, NextFunction } from "express";
 import helmet from "helmet";
 import cors from "cors";
 import dotenv from "dotenv";
+import dns from "node:dns";
 import logger from "./utils/logger";
 import { limiter } from "./middleware/rateLimiter";
+
+dns.setDefaultResultOrder("ipv4first");
 import healthRouter from "./routes/health";
 import readmeRouter from "./routes/readme";
 import commitRouter from "./routes/commit";
