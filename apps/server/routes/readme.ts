@@ -39,10 +39,10 @@ router.post(
 
       logger.info(
         { projectType, compressed, hasExistingReadme: !!rawExistingReadme },
-        "Generate README request received (DeepSeek OpenAI SDK)"
+        "Generate README request received (Gemini OpenAI SDK)"
       );
 
-      const apiKey = process.env.DEEPSEEK_API_KEY;
+      const apiKey = process.env.GEMINI_API_KEY;
       if (!apiKey) {
         return res.status(500).json({ error: "No API Key Provided" });
       }
@@ -100,13 +100,13 @@ router.post(
         options
       );
 
-      const modelName = process.env.README_MODEL_NAME || "deepseek-v4-pro";
+      const modelName = process.env.README_MODEL_NAME || "gemini-3.1-pro";
 
       trackUser({ username, email, id, osInfo }, "readme").catch(() => {});
 
       const openai = new OpenAI({
         apiKey,
-        baseURL: "https://api.deepseek.com",
+        baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
       });
 
       const stream = await openai.chat.completions.create({

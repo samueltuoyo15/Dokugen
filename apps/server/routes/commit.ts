@@ -61,13 +61,13 @@ router.post(
         trackUser({ ...userInfo, id: userInfo.id || uuidv4() }, "commit").catch(() => {});
       }
 
-      const apiKey = process.env.DEEPSEEK_API_KEY;
+      const apiKey = process.env.GEMINI_API_KEY;
       if (!apiKey) {
-        return res.status(500).json({ error: "No DeepSeek API Key Provided on Server" });
+        return res.status(500).json({ error: "No Gemini API Key Provided on Server" });
       }
 
-      const baseURL = process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com";
-      const modelName = process.env.COMMIT_MODEL_NAME || "deepseek-v4-flash";
+      const baseURL = process.env.GEMINI_BASE_URL || "https://generativelanguage.googleapis.com/v1beta/openai/";
+      const modelName = process.env.COMMIT_MODEL_NAME || "gemini-3.1-flash";
 
       const prompt = buildCommitPrompt(diff);
 
