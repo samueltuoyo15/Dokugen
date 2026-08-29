@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import OpenAI from "openai";
+import { createOpenAIClient, getModelName } from "../lib/openaiClient";
 import { trackUser } from "../lib/supabaseTracker";
 import logger from "../utils/logger";
 
@@ -61,20 +61,16 @@ router.post(
         trackUser({ ...userInfo, id: userInfo.id || uuidv4() }, "commit").catch(() => {});
       }
 
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) {
-        return res.status(500).json({ error: "No Gemini API Key Provided on Server" });
-      }
+      const configuredModelName = process.env.COMMIT_MODEL_NAME;
 
-      const baseURL = process.env.GEMINI_BASE_URL || "https://generativelanguage.googleapis.com/v1beta/openai/";
-      const modelName = process.env.COMMIT_MODEL_NAME || "gemini-3.1-flash";
+      if(!configuredModelName) {
+        throw new Error("COMMIT_MODEL_NAME is missing")
+      }
+      const modelName = getModelName(configuredModelName);
 
       const prompt = buildCommitPrompt(diff);
 
-      const openai = new OpenAI({
-        apiKey,
-        baseURL,
-      });
+      const openai = await createOpenAIClient();
 
       const completion = await openai.chat.completions.create({
         model: modelName,

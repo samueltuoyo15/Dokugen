@@ -42,6 +42,10 @@ yarn-error.log*
 .DS_Store
 *.pem
 
+# Google Cloud service-account keys
+*-service-account*.json
+gen-lang-client-*.json
+
 # Bun build artifacts
 *.bun-build
 dist/binaries/

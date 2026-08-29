@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [14.0.10] - 2026-08-29
+
+### Added
+- **Gemini Enterprise Agent Platform**: Unified README, commit, Open Graph metadata, and changelog generation behind the OpenAI SDK's Vertex-compatible Chat Completions endpoint.
+- **Service-account authentication**: Added secure service-account JSON authentication with short-lived OAuth token caching, configured through `GOOGLE_APPLICATION_CREDENTIALS`.
+- **Provider flexibility**: `OPENAI_BASE_URL` now selects the OpenAI-compatible provider; `OPENAI_API_KEY` remains optional for non-Vertex providers.
+
+### Fixed
+- **IPv4-first networking**: Prefer IPv4 for outbound Google OAuth and Vertex requests, improving reliability on hosts with broken IPv6 routing.
+- **Python package command**: Published the standard `dokugen` console command and explicitly configured Hatch to include the `src/dokugen` package in wheels.
+- **README overview voice**: README generation now describes projects as helping developers, teams, or users instead of directly addressing the reader as "you".
+- **Donation prompt wording**: Simplified the post-generation donation prompt to prevent awkward wrapped terminal redraws.
+
 ## [14.0.9] - 2026-07-31
 
 ### Fixed

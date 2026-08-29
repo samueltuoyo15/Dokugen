@@ -87,7 +87,7 @@ def cmd_changelog(args):
                 pass
 
         start_time = time.time()
-        model_name = getattr(args, "model", None) or os.environ.get("OPENROUTER_MODEL")
+        model_name = getattr(args, "model", None) or os.environ.get("OPENAI_MODEL")
         with utils.create_ticking_spinner("Analyzing commit history and generating CHANGELOG...") as spinner:
             backend_domain = utils.get_backend_domain()
             user_info = utils.get_user_info()
@@ -97,7 +97,6 @@ def cmd_changelog(args):
                 "version": version,
                 "existingChangelog": existing_changelog,
                 "userInfo": user_info,
-                "openrouterApiKey": os.environ.get("OPENROUTER_API_KEY"),
             }
             if model_name:
                 payload["model"] = model_name
@@ -157,7 +156,7 @@ def register_changelog_parser(subparsers):
         "--model", "-m",
         type=str,
         default=None,
-        help="Custom OpenRouter model (e.g. anthropic/claude-3.5-sonnet)"
+        help="Custom model configured on the server (e.g. google/gemini-3.1-flash-lite)"
     )
     changelog_parser.add_argument(
         "--outfile", "-o",

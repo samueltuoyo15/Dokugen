@@ -580,14 +580,8 @@ export default function DokugenHomeClient() {
                   How does the AI CHANGELOG generator work?
                 </h3>
                 <p className="text-zinc-600 leading-relaxed text-sm">
-                  Running <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">dokugen changelog</code> analyzes your commit history and generates or updates a clean <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-xs font-mono border border-zinc-200/60">CHANGELOG.md</code> adhering to Keep a Changelog standards. It works out-of-the-box with zero setup! Optionally, if you wish to use your own custom OpenRouter API key, set it in your environment:
+                  Running <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200/60">dokugen changelog</code> analyzes your commit history and generates or updates a clean <code className="text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded text-xs font-mono border border-zinc-200/60">CHANGELOG.md</code> adhering to Keep a Changelog standards. It works out-of-the-box using Dokugen&apos;s Gemini Enterprise Agent Platform credentials, with no client API key required.
                 </p>
-                <div className="mt-3 bg-zinc-900 text-zinc-100 p-3 rounded-lg text-xs font-mono space-y-1">
-                  <p className="text-zinc-400"># Windows (PowerShell):</p>
-                  <p>$env:OPENROUTER_API_KEY=&quot;your_api_key_here&quot;</p>
-                  <p className="text-zinc-400 mt-2"># macOS / Linux / Termux:</p>
-                  <p>export OPENROUTER_API_KEY=your_api_key_here</p>
-                </div>
               </div>
               <div className="bg-white p-8 rounded-2xl border border-zinc-200/80 transition-all duration-200">
                 <h3 className="text-lg font-bold mb-3 text-zinc-950">
@@ -639,7 +633,24 @@ export default function DokugenHomeClient() {
               </p>
               
               <div className="flex flex-col md:flex-row gap-8 justify-center text-left w-full">
-                {/* Left hand side: GitHub Sponsors */}
+             
+                
+                {/* Left hand side: Myhappr Tip Card */}
+                <div className="flex-1 w-full flex">
+                  <div className="bg-white border border-zinc-200/80 rounded-2xl shadow-sm p-0 sm:p-5 flex flex-col w-full">
+                    <div className="px-4 pt-4 pb-2 md:p-0 md:mb-4 text-center md:text-left">
+                      <h4 className="text-sm font-bold text-zinc-800 mb-1">Myhappr Tip Card</h4>
+                      <p className="text-zinc-400 text-[10px] leading-relaxed">
+                        Support Samuel Tuoyo directly on Myhappr Tip Card to help fund Dokugen development if you are in Africa.
+                      </p>
+                    </div>
+                    <div className="flex-grow flex items-center justify-center p-1 sm:p-0">
+                      <SupportCard />
+                    </div>
+                  </div>
+                </div>
+
+                   {/* Right hand side: GitHub Sponsors */}
                 <div className="flex-1 w-full flex">
                   <div className="bg-white border border-zinc-200/80 rounded-2xl shadow-sm p-5 flex flex-col w-full">
                     <div className="mb-4 text-center md:text-left">
@@ -674,21 +685,6 @@ export default function DokugenHomeClient() {
                         <span className="text-zinc-900 text-sm font-bold tracking-wide">Support Dokugen</span>
                       </div>
                     </a>
-                  </div>
-                </div>
-                
-                {/* Right hand side: Myhappr Tip Card */}
-                <div className="flex-1 w-full flex">
-                  <div className="bg-white border border-zinc-200/80 rounded-2xl shadow-sm p-0 sm:p-5 flex flex-col w-full">
-                    <div className="px-4 pt-4 pb-2 md:p-0 md:mb-4 text-center md:text-left">
-                      <h4 className="text-sm font-bold text-zinc-800 mb-1">Myhappr Tip Card</h4>
-                      <p className="text-zinc-400 text-[10px] leading-relaxed">
-                        Support Samuel Tuoyo directly on Myhappr Tip Card to help fund Dokugen development if you are in Africa.
-                      </p>
-                    </div>
-                    <div className="flex-grow flex items-center justify-center p-1 sm:p-0">
-                      <SupportCard />
-                    </div>
                   </div>
                 </div>
               </div>

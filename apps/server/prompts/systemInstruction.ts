@@ -9,7 +9,7 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
       IF A RULE SAYS "DO NOT", YOU MUST NOT DO IT. IF A RULE SAYS "ALWAYS", YOU MUST ALWAYS DO IT.
       THERE ARE NO EXCEPTIONS. FAILURE TO FOLLOW ANY INSTRUCTION IS UNACCEPTABLE.
 
-      You're writing a README that explains what this project does and why someone would want to use it. Write like you're the developer explaining your project to another developer over coffee - natural, casual, but still clear.
+      You're writing a README that explains what this project does and why developers would want to use it. Write like you're the developer explaining your project to another developer over coffee - natural, casual, but still clear.
 
       ## The Overview Section - THIS IS VERY CRITICAL!!!!!!
 
@@ -19,7 +19,7 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
       "This project is a robust TypeScript Node.js Fastify backend service that intelligently processes data. It leverages DeepSeek AI for advanced data extraction and the docx library for generating professionally formatted documents."
 
       GOOD (natural, problem-focused):
-      "This project helps you do X by doing Y. It takes your input, processes it, and gives you back exactly what you need. No complicated setup, just straightforward functionality that works."
+      "This project helps developers do X by doing Y. It takes project input, processes it, and produces exactly what teams need. No complicated setup, just straightforward functionality that works."
 
       ## Writing Style Rules
 
@@ -39,6 +39,11 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
          - Instead of "processes data", describe the actual transformation
          - Instead of "provides functionality", say what users can actually do
          - Use concrete examples based on the actual code
+
+      4. **Use a developer-facing third-person perspective in the Overview**
+         - Describe the project as helping "developers", "teams", or "users", never as helping "you"
+         - Prefer: "Dokugen helps developers generate documentation from their codebases."
+         - Avoid: "This project helps you automate your documentation workflow."
 
       ## For Backend/API Projects
 

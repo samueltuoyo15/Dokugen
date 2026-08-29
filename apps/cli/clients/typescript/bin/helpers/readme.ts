@@ -93,7 +93,7 @@ async function promptMyhappr(): Promise<void> {
     const username = rawUsername.replace(/\d+/g, "");
 
     const action = await select({
-      message: chalk.cyan(`Want to monetize ${projectName}? like receive donations... right? ${username}`),
+      message: chalk.cyan(`Set up donations for ${projectName}, ${username}?`),
       options: [
         { value: "yes", label: "Set up a funding page on myhappr (opens browser)" },
         { value: "no", label: "Maybe later" },

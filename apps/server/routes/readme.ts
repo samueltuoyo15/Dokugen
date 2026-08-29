@@ -1,7 +1,7 @@
 import express, { Router, Request, Response } from "express";
 import os from "os";
 import { v4 as uuidv4 } from "uuid";
-import OpenAI from "openai";
+import { createOpenAIClient, getModelName } from "../lib/openaiClient";
 import { fetchGitHubReadme } from "../lib/fetchGitHubReadme";
 import { gunzipAsync } from "../middleware/compression";
 import { trackUser } from "../lib/supabaseTracker";
@@ -39,13 +39,8 @@ router.post(
 
       logger.info(
         { projectType, compressed, hasExistingReadme: !!rawExistingReadme },
-        "Generate README request received (Gemini OpenAI SDK)"
+        "Generate README request received (OpenAI-compatible SDK)"
       );
-
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) {
-        return res.status(500).json({ error: "No API Key Provided" });
-      }
 
       let fullCode = rawFullCode;
       let existingReadme = rawExistingReadme;
@@ -100,14 +95,15 @@ router.post(
         options
       );
 
-      const modelName = process.env.README_MODEL_NAME || "gemini-3.1-pro";
+      const configuredModelName = process.env.README_MODEL_NAME;
+      if(!configuredModelName) {
+        throw new Error("Model name is missing")
+      }
+      const modelName = getModelName(configuredModelName);
 
       trackUser({ username, email, id, osInfo }, "readme").catch(() => {});
 
-      const openai = new OpenAI({
-        apiKey,
-        baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
-      });
+      const openai = await createOpenAIClient();
 
       const stream = await openai.chat.completions.create({
         model: modelName,

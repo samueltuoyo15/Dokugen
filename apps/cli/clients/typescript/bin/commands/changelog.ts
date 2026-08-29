@@ -15,7 +15,7 @@ export function registerChangelogCommand(program: Command) {
     .description("AI-powered CHANGELOG generator and updater")
     .option("-v, --version-tag <version>", "Version header (e.g. v1.0.0)")
     .option("-n, --limit <number>", "Number of git commits to analyze", "200")
-    .option("-m, --model <modelName>", "Custom OpenRouter model (e.g. anthropic/claude-3.5-sonnet)")
+    .option("-m, --model <modelName>", "Custom model configured on the server (e.g. google/gemini-3.1-flash-lite)")
     .option("-o, --outfile <filepath>", "Output changelog file path", "CHANGELOG.md")
     .action(async (options: any) => {
       await checkAndUpdate();
@@ -111,8 +111,7 @@ export function registerChangelogCommand(program: Command) {
             version,
             existingChangelog,
             userInfo,
-            openrouterApiKey: process.env.OPENROUTER_API_KEY,
-            model: options.model || process.env.OPENROUTER_MODEL,
+            model: options.model || process.env.OPENAI_MODEL,
           }
         );
 

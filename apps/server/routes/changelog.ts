@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import OpenAI from "openai";
+import { createOpenAIClient, getModelName } from "../lib/openaiClient";
 import { trackUser } from "../lib/supabaseTracker";
 import { buildChangelogPrompt } from "../prompts/changelogPrompt";
 import logger from "../utils/logger";
@@ -49,7 +49,7 @@ router.post(
   "/generate-changelog",
   async (req: Request, res: Response): Promise<any> => {
     try {
-      const { logs, version = "Unreleased", existingChangelog, userInfo, openrouterApiKey: clientKey, model: clientModel } = req.body;
+      const { logs, version = "Unreleased", existingChangelog, userInfo, model: clientModel } = req.body;
 
       if (!logs) {
         return res.status(400).json({ error: "No git log history provided" });
@@ -59,26 +59,13 @@ router.post(
         trackUser({ ...userInfo, id: userInfo.id || uuidv4() }, "changelog").catch(() => {});
       }
 
-      const apiKey = clientKey || process.env.OPENROUTER_API_KEY;
-      if (!apiKey) {
-        return res.status(400).json({
-          error: "Please set an OPENROUTER_API_KEY environment variable to use the CHANGELOG generator. Visit https://dokugen.samueltuoyo.com to learn how to set your key.",
-        });
-      }
-
-      const baseURL = process.env.OPENROUTER_BASE_URL || "https://openrouter.ai/api/v1";
-      const modelName = clientModel || process.env.CHANGELOG_MODEL_NAME || "openrouter/free";
+      const modelName = getModelName(
+        clientModel || process.env.CHANGELOG_MODEL_NAME || "gemini-3.1-flash-lite",
+      );
 
       const prompt = buildChangelogPrompt(logs, version);
 
-      const openai = new OpenAI({
-        apiKey,
-        baseURL,
-        defaultHeaders: {
-          "HTTP-Referer": "https://dokugen.samueltuoyo.com",
-          "X-Title": "Dokugen",
-        },
-      });
+      const openai = await createOpenAIClient();
 
       const completion = await openai.chat.completions.create({
         model: modelName,

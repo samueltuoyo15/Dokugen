@@ -3,8 +3,7 @@
 ![Demo GIF](./public/Demo.gif)
 
 ## Overview
-
-Dokugen is a helpful tool that automatically creates and updates README files for your projects. It takes a look at your codebase, figures out what your project does, and then writes a clear, detailed README so you don't have to spend time doing it yourself. It's built to make sure your project always has professional and accurate documentation.
+Dokugen helps developers automate their documentation workflow by analyzing your codebase and generating exactly what you need.  It takes a look at your codebase, figures out what your project does, and then writes a clear, detailed README so you don't have to spend time doing it yourself. It's built to make sure your project always has professional and accurate documentation. No complicated setup is required, just straightforward functionality that keeps your documentation in sync with your actual code.
 
 ## System Architecture / Design
 

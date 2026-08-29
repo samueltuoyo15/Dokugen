@@ -160,7 +160,7 @@ const jsonLd = {
           "name": "How does the AI CHANGELOG generator work?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Running dokugen changelog analyzes your commit history and generates or updates CHANGELOG.md following Keep a Changelog standards out-of-the-box. Optionally, you can set a custom OPENROUTER_API_KEY environment variable (export OPENROUTER_API_KEY=your_key on macOS/Linux/Termux or $env:OPENROUTER_API_KEY=\"your_key\" on Windows)."
+            "text": "Running dokugen changelog analyzes your commit history and generates or updates CHANGELOG.md following Keep a Changelog standards using Dokugen's Gemini Enterprise Agent Platform credentials, with no client API key required."
           }
         },
         {

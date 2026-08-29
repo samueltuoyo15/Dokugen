@@ -143,7 +143,7 @@ def prompt_myhappr():
         username = re.sub(r'\d+', '', raw_username)
 
         answer = questionary.select(
-            f"Want to monetize {project_name}? like receive donations... right? {username}",
+            f"Set up donations for {project_name}, {username}?",
             choices=[
                 questionary.Choice("Set up a funding page on myhappr (opens browser)", value="yes"),
                 questionary.Choice("Maybe later", value="no")

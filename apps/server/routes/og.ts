@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import sharp from "sharp";
+import { createOpenAIClient, getModelName } from "../lib/openaiClient";
 import { getOgInstruction } from "../prompts/ogInstruction";
 import logger from "../utils/logger";
 
@@ -96,66 +97,28 @@ function generateSvgCard(metadata: {
 
 router.post("/og-metadata", async (req: Request, res: Response): Promise<any> => {
   try {
-    const { summary, apiKey } = req.body;
+    const { summary } = req.body;
 
     if (!summary) {
       return res.status(400).json({ error: "No codebase summary provided." });
     }
 
-    const key = apiKey || process.env.GOOGLE_GEMINI_API_KEY;
-    if (!key) {
-      return res.status(400).json({ error: "No Google Gemini API Key configured on server." });
-    }
-
     const systemPrompt = getOgInstruction();
     const userPrompt = `Generate the JSON metadata profile for this codebase summary:\n\n${summary}`;
+    const openai = await createOpenAIClient();
+    const model = getModelName(process.env.OG_MODEL_NAME || "gemini-3.1-flash-lite");
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`;
-
-    const response = await fetch(geminiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: systemPrompt }, { text: userPrompt }] }],
-        generationConfig: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: "OBJECT",
-            properties: {
-              title:     { type: "STRING" },
-              tagline:   { type: "STRING" },
-              techStack: { type: "ARRAY", items: { type: "STRING" } },
-              theme:     { type: "STRING", enum: ["light", "dark"] },
-              url:       { type: "STRING" },
-              author:    { type: "STRING" },
-              version:   { type: "STRING" },
-              logo:      { type: "STRING" },
-              buttons: {
-                type: "ARRAY",
-                items: {
-                  type: "OBJECT",
-                  properties: {
-                    label:   { type: "STRING" },
-                    variant: { type: "STRING", enum: ["primary", "secondary"] }
-                  },
-                  required: ["label", "variant"]
-                }
-              }
-            },
-            required: ["title", "tagline", "techStack", "theme", "buttons"]
-          }
-        }
-      })
+    const completion = await openai.chat.completions.create({
+      model,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+      response_format: { type: "json_object" },
+      max_tokens: 800,
     });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      logger.error({ status: response.status, error: errText }, "Gemini REST API error for OG metadata");
-      return res.status(response.status).json({ error: "Failed to generate metadata profile via Gemini API." });
-    }
-
-    const data = await response.json() as any;
-    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const rawText = completion.choices[0]?.message?.content || "";
 
     try {
       const parsed = JSON.parse(rawText.trim());
@@ -168,8 +131,8 @@ router.post("/og-metadata", async (req: Request, res: Response): Promise<any> =>
       }
       return res.status(200).json(parsed);
     } catch (parseErr) {
-      logger.error({ rawText, parseErr }, "Failed to parse Gemini response as JSON");
-      return res.status(500).json({ error: "Gemini did not return valid JSON. Please try again." });
+      logger.error({ rawText, parseErr }, "Failed to parse AI response as JSON");
+      return res.status(500).json({ error: "The AI did not return valid JSON. Please try again." });
     }
   } catch (error: any) {
     logger.error(error, "Error in /og-metadata");

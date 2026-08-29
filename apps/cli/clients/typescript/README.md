@@ -98,8 +98,8 @@ Analyze your Git commit history and automatically generate or update a structure
 dokugen changelog
 # or analyze up to a custom limit of commits
 dokugen changelog --limit 100
-# or specify a custom OpenRouter model
-dokugen changelog --model anthropic/claude-3.5-sonnet
+# or specify a custom model configured on the server
+dokugen changelog --model google/gemini-3.1-flash-lite
 ```
 
 ---
