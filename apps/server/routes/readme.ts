@@ -74,6 +74,18 @@ router.post(
         return res.status(400).json({ error: "Missing required fields in request body" });
       }
 
+      const MAX_CODE_CHARS = 2_500_000; // ~2.5MB to safely stay under Vertex 10MB payload limit
+      if (fullCode && fullCode.length > MAX_CODE_CHARS) {
+        logger.info(`Truncating fullCode from ${fullCode.length} to ${MAX_CODE_CHARS} chars`);
+        fullCode = fullCode.substring(0, MAX_CODE_CHARS) + "\n\n...[TRUNCATED FOR PAYLOAD SIZE]...";
+      }
+
+      const MAX_README_CHARS = 50_000; 
+      if (existingReadme && existingReadme.length > MAX_README_CHARS) {
+        existingReadme = existingReadme.substring(0, MAX_README_CHARS) + "\n...[TRUNCATED]...";
+      }
+
+
       let formatTemplate = "";
       if (customReadmeFormat) {
         formatTemplate = await fetchGitHubReadme(customReadmeFormat);

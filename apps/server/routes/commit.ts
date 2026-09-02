@@ -46,7 +46,6 @@ ${diff}
 ONE LINE. NOW. Commit message:
 `.trim();
 
-
 router.post(
   "/generate-commit",
   async (req: Request, res: Response): Promise<any> => {
@@ -55,6 +54,13 @@ router.post(
 
       if (!diff) {
         return res.status(400).json({ error: "No git diff provided" });
+      }
+
+      let processedDiff = diff;
+      const MAX_DIFF_CHARS = 100_000; // ~100k characters for a git diff is plenty and keeps payload small
+      if (processedDiff.length > MAX_DIFF_CHARS) {
+        processedDiff = processedDiff.substring(0, MAX_DIFF_CHARS) + "\n\n...[TRUNCATED FOR PAYLOAD SIZE LIMIT]...";
+        logger.info(`Truncating git diff from ${diff.length} to ${MAX_DIFF_CHARS} chars`);
       }
 
       if (userInfo?.username && userInfo?.email) {
@@ -68,7 +74,7 @@ router.post(
       }
       const modelName = getModelName(configuredModelName);
 
-      const prompt = buildCommitPrompt(diff);
+      const prompt = buildCommitPrompt(processedDiff);
 
       const openai = await createOpenAIClient();
 
