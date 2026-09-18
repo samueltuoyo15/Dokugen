@@ -151,8 +151,8 @@ The server requires environment variables to run.
     BACKEND_DOMAIN=http://localhost:3000
     OPENAI_API_KEY=your_api_key_here
     OPENAI_BASE_URL=https://api.openai.com/v1 # Or any compatible provider like ApiSmart, OpenRouter
-    README_MODEL_NAME=gemini-3.1-pro
-    COMMIT_MODEL_NAME=gemini-3.1-flash
+    README_MODEL_NAME=gpt-4o
+    COMMIT_MODEL_NAME=gpt-4o-mini
     SUPABASE_CLIENT_URL=your_supabase_url
     SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
     SUPABASE_SECRET_KEY=your_supabase_secret_key

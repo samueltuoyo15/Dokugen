@@ -1,4 +1,5 @@
-.env
+.env*
+!.env.example
 dist/
 node_modules/
 gen-lang-client-0433803567-a4490f059056.json
