@@ -149,7 +149,8 @@ The server requires environment variables to run.
     PORT=3000
     NODE_ENV=development
     BACKEND_DOMAIN=http://localhost:3000
-    GEMINI_API_KEY=your_gemini_api_key_here
+    OPENAI_API_KEY=your_api_key_here
+    OPENAI_BASE_URL=https://api.openai.com/v1 # Or any compatible provider like ApiSmart, OpenRouter
     README_MODEL_NAME=gemini-3.1-pro
     COMMIT_MODEL_NAME=gemini-3.1-flash
     SUPABASE_CLIENT_URL=your_supabase_url

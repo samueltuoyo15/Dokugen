@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [14.0.10] - 2026-08-29
 
 ### Added
+- **Smarter AI Commits**: Completely revamped the AI prompt for the `aic` (AI Git Commit) command. The model is now much smarter and flawlessly generates standard Conventional Commit messages (`feat`, `fix`, `chore`, etc.) with proper scopes.
 - **Gemini Enterprise Agent Platform**: Unified README, commit, Open Graph metadata, and changelog generation behind the OpenAI SDK's Vertex-compatible Chat Completions endpoint.
 - **Service-account authentication**: Added secure service-account JSON authentication with short-lived OAuth token caching, configured through `GOOGLE_APPLICATION_CREDENTIALS`.
 - **Provider flexibility**: `OPENAI_BASE_URL` now selects the OpenAI-compatible provider; `OPENAI_API_KEY` remains optional for non-Vertex providers.

@@ -1,0 +1,65 @@
+name: PR checks
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  linked-issue:
+    # Promotion PRs (dev to main) roll up several already-linked issues rather
+    # than closing one themselves, so the check doesn't apply to them.
+    if: github.event.pull_request.base.ref != 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require a linked issue
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          if echo "$PR_BODY" | grep -qiE '(close[sd]?|fix(e[sd])?|resolve[sd]?|relates? to|part of)[[:space:]]+#[0-9]+'; then
+            echo "Found an issue reference."
+          else
+            echo "No linked issue found in the PR description."
+            echo "Consider referencing the related issue, e.g. 'Closes #123'. This is not required to merge."
+          fi
+
+  branch-name:
+    if: github.event.pull_request.base.ref != 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require a conventional branch name
+        env:
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          if echo "$BRANCH" | grep -qE '^(feat|fix|chore|docs|refactor|test|style|perf|build|ci|revert)/([0-9]+-)?[a-z0-9-]+$'; then
+            echo "Branch name follows convention."
+          else
+            echo "Branch name doesn't follow convention."
+            echo "Expected '<type>/[issue-]<description>', e.g. 'feat/badge-cache' or 'chore/12-fix-cors'."
+            echo "Types: feat, fix, chore, docs, refactor, test, style, perf, build, ci, revert."
+            exit 1
+          fi
+
+  lint-and-format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run Biome Lint
+        run: pnpm run lint
+
+      - name: Check Formatting
+        run: pnpm exec biome format .

@@ -1,0 +1,30 @@
+name: Paid Sponsorship or Partnership
+description: Propose a paid sponsorship or partnership for Dokugen
+title: "[Sponsorship]: "
+labels: ["sponsorship"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for your interest in sponsoring Dokugen! Please provide the details of your proposal below.
+  - type: input
+    id: company_name
+    attributes:
+      label: Company / Organization Name
+      placeholder: e.g., ApiSmart
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Sponsorship Proposal
+      description: Describe what kind of partnership or placement you are looking for (e.g., README logo, CLI sponsor mention).
+    validations:
+      required: true
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Email or Link
+      description: Where can we reach you to discuss further details?
+    validations:
+      required: true

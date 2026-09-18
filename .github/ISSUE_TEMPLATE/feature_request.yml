@@ -1,0 +1,33 @@
+name: Feature request
+description: New functionality or a change in behavior.
+title: "feat: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What's missing or awkward today. Not the solution yet — the gap.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What you'd build. Link an ADR if this touches an existing decision (see docs/adr/).
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches, and why they were passed over. OK to leave blank if there's only one obvious approach.
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        This issue must be approved (a maintainer comment, or a `approved` label) before a PR referencing it is opened. See [CONTRIBUTING.md](../../CONTRIBUTING.md).

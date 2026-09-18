@@ -57,7 +57,7 @@ Run `pnpm install` at the project root to install dependencies for all apps.
 
 ### 2. Server (`apps/server`)
 1. Go to `apps/server`.
-2. Create a `.env` file with your local API keys (Gemini, Supabase, etc.).
+2. Create a `.env` file with your local API keys (OpenAI-compatible endpoints, Supabase, etc.).
 3. Run `pnpm run dev` or `pnpm run build` to test the backend logic.
 4. Keep server responses and prompt templates clean without emojis.
 

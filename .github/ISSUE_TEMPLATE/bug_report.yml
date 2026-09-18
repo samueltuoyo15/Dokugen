@@ -1,0 +1,43 @@
+name: Bug report
+description: Something is broken.
+title: "bug: "
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you did, what you expected, what happened instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. ...
+        2. ...
+    validations:
+      required: true
+
+  - type: input
+    id: scope
+    attributes:
+      label: Where
+      description: Package or app affected, e.g. `apps/api`, `packages/embed`.
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Logs, screenshots, environment — anything relevant.
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        This issue must be approved (a maintainer comment, or a `approved` label) before a PR referencing it is opened. See [CONTRIBUTING.md](../../CONTRIBUTING.md).

@@ -1,0 +1,24 @@
+name: Chore / task
+description: Refactor, dependency bump, tooling, docs, or other work that isn't a bug fix or a feature.
+title: "chore: "
+labels: [chore]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What needs to change
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why now
+      description: What prompted this — drift noticed, a blocker for other work, upkeep, etc.
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        This issue must be approved (a maintainer comment, or a `approved` label) before a PR referencing it is opened. See [CONTRIBUTING.md](../../CONTRIBUTING.md).
