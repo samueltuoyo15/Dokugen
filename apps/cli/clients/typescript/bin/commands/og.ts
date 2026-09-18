@@ -1,12 +1,12 @@
-import { Command } from "commander";
-import * as path from "path";
-import fs from "fs-extra";
+import * as path from "node:path";
 import axios from "axios";
 import chalk from "chalk";
+import type { Command } from "commander";
+import fs from "fs-extra";
 import { createSpinner } from "nanospinner";
-import { checkAndUpdate, checkInternetConnection, getBackendDomain } from "../helpers/network.js";
-import { isGitRepository } from "../helpers/git.js";
 import { DOKUGEN_BANNER } from "../helpers/constants.js";
+import { isGitRepository } from "../helpers/git.js";
+import { checkAndUpdate, checkInternetConnection, getBackendDomain } from "../helpers/network.js";
 //@ts-ignore
 import { detectProjectType } from "../projectDetect.mjs";
 
@@ -37,15 +37,13 @@ export function registerOgCommand(program: Command) {
     .action(async (options: any) => {
       if (!isGitRepository()) {
         console.log(
-          chalk.red(
-            "No Git repository found. Please navigate to a project directory that has a Git repository."
-          )
+          chalk.red("No Git repository found. Please navigate to a project directory that has a Git repository."),
         );
         process.exit(1);
       }
 
       await checkAndUpdate();
-      console.log("\n" + chalk.hex("#000080")(DOKUGEN_BANNER) + "\n");
+      console.log(`\n${chalk.hex("#000080")(DOKUGEN_BANNER)}\n`);
       const projectDir = process.cwd();
       const dokugenFolder = path.join(projectDir, ".dokugen");
       await fs.ensureDir(dokugenFolder);
@@ -61,9 +59,7 @@ export function registerOgCommand(program: Command) {
       connectionSpinner.stop();
 
       if (!hasInternet) {
-        return console.log(
-          chalk.red("Please check your internet connection and try again.")
-        );
+        return console.log(chalk.red("Please check your internet connection and try again."));
       }
 
       let metadata: OgMetadata;
@@ -78,7 +74,7 @@ export function registerOgCommand(program: Command) {
 
         try {
           const projectType = await detectProjectType(projectDir);
-          
+
           let codebaseSummary = `Project Name: ${projectName}\nDetected Tech Stack: ${projectType}\n`;
 
           const readmePath = path.join(projectDir, "README.md");
@@ -87,15 +83,20 @@ export function registerOgCommand(program: Command) {
             codebaseSummary += `\nExisting README Summary:\n${readmeContent.slice(0, 3000)}`;
           } else {
             const files = await fs.readdir(projectDir).catch(() => []);
-            const srcFiles = files.filter(f => f.match(/\.(ts|js|py|go|rs|cpp|h|java)$/i));
+            const srcFiles = files.filter((f) => f.match(/\.(ts|js|py|go|rs|cpp|h|java)$/i));
             if (srcFiles.length > 0) {
               codebaseSummary += `\nCore source files found: ${srcFiles.join(", ")}`;
             }
           }
 
           const cssCandidates = [
-            "index.css", "globals.css", "src/index.css", "src/globals.css",
-            "app/globals.css", "tailwind.config.js", "tailwind.config.ts"
+            "index.css",
+            "globals.css",
+            "src/index.css",
+            "src/globals.css",
+            "app/globals.css",
+            "tailwind.config.js",
+            "tailwind.config.ts",
           ];
           for (const cssFile of cssCandidates) {
             const fullCssPath = path.join(projectDir, cssFile);
@@ -107,9 +108,13 @@ export function registerOgCommand(program: Command) {
           }
 
           const backendUrl = await getBackendDomain();
-          const response = await axios.post<OgMetadata>(`${backendUrl}/api/og-metadata`, {
-            summary: codebaseSummary
-          }, { timeout: 30000 });
+          const response = await axios.post<OgMetadata>(
+            `${backendUrl}/api/og-metadata`,
+            {
+              summary: codebaseSummary,
+            },
+            { timeout: 30000 },
+          );
 
           clearInterval(timerInterval);
           metadataSpinner.stop();
@@ -125,7 +130,7 @@ export function registerOgCommand(program: Command) {
           return;
         }
       } else {
-        metadata = await fs.readJson(configPath) as OgMetadata;
+        metadata = (await fs.readJson(configPath)) as OgMetadata;
       }
 
       // Automatically render the PNG card image right after
@@ -153,7 +158,7 @@ export function registerOgCommand(program: Command) {
         const backendUrl = await getBackendDomain();
         const response = await axios.post(`${backendUrl}/api/render-og`, renderPayload, {
           responseType: "arraybuffer",
-          timeout: 20000
+          timeout: 20000,
         });
 
         clearInterval(renderTimerInterval);
@@ -176,8 +181,8 @@ ${metadata.tagline ? `<meta name="twitter:description" content="${metadata.tagli
 
         await fs.writeFile(seoPath, seoText);
 
-        console.log(chalk.green(`\n✔ Created card image: ./.dokugen/card.png`));
-        console.log(chalk.green(`✔ Created SEO meta tags: ./.dokugen/seo-instructions.txt`));
+        console.log(chalk.green("\n✔ Created card image: ./.dokugen/card.png"));
+        console.log(chalk.green("✔ Created SEO meta tags: ./.dokugen/seo-instructions.txt"));
       } catch (err: any) {
         clearInterval(renderTimerInterval);
         renderSpinner.error({ text: "Failed to render social card PNG." });

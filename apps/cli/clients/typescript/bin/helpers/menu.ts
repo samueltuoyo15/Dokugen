@@ -1,8 +1,8 @@
-import { select, isCancel } from "@clack/prompts";
-import { program } from "commander";
+import path from "node:path";
+import { isCancel, select } from "@clack/prompts";
 import chalk from "chalk";
-import path from "path";
-import { DOKUGEN_BANNER, CURRENT_VERSION } from "./constants.js";
+import { program } from "commander";
+import { CURRENT_VERSION, DOKUGEN_BANNER } from "./constants.js";
 import { checkAndUpdate } from "./network.js";
 
 export const waitForKeypress = async (): Promise<void> => {
@@ -19,16 +19,18 @@ export const waitForKeypress = async (): Promise<void> => {
 
 export const isRunAsStandaloneBinary = (): boolean => {
   const execPath = process.execPath.toLowerCase();
-  return execPath.includes("dokugen-windows") ||
+  return (
+    execPath.includes("dokugen-windows") ||
     execPath.includes("dokugen-linux") ||
     execPath.includes("dokugen-macos") ||
-    execPath.endsWith(".exe") && !execPath.includes("node") && !execPath.includes("bun");
+    (execPath.endsWith(".exe") && !execPath.includes("node") && !execPath.includes("bun"))
+  );
 };
 
 export const runInteractiveMenu = async (): Promise<void> => {
   await checkAndUpdate();
 
-  console.log("\n" + chalk.hex("#000080")(DOKUGEN_BANNER) + "\n");
+  console.log(`\n${chalk.hex("#000080")(DOKUGEN_BANNER)}\n`);
   console.log(chalk.blue(`Welcome to Dokugen (v${CURRENT_VERSION}) - Automatic README Generator\n`));
 
   const projectName = path.basename(process.cwd());
@@ -37,12 +39,36 @@ export const runInteractiveMenu = async (): Promise<void> => {
     message: "What would you like to do?",
     options: [
       { value: "generate", label: "Generate README", hint: `Scan ${projectName} and create a new README.md` },
-      { value: "update", label: "Update README", hint: `Update an existing Dokugen-generated README for ${projectName}` },
-      { value: "revert", label: "Revert README", hint: `Restore the previous Dokugen-generated README for ${projectName}` },
-      { value: "license", label: "Generate LICENSE", hint: `Generate a LICENSE file. Protect your work and open the door to collaboration.` },
-      { value: "changelog", label: "Generate CHANGELOG", hint: `Analyze commit history and update CHANGELOG.md for ${projectName}` },
-      { value: "aic", label: "AI Git Commit", hint: `Generate commit message and commit staged changes for ${projectName}` },
-      { value: "og", label: "Generate Social Card (OG)", hint: `Create a beautiful 1200x630 preview card for Twitter & GitHub` },
+      {
+        value: "update",
+        label: "Update README",
+        hint: `Update an existing Dokugen-generated README for ${projectName}`,
+      },
+      {
+        value: "revert",
+        label: "Revert README",
+        hint: `Restore the previous Dokugen-generated README for ${projectName}`,
+      },
+      {
+        value: "license",
+        label: "Generate LICENSE",
+        hint: "Generate a LICENSE file. Protect your work and open the door to collaboration.",
+      },
+      {
+        value: "changelog",
+        label: "Generate CHANGELOG",
+        hint: `Analyze commit history and update CHANGELOG.md for ${projectName}`,
+      },
+      {
+        value: "aic",
+        label: "AI Git Commit",
+        hint: `Generate commit message and commit staged changes for ${projectName}`,
+      },
+      {
+        value: "og",
+        label: "Generate Social Card (OG)",
+        hint: "Create a beautiful 1200x630 preview card for Twitter & GitHub",
+      },
       { value: "help", label: "View Help", hint: "Show all available commands and options" },
       { value: "exit", label: "Exit" },
     ],

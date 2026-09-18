@@ -11,7 +11,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteMetadata.siteUrl),
   title: {
-    template: `%s | Dokugen`,
+    template: "%s | Dokugen",
     default: siteMetadata.title,
   },
   description: siteMetadata.description,
@@ -56,9 +56,7 @@ export const metadata: Metadata = {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || process.env.GOOGLE_SITE_VERIFICATION_TOKEN || "",
   },
   icons: {
-    icon: [
-      { url: "/dokugen_logo.svg", type: "image/svg+xml" },
-    ],
+    icon: [{ url: "/dokugen_logo.svg", type: "image/svg+xml" }],
     shortcut: "/dokugen_logo.svg",
     apple: "/dokugen_logo.svg",
   },
@@ -76,7 +74,10 @@ export default function RootLayout({
         <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Caveat:wght@700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Caveat:wght@700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body className="antialiased">
         <Providers>{children}</Providers>

@@ -1,5 +1,5 @@
-import { execSync } from "child_process";
-import os from "os";
+import { execSync } from "node:child_process";
+import os from "node:os";
 import chalk from "chalk";
 
 export const getUserInfo = (): {
@@ -28,7 +28,7 @@ export const getUserInfo = (): {
 
   if (!username && gitEmail && gitEmail.includes("@users.noreply.github.com")) {
     const match = gitEmail.match(/^(?:\d+\+)?([^@]+)@users\.noreply\.github\.com$/i);
-    if (match && match[1]) {
+    if (match?.[1]) {
       username = match[1];
     }
   }

@@ -1,6 +1,6 @@
-import {Composition} from 'remotion';
-import {DokugenLaunch} from './DokugenLaunch';
-import {DokugenVertical} from './DokugenVertical';
+import { Composition } from "remotion";
+import { DokugenLaunch } from "./DokugenLaunch";
+import { DokugenVertical } from "./DokugenVertical";
 
 export const RemotionRoot = () => {
   return (

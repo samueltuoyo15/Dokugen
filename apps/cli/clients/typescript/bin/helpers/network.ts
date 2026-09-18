@@ -1,9 +1,9 @@
+import { execSync } from "node:child_process";
+import { promisify } from "node:util";
+import { gzip } from "node:zlib";
 import axios from "axios";
-import { gzip } from "zlib";
-import { promisify } from "util";
-import { createSpinner } from "nanospinner";
-import { execSync } from "child_process";
 import chalk from "chalk";
+import { createSpinner } from "nanospinner";
 import { CURRENT_VERSION } from "./constants.js";
 
 const gzipAsync = promisify(gzip);
@@ -51,16 +51,16 @@ export const checkAndUpdate = async (): Promise<void> => {
       try {
         execSync("npm install -g dokugen@latest --ignore-scripts", {
           stdio: "pipe",
-          timeout: 60000
+          timeout: 60000,
         });
         updateSpinner.success({
-          text: chalk.green(`Successfully updated to v${latestVersion}!`)
+          text: chalk.green(`Successfully updated to v${latestVersion}!`),
         });
         console.log(chalk.yellow("Please re-run your command to use the new version.\n"));
         process.exit(0);
       } catch (error) {
         updateSpinner.error({
-          text: chalk.yellow("Auto-update failed. Please run: npm install -g dokugen@latest")
+          text: chalk.yellow("Auto-update failed. Please run: npm install -g dokugen@latest"),
         });
       }
     }
@@ -81,15 +81,13 @@ export const getBackendDomain = async (): Promise<string> => {
       if (localHealth.status === 200 && localHealth.data?.status === "Ok") {
         return `http://localhost:${port}`;
       }
-    } catch (err) {
-    }
+    } catch (err) {}
   }
 
   try {
-    const response = await axios.get<{ domain: string }>(
-      "https://dokugen.samueltuoyo.com/api/get-server-url",
-      { timeout: 5000 }
-    );
+    const response = await axios.get<{ domain: string }>("https://dokugen.samueltuoyo.com/api/get-server-url", {
+      timeout: 5000,
+    });
     return response.data.domain;
   } catch (err) {
     return "https://dokugen.samueltuoyo.com";

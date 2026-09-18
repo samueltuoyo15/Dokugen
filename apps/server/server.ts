@@ -1,20 +1,20 @@
-import express, { Application, Request, Response, NextFunction } from "express";
-import helmet from "helmet";
+import dns from "node:dns";
 import cors from "cors";
 import dotenv from "dotenv";
-import dns from "node:dns";
+import express, { type Application, type Request, type Response, type NextFunction } from "express";
+import helmet from "helmet";
 
 // Prefer IPv4 for Vertex and Google OAuth calls on VPSes without working IPv6.
 dns.setDefaultResultOrder("ipv4first");
 
-import logger from "./utils/logger";
 import { limiter } from "./middleware/rateLimiter";
-import healthRouter from "./routes/health";
-import readmeRouter from "./routes/readme";
-import commitRouter from "./routes/commit";
-import trackRouter from "./routes/track";
-import ogRouter from "./routes/og";
 import changelogRouter from "./routes/changelog";
+import commitRouter from "./routes/commit";
+import healthRouter from "./routes/health";
+import ogRouter from "./routes/og";
+import readmeRouter from "./routes/readme";
+import trackRouter from "./routes/track";
+import logger from "./utils/logger";
 
 dotenv.config();
 
@@ -38,8 +38,6 @@ app.use("/api", commitRouter);
 app.use("/api", trackRouter);
 app.use("/api", ogRouter);
 app.use("/api", changelogRouter);
-
-
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Dokugen API is running");
@@ -66,4 +64,3 @@ const handleShutdown = (signal: string) => {
 
 process.on("SIGTERM", () => handleShutdown("SIGTERM"));
 process.on("SIGINT", () => handleShutdown("SIGINT"));
-

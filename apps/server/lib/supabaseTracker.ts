@@ -53,7 +53,9 @@ export async function trackUser(userInfo: UserInfo | undefined, usageType?: stri
     if (email) {
       const { data, error } = await supabase
         .from("active_users")
-        .select("id, username, email, usage_count, readme_usage, update_usage, commit_usage, license_usage, revert_usage, changelog_usage")
+        .select(
+          "id, username, email, usage_count, readme_usage, update_usage, commit_usage, license_usage, revert_usage, changelog_usage",
+        )
         .eq("email", email)
         .maybeSingle();
 
@@ -65,7 +67,9 @@ export async function trackUser(userInfo: UserInfo | undefined, usageType?: stri
     if (!existingUser && username) {
       const { data, error } = await supabase
         .from("active_users")
-        .select("id, username, email, usage_count, readme_usage, update_usage, commit_usage, license_usage, revert_usage, changelog_usage")
+        .select(
+          "id, username, email, usage_count, readme_usage, update_usage, commit_usage, license_usage, revert_usage, changelog_usage",
+        )
         .eq("username", username)
         .maybeSingle();
 
@@ -96,26 +100,21 @@ export async function trackUser(userInfo: UserInfo | undefined, usageType?: stri
         updateData.osInfo = formattedOsInfo;
       }
 
-      await supabase
-        .from("active_users")
-        .update(updateData)
-        .eq("id", existingUser.id);
+      await supabase.from("active_users").update(updateData).eq("id", existingUser.id);
     } else {
       const insertData: Record<string, any> = {
-        username: username || "unknown", 
-        email: email || "", 
-        id, 
-        osInfo: formattedOsInfo, 
-        usage_count: 1
+        username: username || "unknown",
+        email: email || "",
+        id,
+        osInfo: formattedOsInfo,
+        usage_count: 1,
       };
-      
+
       if (columnToIncrement) {
         insertData[columnToIncrement] = 1;
       }
 
-      await supabase
-        .from("active_users")
-        .insert([insertData]);
+      await supabase.from("active_users").insert([insertData]);
     }
     logger.info({ username, emailDomain: email ? email.split("@")[1] : undefined, usageType }, "Updated active user");
   } catch (error) {

@@ -11,22 +11,11 @@
     "postbuild": "node --no-warnings --loader ts-node/esm lib/rename.ts",
     "build:binaries": "bun run scripts/build-binaries.ts"
   },
-  "files": [
-    "dist/",
-    "README.md",
-    "LICENSE"
-  ],
+  "files": ["dist/", "README.md", "LICENSE"],
   "bin": {
     "dokugen": "dist/bin/dokugen.mjs"
   },
-  "keywords": [
-    "open source",
-    "readme generator",
-    "readme.md generator",
-    "readme generation",
-    "dokugen",
-    "cli tool"
-  ],
+  "keywords": ["open source", "readme generator", "readme.md generator", "readme generation", "dokugen", "cli tool"],
   "author": "OritseWeyinmi Samuel Tuoyo",
   "license": "ISC",
   "description": "Readme generator command line tool.",
@@ -38,16 +27,16 @@
     "url": "git+https://github.com/samueltuoyo15/Dokugen/issues"
   },
   "dependencies": {
-    "@clack/prompts": "^0.10.0",
+    "@clack/prompts": "^0.10.1",
     "@jaames/iro": "^5.5.2",
     "@types/marked-terminal": "^6.1.1",
-    "axios": "^1.8.1",
-    "chalk": "^5.4.1",
+    "axios": "^1.20.0",
+    "chalk": "^5.6.2",
     "cli-md": "^1.2.0",
     "commander": "^13.1.0",
-    "esbuild": "^0.25.1",
-    "fs": "^0.0.1-security",
-    "fs-extra": "^11.3.0",
+    "esbuild": "^0.25.12",
+    "fs": "0.0.1-security",
+    "fs-extra": "^11.4.0",
     "gradient-string": "^3.0.0",
     "nanospinner": "^1.2.2"
   },
@@ -55,9 +44,9 @@
     "@types/axios": "^0.9.36",
     "@types/fs-extra": "^11.0.4",
     "@types/marked": "^5.0.2",
-    "@types/node": "^22.13.4",
-    "supertest": "^7.1.0",
+    "@types/node": "^22.20.3",
+    "supertest": "^7.2.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.3"
   }
 }

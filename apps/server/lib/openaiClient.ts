@@ -21,8 +21,7 @@ interface CachedAccessToken {
 let cachedAccessToken: CachedAccessToken | undefined;
 let tokenRequest: Promise<string> | undefined;
 
-const base64UrlEncode = (value: string): string =>
-  Buffer.from(value).toString("base64url");
+const base64UrlEncode = (value: string): string => Buffer.from(value).toString("base64url");
 
 const getBaseURL = (): string => {
   const baseURL = process.env.OPENAI_BASE_URL?.trim();
@@ -67,13 +66,15 @@ const exchangeServiceAccountJwt = async (): Promise<string> => {
   const now = Math.floor(Date.now() / 1000);
   const unsignedJwt = [
     base64UrlEncode(JSON.stringify({ alg: "RS256", typ: "JWT" })),
-    base64UrlEncode(JSON.stringify({
-      iss: credentials.client_email,
-      scope: CLOUD_PLATFORM_SCOPE,
-      aud: tokenUri,
-      iat: now,
-      exp: now + 3600,
-    })),
+    base64UrlEncode(
+      JSON.stringify({
+        iss: credentials.client_email,
+        scope: CLOUD_PLATFORM_SCOPE,
+        aud: tokenUri,
+        iat: now,
+        exp: now + 3600,
+      }),
+    ),
   ].join(".");
   const signature = sign("RSA-SHA256", Buffer.from(unsignedJwt), createPrivateKey(credentials.private_key));
   const assertion = `${unsignedJwt}.${signature.toString("base64url")}`;
@@ -90,7 +91,7 @@ const exchangeServiceAccountJwt = async (): Promise<string> => {
     throw new Error(`Google OAuth token exchange failed with status ${response.status}`);
   }
 
-  const data = await response.json() as { access_token?: string; expires_in?: number };
+  const data = (await response.json()) as { access_token?: string; expires_in?: number };
   if (!data.access_token || typeof data.expires_in !== "number") {
     throw new Error("Google OAuth token exchange returned an invalid response");
   }
@@ -135,7 +136,5 @@ export const createOpenAIClient = async (): Promise<OpenAI> => {
 /** Vertex's OpenAI-compatible endpoint expects Google publisher model IDs. */
 export const getModelName = (modelName: string): string => {
   const baseURL = getBaseURL();
-  return isVertexOpenAIEndpoint(baseURL) && !modelName.includes("/")
-    ? `google/${modelName}`
-    : modelName;
+  return isVertexOpenAIEndpoint(baseURL) && !modelName.includes("/") ? `google/${modelName}` : modelName;
 };

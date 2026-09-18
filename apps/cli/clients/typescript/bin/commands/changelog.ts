@@ -1,12 +1,12 @@
-import { Command } from "commander";
-import { execSync } from "child_process";
-import fs from "fs-extra";
-import path from "path";
-import chalk from "chalk";
+import { execSync } from "node:child_process";
+import path from "node:path";
 import axios from "axios";
+import chalk from "chalk";
+import type { Command } from "commander";
+import fs from "fs-extra";
 import { createSpinner } from "nanospinner";
-import { isGitRepository, getUserInfo } from "../helpers/git.js";
-import { getBackendDomain, checkAndUpdate, checkInternetConnection } from "../helpers/network.js";
+import { getUserInfo, isGitRepository } from "../helpers/git.js";
+import { checkAndUpdate, checkInternetConnection, getBackendDomain } from "../helpers/network.js";
 
 export function registerChangelogCommand(program: Command) {
   program
@@ -23,8 +23,8 @@ export function registerChangelogCommand(program: Command) {
       if (!isGitRepository()) {
         console.log(
           chalk.red(
-            "Opps... No Git repository found. Please navigate to a project directory that has a Git repository, or initialize one using 'git init'."
-          )
+            "Opps... No Git repository found. Please navigate to a project directory that has a Git repository, or initialize one using 'git init'.",
+          ),
         );
         process.exit(1);
       }
@@ -32,11 +32,7 @@ export function registerChangelogCommand(program: Command) {
       if (!(await checkInternetConnection())) {
         const rawUsername = getUserInfo()?.username;
         const username = rawUsername ? rawUsername.replace(/\d+/g, "") : "";
-        console.log(
-          chalk.red(
-            `Opps... ${username} kindly check your device or pc internet connection and try again.`
-          )
-        );
+        console.log(chalk.red(`Opps... ${username} kindly check your device or pc internet connection and try again.`));
         process.exit(1);
       }
 
@@ -44,13 +40,16 @@ export function registerChangelogCommand(program: Command) {
       try {
         let lastTag = "";
         try {
-          lastTag = execSync("git describe --tags --abbrev=0", { encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+          lastTag = execSync("git describe --tags --abbrev=0", {
+            encoding: "utf-8",
+            stdio: ["ignore", "pipe", "ignore"],
+          }).trim();
         } catch {}
 
         let gitCmd = `git log --pretty=format:"%h - %s (%an, %ad)" --date=short`;
         if (options.limit && options.limit !== "all") {
-          const limitNum = parseInt(options.limit, 10);
-          if (!isNaN(limitNum)) {
+          const limitNum = Number.parseInt(options.limit, 10);
+          if (!Number.isNaN(limitNum)) {
             gitCmd = `git log -n ${limitNum} --pretty=format:"%h - %s (%an, %ad)" --date=short`;
           }
         } else if (lastTag) {
@@ -61,7 +60,9 @@ export function registerChangelogCommand(program: Command) {
         try {
           gitLogs = execSync(gitCmd, { encoding: "utf-8" }).trim();
           if (!gitLogs) {
-            gitLogs = execSync(`git log -n 200 --pretty=format:"%h - %s (%an, %ad)" --date=short`, { encoding: "utf-8" }).trim();
+            gitLogs = execSync(`git log -n 200 --pretty=format:"%h - %s (%an, %ad)" --date=short`, {
+              encoding: "utf-8",
+            }).trim();
           }
         } catch (err) {
           console.error(chalk.red("Failed to retrieve git log history:"), err);
@@ -76,7 +77,10 @@ export function registerChangelogCommand(program: Command) {
         let version = options.versionTag;
         if (!version) {
           try {
-            version = execSync("git describe --tags --abbrev=0", { encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+            version = execSync("git describe --tags --abbrev=0", {
+              encoding: "utf-8",
+              stdio: ["ignore", "pipe", "ignore"],
+            }).trim();
           } catch {
             if (fs.existsSync("package.json")) {
               try {
@@ -104,16 +108,13 @@ export function registerChangelogCommand(program: Command) {
         const backendDomain = await getBackendDomain();
         const userInfo = getUserInfo();
 
-        const response = await axios.post<{ changelog: string }>(
-          `${backendDomain}/api/generate-changelog`,
-          {
-            logs: gitLogs,
-            version,
-            existingChangelog,
-            userInfo,
-            model: options.model || process.env.OPENAI_MODEL,
-          }
-        );
+        const response = await axios.post<{ changelog: string }>(`${backendDomain}/api/generate-changelog`, {
+          logs: gitLogs,
+          version,
+          existingChangelog,
+          userInfo,
+          model: options.model || process.env.OPENAI_MODEL,
+        });
 
         const generatedContent = response.data.changelog;
         if (!generatedContent) {
@@ -130,24 +131,29 @@ export function registerChangelogCommand(program: Command) {
         }
 
         spinner.stop();
-        console.log(chalk.green(`CHANGELOG generated successfully in ${timeString}! Written to ${path.basename(outfile)}`));
+        console.log(
+          chalk.green(`CHANGELOG generated successfully in ${timeString}! Written to ${path.basename(outfile)}`),
+        );
       } catch (error: any) {
         if (spinner) {
           spinner.stop();
         }
         const serverError = error.response?.data?.error;
         if (serverError) {
-          console.log("\n" + chalk.blue(serverError));
-        } else if (error.code === "ENOTFOUND" || error.code === "EAI_AGAIN" || error.code === "ECONNREFUSED" || !error.response) {
+          console.log(`\n${chalk.blue(serverError)}`);
+        } else if (
+          error.code === "ENOTFOUND" ||
+          error.code === "EAI_AGAIN" ||
+          error.code === "ECONNREFUSED" ||
+          !error.response
+        ) {
           const rawUsername = getUserInfo()?.username;
           const username = rawUsername ? rawUsername.replace(/\d+/g, "") : "";
           console.log(
-            "\n" + chalk.red(
-              `Opps... ${username} kindly check your device or pc internet connection and try again.`
-            )
+            `\n${chalk.red(`Opps... ${username} kindly check your device or pc internet connection and try again.`)}`,
           );
         } else {
-          console.log("\n" + chalk.red(error.message));
+          console.log(`\n${chalk.red(error.message)}`);
         }
         process.exit(1);
       }

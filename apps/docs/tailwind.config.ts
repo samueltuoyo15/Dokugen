@@ -1,5 +1,5 @@
-import type { Config } from "tailwindcss";
 import scrollbarHide from "tailwind-scrollbar-hide";
+import type { Config } from "tailwindcss";
 export default {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -16,7 +16,7 @@ export default {
         sans: ["var(--font-plus-jakarta)", "sans-serif"],
         caveat: ["var(--font-caveat)", "cursive"],
         mono: ["var(--font-jetbrains-mono)", "monospace"],
-        inter: ['var(--font-inter)'],
+        inter: ["var(--font-inter)"],
       },
     },
   },
