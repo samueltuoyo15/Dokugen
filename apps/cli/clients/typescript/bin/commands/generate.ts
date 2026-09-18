@@ -24,7 +24,7 @@ export function registerGenerateCommand(program: Command) {
       "--template <url>",
       "use a custom GitHub repo readme file as a template to generate a concise and strict readme for your project",
     )
-    .action(async (options: any) => {
+    .action(async (options: unknown) => {
       if (!isGitRepository()) {
         console.log(
           chalk.red(

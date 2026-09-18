@@ -36,7 +36,7 @@ export function registerChangelogCommand(program: Command) {
         process.exit(1);
       }
 
-      let spinner: any = null;
+      let spinner: ReturnType<typeof createSpinner> | null = null;
       try {
         let lastTag = "";
         try {
