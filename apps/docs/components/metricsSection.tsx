@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowDown, ArrowUpDown, Award, Code2, FileText, Flame, GitCommit, RotateCcw, Users } from "lucide-react";
+import { ArrowDown, ArrowUpDown, Award, Code2, FileText, Flame, GitCommit, Users } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { Bar, CartesianGrid, ComposedChart, Legend, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -99,8 +99,6 @@ export default function MetricsSection() {
     Total: false,
     READMEs: false,
     Commits: false,
-    Licenses: false,
-    Reverts: false,
     Changelogs: false,
   });
 
@@ -190,8 +188,6 @@ export default function MetricsSection() {
       Total: user.usage_count,
       READMEs: user.readme_usage || 0,
       Commits: user.commit_usage || 0,
-      Licenses: user.license_usage || 0,
-      Reverts: user.revert_usage || 0,
       Changelogs: user.changelog_usage || 0,
       profileUrl: `https://github.com/${user.username}`,
     })) || [];
@@ -321,34 +317,6 @@ export default function MetricsSection() {
                   <th className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">
                     <button
                       type="button"
-                      onClick={() => handleSortChange("license_usage")}
-                      className="inline-flex items-center justify-end gap-1.5 w-full cursor-pointer hover:text-zinc-800 select-none transition-colors group"
-                    >
-                      Licenses
-                      {sortBy === "license_usage" ? (
-                        <ArrowDown className="w-3.5 h-3.5 text-zinc-800" />
-                      ) : (
-                        <ArrowUpDown className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
-                      )}
-                    </button>
-                  </th>
-                  <th className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">
-                    <button
-                      type="button"
-                      onClick={() => handleSortChange("revert_usage")}
-                      className="inline-flex items-center justify-end gap-1.5 w-full cursor-pointer hover:text-zinc-800 select-none transition-colors group"
-                    >
-                      Reverts
-                      {sortBy === "revert_usage" ? (
-                        <ArrowDown className="w-3.5 h-3.5 text-zinc-800" />
-                      ) : (
-                        <ArrowUpDown className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
-                      )}
-                    </button>
-                  </th>
-                  <th className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">
-                    <button
-                      type="button"
                       onClick={() => handleSortChange("changelog_usage")}
                       className="inline-flex items-center justify-end gap-1.5 w-full cursor-pointer hover:text-zinc-800 select-none transition-colors group"
                     >
@@ -381,12 +349,6 @@ export default function MetricsSection() {
                     </td>
                     <td className="px-4 py-3 text-right text-zinc-600 font-mono text-xs">
                       {(user.commit_usage ?? 0).toLocaleString()}
-                    </td>
-                    <td className="px-4 py-3 text-right text-zinc-600 font-mono text-xs">
-                      {(user.license_usage ?? 0).toLocaleString()}
-                    </td>
-                    <td className="px-4 py-3 text-right text-zinc-600 font-mono text-xs">
-                      {(user.revert_usage ?? 0).toLocaleString()}
                     </td>
                     <td className="px-4 py-3 text-right text-zinc-600 font-mono text-xs">
                       {(user.changelog_usage ?? 0).toLocaleString()}
@@ -467,30 +429,6 @@ export default function MetricsSection() {
               >
                 <GitCommit className="w-3.5 h-3.5 text-blue-500" />
                 Commits
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveChartMetric("Licenses")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold select-none transition-all cursor-pointer ${
-                  activeChartMetric === "Licenses"
-                    ? "bg-white text-rose-600 shadow-sm border border-rose-200/20"
-                    : "text-zinc-500 hover:text-rose-600"
-                }`}
-              >
-                <Award className="w-3.5 h-3.5 text-rose-500" />
-                Licenses
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveChartMetric("Reverts")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold select-none transition-all cursor-pointer ${
-                  activeChartMetric === "Reverts"
-                    ? "bg-white text-amber-600 shadow-sm border border-amber-200/20"
-                    : "text-zinc-500 hover:text-amber-600"
-                }`}
-              >
-                <RotateCcw className="w-3.5 h-3.5 text-amber-500" />
-                Reverts
               </button>
               <button
                 type="button"
@@ -575,26 +513,6 @@ export default function MetricsSection() {
                     stackId={activeChartMetric === "all" ? "a" : undefined}
                     fill="#3b82f6"
                     name="Commits"
-                    radius={activeChartMetric === "all" ? [0, 0, 0, 0] : [4, 4, 0, 0]}
-                  />
-                )}
-                {(activeChartMetric === "all" || activeChartMetric === "Licenses") && (
-                  <Bar
-                    hide={hiddenLines.Licenses}
-                    dataKey="Licenses"
-                    stackId={activeChartMetric === "all" ? "a" : undefined}
-                    fill="#f43f5e"
-                    name="Licenses"
-                    radius={activeChartMetric === "all" ? [0, 0, 0, 0] : [4, 4, 0, 0]}
-                  />
-                )}
-                {(activeChartMetric === "all" || activeChartMetric === "Reverts") && (
-                  <Bar
-                    hide={hiddenLines.Reverts}
-                    dataKey="Reverts"
-                    stackId={activeChartMetric === "all" ? "a" : undefined}
-                    fill="#f59e0b"
-                    name="Reverts"
                     radius={activeChartMetric === "all" ? [0, 0, 0, 0] : [4, 4, 0, 0]}
                   />
                 )}

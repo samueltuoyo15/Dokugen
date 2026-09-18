@@ -13,7 +13,6 @@ import commitRouter from "./routes/commit";
 import healthRouter from "./routes/health";
 import ogRouter from "./routes/og";
 import readmeRouter from "./routes/readme";
-import trackRouter from "./routes/track";
 import logger from "./utils/logger";
 
 dotenv.config();
@@ -35,7 +34,6 @@ app.use(limiter);
 app.use("/api", healthRouter);
 app.use("/api", readmeRouter);
 app.use("/api", commitRouter);
-app.use("/api", trackRouter);
 app.use("/api", ogRouter);
 app.use("/api", changelogRouter);
 

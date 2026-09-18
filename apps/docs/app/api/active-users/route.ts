@@ -19,14 +19,7 @@ export async function GET(req: NextRequest) {
   const limit = Number.parseInt(searchParams.get("limit") || "10");
   const sortBy = searchParams.get("sortBy") || "usage_count";
 
-  const allowedSorts = [
-    "usage_count",
-    "readme_usage",
-    "commit_usage",
-    "license_usage",
-    "revert_usage",
-    "changelog_usage",
-  ];
+  const allowedSorts = ["usage_count", "readme_usage", "commit_usage", "changelog_usage"];
   const sortColumn = allowedSorts.includes(sortBy) ? sortBy : "usage_count";
 
   const startIndex = (page - 1) * limit;

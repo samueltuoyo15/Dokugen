@@ -2,10 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [14.0.11] - 2026-09-18
+
+### Added
+- **Smarter AI Commits**: Completely revamped the AI prompt and upgraded the model powering the `aic` (AI Git Commit) command. The model is now much smarter and flawlessly generates standard Conventional Commit messages (`feat`, `fix`, `chore`, etc.) with proper scopes.
+
+### Changed
+- **Local Action Tracking Discontinued**: Discontinued metric tracking for client-side local commands (`license` and `revert`) to improve user privacy and eliminate unauthenticated tracking spoofing.
+- **Leaderboard UI Cleanup**: Streamlined the public leaderboard and activity trends charts to exclusively display verified AI server operations (`READMEs`, `Commits`, `Changelogs`, `Total`).
+
+### Fixed
+- **Runtime WebSocket Crash**: Upgraded the backend Docker image and CI workflow to Node.js 22 LTS, enabling native WebSocket support required by `@supabase/supabase-js`.
+- **Biome Migration & Typesafety**: Migrated the entire repository from legacy ESLint configurations to Biome, resolved all strict linting/accessibility diagnostics, and enforced strict TypeScript typing across all packages.
+
 ## [14.0.10] - 2026-08-29
 
 ### Added
-- **Smarter AI Commits**: Completely revamped the AI prompt for the `aic` (AI Git Commit) command. The model is now much smarter and flawlessly generates standard Conventional Commit messages (`feat`, `fix`, `chore`, etc.) with proper scopes.
 - **Gemini Enterprise Agent Platform**: Unified README, commit, Open Graph metadata, and changelog generation behind the OpenAI SDK's Vertex-compatible Chat Completions endpoint.
 - **Service-account authentication**: Added secure service-account JSON authentication with short-lived OAuth token caching, configured through `GOOGLE_APPLICATION_CREDENTIALS`.
 - **Provider flexibility**: `OPENAI_BASE_URL` now selects the OpenAI-compatible provider; `OPENAI_API_KEY` remains optional for non-Vertex providers.

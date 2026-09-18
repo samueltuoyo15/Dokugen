@@ -184,6 +184,7 @@ function getHttpErrorLabel(error: unknown): string {
     return "Unexpected Error";
   }
 
+  const statusCode = typeof status === "number" ? status : Number(status);
   const labels: Record<number, string> = {
     400: "Bad Request",
     401: "Unauthorized",
@@ -196,7 +197,8 @@ function getHttpErrorLabel(error: unknown): string {
     504: "Gateway Timeout",
   };
 
-  return labels[status] ? `${labels[status]} (${status})` : `Error ${status}`;
+  const label = !Number.isNaN(statusCode) ? labels[statusCode] : undefined;
+  return label ? `${label} (${status})` : `Error ${status}`;
 }
 
 export const generateReadme = async (

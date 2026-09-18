@@ -132,7 +132,7 @@ This project is licensed under the MIT License, see the [LICENSE](https://github
 
 - **Samuel Tuoyo**
 - [X (Twitter)](https://x.com/TuoyoS26091)
-- [LinkedIn](https://www.linkedin.com/in/samuel-tuoyo-8568b62b6)
+- [LinkedIn](https://www.linkedin.com/in/samueltuoyo)
 
 ---
 

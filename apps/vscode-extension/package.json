@@ -2,7 +2,7 @@
   "name": "vscode-extension",
   "displayName": "dokugen",
   "description": "README.md file generator",
-  "version": "14.0.10",
+  "version": "14.0.11",
   "engines": {
     "vscode": "^1.105.0"
   },
@@ -34,18 +34,15 @@
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
-    "lint": "eslint src",
+    "lint": "biome lint src",
     "test": "vscode-test"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "~22.20.3",
     "@types/vscode": "^1.138.0",
-    "@typescript-eslint/eslint-plugin": "^8.70.0",
-    "@typescript-eslint/parser": "^8.70.0",
     "@vscode/test-cli": "^0.0.11",
     "@vscode/test-electron": "^2.5.2",
-    "eslint": "^9.39.5",
     "ts-loader": "^9.6.2",
     "typescript": "^5.9.3",
     "webpack": "^5.111.1",

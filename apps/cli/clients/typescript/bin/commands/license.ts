@@ -1,11 +1,10 @@
 import * as path from "node:path";
 import { isCancel, select, text } from "@clack/prompts";
-import axios from "axios";
 import chalk from "chalk";
 import type { Command } from "commander";
 import fs from "fs-extra";
 import { getUserInfo } from "../helpers/git.js";
-import { checkAndUpdate, getBackendDomain } from "../helpers/network.js";
+import { checkAndUpdate } from "../helpers/network.js";
 
 const LICENSES: Record<string, (year: number, author: string) => string> = {
   MIT: (year, author) => `MIT License
@@ -224,15 +223,5 @@ export function registerLicenseCommand(program: Command) {
 
       await fs.writeFile(licensePath, content, "utf-8");
       console.log(chalk.green(`\nLICENSE file generated (${licenseType}) at ${licensePath}`));
-
-      // Fire-and-forget usage tracking
-      try {
-        const backendDomain = await getBackendDomain();
-        if (userInfo?.username && userInfo?.email) {
-          axios.post(`${backendDomain}/api/track`, { userInfo, usageType: "license" }).catch(() => {});
-        }
-      } catch {
-        /* never block the user */
-      }
     });
 }
