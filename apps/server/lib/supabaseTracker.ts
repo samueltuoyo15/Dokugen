@@ -19,8 +19,10 @@ export async function trackUser(userInfo: UserInfo | undefined, usageType?: stri
 
   // Map usageType to database column safely without defaulting to readme_usage
   let columnToIncrement: string | null = null;
-  if (usageType === "readme" || usageType === "update") {
+  if (usageType === "readme") {
     columnToIncrement = "readme_usage";
+  } else if (usageType === "update") {
+    columnToIncrement = "update_usage";
   } else if (usageType === "commit") {
     columnToIncrement = "commit_usage";
   } else if (usageType === "license") {

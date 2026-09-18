@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { trackUser } from "../lib/supabaseTracker";
+import { supabase } from "../supabase";
 import logger from "../utils/logger";
 
 const router = Router();
@@ -16,6 +17,18 @@ router.post(
       const ALLOWED_PUBLIC_TYPES = ["license", "revert"];
       if (!ALLOWED_PUBLIC_TYPES.includes(usageType)) {
         return res.status(403).json({ error: "Invalid or forbidden usage type for this endpoint" });
+      }
+
+      // Check if user already exists (must have used a core feature first)
+      const { data: existingUser } = await supabase
+        .from("active_users")
+        .select("id")
+        .or(`email.eq.${userInfo.email},username.eq.${userInfo.username}`)
+        .limit(1)
+        .maybeSingle();
+
+      if (!existingUser) {
+        return res.status(403).json({ error: "Forbidden" });
       }
 
       const id = userInfo.id || uuidv4();

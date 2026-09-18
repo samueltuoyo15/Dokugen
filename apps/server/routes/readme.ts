@@ -158,7 +158,8 @@ router.post(
       if (!clientDisconnected) {
         res.end();
         logger.info("README generated successfully");
-        trackUser({ username, email, id, osInfo }, "readme").catch(() => {});
+        const finalUsageType = rawExistingReadme ? "update" : "readme";
+        trackUser({ username, email, id, osInfo }, finalUsageType).catch(() => {});
       }
     } catch (error: any) {
       if (error.name === "AbortError" || error.name === "APIUserAbortError") {
