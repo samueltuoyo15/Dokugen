@@ -5,7 +5,7 @@ interface UserInfo {
   username?: string;
   email?: string;
   id?: string;
-  osInfo?: any;
+  osInfo?: unknown;
 }
 
 export async function trackUser(userInfo: UserInfo | undefined, usageType?: string) {
@@ -48,7 +48,7 @@ export async function trackUser(userInfo: UserInfo | undefined, usageType?: stri
   }
 
   try {
-    let existingUser: any = null;
+    let existingUser: Record<string, unknown> | null = null;
 
     if (email) {
       const { data, error } = await supabase
@@ -60,7 +60,7 @@ export async function trackUser(userInfo: UserInfo | undefined, usageType?: stri
         .maybeSingle();
 
       if (!error && data) {
-        existingUser = data;
+        existingUser = data as Record<string, unknown>;
       }
     }
 
@@ -74,17 +74,18 @@ export async function trackUser(userInfo: UserInfo | undefined, usageType?: stri
         .maybeSingle();
 
       if (!error && data) {
-        existingUser = data;
+        existingUser = data as Record<string, unknown>;
       }
     }
 
     if (existingUser) {
-      const updateData: Record<string, any> = {
-        usage_count: (existingUser.usage_count || 0) + 1,
+      const currentUsageCount = Number(existingUser.usage_count || 0);
+      const updateData: Record<string, unknown> = {
+        usage_count: currentUsageCount + 1,
       };
 
       if (columnToIncrement) {
-        const currentSpecificCount = (existingUser as any)[columnToIncrement] || 0;
+        const currentSpecificCount = Number(existingUser[columnToIncrement] || 0);
         updateData[columnToIncrement] = currentSpecificCount + 1;
       }
 
@@ -102,7 +103,7 @@ export async function trackUser(userInfo: UserInfo | undefined, usageType?: stri
 
       await supabase.from("active_users").update(updateData).eq("id", existingUser.id);
     } else {
-      const insertData: Record<string, any> = {
+      const insertData: Record<string, unknown> = {
         username: username || "unknown",
         email: email || "",
         id,

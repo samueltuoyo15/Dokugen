@@ -55,8 +55,9 @@ export function registerRevertCommand(program: Command) {
         } catch {
           /* never block the user */
         }
-      } catch (error: any) {
-        console.error(chalk.red("Failed to revert README:"), error.message);
+      } catch (error: unknown) {
+        const err = error as Error;
+        console.error(chalk.red("Failed to revert README:"), err.message);
         process.exit(1);
       }
     });

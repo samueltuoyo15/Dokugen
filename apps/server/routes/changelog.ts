@@ -45,12 +45,13 @@ function mergeChangelog(existingContent: string, newVersionBlock: string, versio
   return `${(`${header + newVersionBlock}\n\n${body}`).trim()}\n`;
 }
 
-router.post("/generate-changelog", async (req: Request, res: Response): Promise<any> => {
+router.post("/generate-changelog", async (req: Request, res: Response): Promise<void> => {
   try {
     const { logs, version = "Unreleased", existingChangelog, userInfo, model: clientModel } = req.body;
 
     if (!logs) {
-      return res.status(400).json({ error: "No git log history provided" });
+      res.status(400).json({ error: "No git log history provided" });
+      return;
     }
 
     if (userInfo?.username && userInfo?.email) {
@@ -76,11 +77,12 @@ router.post("/generate-changelog", async (req: Request, res: Response): Promise<
       ? mergeChangelog(existingChangelog, cleanBlock, version)
       : `# Changelog\n\nAll notable changes to this project will be documented in this file.\n\n${cleanBlock}\n`;
 
-    return res.status(200).json({ changelog: finalChangelog });
-  } catch (error: any) {
+    res.status(200).json({ changelog: finalChangelog });
+  } catch (error: unknown) {
     logger.error(error, "Error generating changelog");
-    const errorMessage = error?.response?.data?.error?.message || error?.message || "Internal Server Error";
-    return res.status(500).json({ error: errorMessage });
+    const err = error as { response?: { data?: { error?: { message?: string } } }; message?: string };
+    const errorMessage = err?.response?.data?.error?.message || err?.message || "Internal Server Error";
+    res.status(500).json({ error: errorMessage });
   }
 });
 

@@ -5,6 +5,7 @@ export default function SupportButton() {
     <>
       {/* Custom button anywhere in your layouts or pages */}
       <button
+        type="button"
         data-myhappr-username="samueltuoyo"
         data-color="#FF5E5E"
         data-text-color="#ffffff"

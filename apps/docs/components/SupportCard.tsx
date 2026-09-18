@@ -1,6 +1,7 @@
 export default function SupportCard() {
   return (
     <iframe
+      title="Support Dokugen"
       src="https://myhappr.com/embed/samueltuoyo?color=%23eab308&title=Support+Dokugen&theme=light"
       width="100%"
       height="520"

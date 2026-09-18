@@ -52,12 +52,13 @@ Git diff:
 Commit message:
 `.trim();
 
-router.post("/generate-commit", async (req: Request, res: Response): Promise<any> => {
+router.post("/generate-commit", async (req: Request, res: Response): Promise<void> => {
   try {
     const { diff, userInfo } = req.body;
 
     if (!diff) {
-      return res.status(400).json({ error: "No git diff provided" });
+      res.status(400).json({ error: "No git diff provided" });
+      return;
     }
 
     let processedDiff = diff;
@@ -90,11 +91,12 @@ router.post("/generate-commit", async (req: Request, res: Response): Promise<any
 
     const message = completion.choices[0]?.message?.content?.trim() || "chore: update code";
     const cleanMessage = message.replace(/^["']|["']$/g, "");
-    return res.status(200).json({ message: cleanMessage });
-  } catch (error: any) {
+    res.status(200).json({ message: cleanMessage });
+  } catch (error: unknown) {
     logger.error(error, "Error generating commit message");
-    const errorMessage = error?.response?.data?.error?.message || error?.message || "Internal Server Error";
-    return res.status(500).json({ error: errorMessage });
+    const err = error as { response?: { data?: { error?: { message?: string } } }; message?: string };
+    const errorMessage = err?.response?.data?.error?.message || err?.message || "Internal Server Error";
+    res.status(500).json({ error: errorMessage });
   }
 });
 

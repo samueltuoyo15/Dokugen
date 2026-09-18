@@ -165,11 +165,16 @@ export const restoreReadme = async (): Promise<string | null> => {
   }
 };
 
-function getHttpErrorLabel(error: any): string {
-  const status = error?.response?.status || error?.response?.data?.error?.code || error?.code;
+function getHttpErrorLabel(error: unknown): string {
+  const err = error as {
+    response?: { status?: number; data?: { error?: { code?: number } } };
+    code?: number | string;
+    message?: string;
+  };
+  const status = err?.response?.status || err?.response?.data?.error?.code || err?.code;
 
   if (!status) {
-    const msg = (error?.message || "").toLowerCase();
+    const msg = (err?.message || "").toLowerCase();
     if (msg.includes("timeout") || msg.includes("timedout") || msg.includes("econnaborted")) {
       return "Request Timed Out";
     }
@@ -324,7 +329,7 @@ export const generateReadme = async (
       const MAX_BUFFER_SIZE = 1024 * 1024;
       let isCleanedUp = false;
 
-      const cleanup = async (success: boolean, error?: any) => {
+      const cleanup = async (success: boolean, error?: unknown) => {
         if (isCleanedUp) return;
         isCleanedUp = true;
         if (timerInterval) clearInterval(timerInterval);
@@ -392,7 +397,7 @@ export const generateReadme = async (
 
         const lines = buffer.split("\n");
         buffer = lines.pop() || "";
-        lines.forEach((line) => {
+        for (const line of lines) {
           if (line.startsWith("data:")) {
             try {
               const json = JSON.parse(line.replace("data: ", "").trim());
@@ -404,7 +409,7 @@ export const generateReadme = async (
               console.error("Skipping invalid event data:", line);
             }
           }
-        });
+        }
       });
 
       responseStream.on("end", () => {

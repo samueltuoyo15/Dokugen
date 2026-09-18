@@ -180,6 +180,7 @@ const jsonLd = {
 export default function Home() {
   return (
     <>
+      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Valid JSON-LD structured data */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <DokugenHomeClient />
     </>

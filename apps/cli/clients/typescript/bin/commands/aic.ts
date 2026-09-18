@@ -7,13 +7,17 @@ import { createSpinner } from "nanospinner";
 import { getUserInfo, isGitRepository } from "../helpers/git.js";
 import { checkAndUpdate, checkInternetConnection, getBackendDomain } from "../helpers/network.js";
 
+interface AicOptions {
+  push?: boolean;
+}
+
 export function registerAicCommand(program: Command) {
   program
     .command("aic")
     .alias("ai-commit")
     .description("AI-powered Git commit generator")
     .option("-p, --push", "Push after committing")
-    .action(async (options: any) => {
+    .action(async (options: AicOptions) => {
       await checkAndUpdate();
 
       if (!isGitRepository()) {
@@ -61,7 +65,9 @@ export function registerAicCommand(program: Command) {
             .split("\n")
             .filter(Boolean);
           console.log(chalk.blue("\nFiles being committed:"));
-          stagedFiles.forEach((file) => console.log(chalk.cyan(`- ${file}`)));
+          for (const file of stagedFiles) {
+            console.log(chalk.cyan(`- ${file}`));
+          }
           console.log("");
         } catch {}
 
@@ -102,7 +108,7 @@ export function registerAicCommand(program: Command) {
           spinner.success({
             text: chalk.green(`Commit message generated successfully in ${timeString}`),
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           spinner.error({ text: chalk.red("Failed to generate commit message") });
           throw error;
         }
@@ -156,9 +162,10 @@ export function registerAicCommand(program: Command) {
               }
               regenSpinner.success({ text: chalk.green("New commit message generated successfully") });
               console.log(chalk.green(`"${finalCommitMessage}"\n`));
-            } catch (err: any) {
+            } catch (err: unknown) {
+              const errorObj = err as { response?: { data?: { error?: string } }; message?: string };
               regenSpinner.error({ text: chalk.red("Failed to regenerate commit message") });
-              console.error(chalk.red("Error details:"), err.response?.data?.error || err.message);
+              console.error(chalk.red("Error details:"), errorObj.response?.data?.error || errorObj.message);
             }
           }
         }
@@ -174,12 +181,13 @@ export function registerAicCommand(program: Command) {
           execSync("git push", { stdio: "inherit" });
           console.log(chalk.green("Push successful"));
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const errObj = error as { code?: string; response?: unknown; message?: string };
         if (
-          error.code === "ENOTFOUND" ||
-          error.code === "EAI_AGAIN" ||
-          error.code === "ECONNREFUSED" ||
-          !error.response
+          errObj.code === "ENOTFOUND" ||
+          errObj.code === "EAI_AGAIN" ||
+          errObj.code === "ECONNREFUSED" ||
+          !errObj.response
         ) {
           const rawUsername = getUserInfo()?.username;
           const username = rawUsername ? rawUsername.replace(/\d+/g, "") : "";
@@ -187,7 +195,8 @@ export function registerAicCommand(program: Command) {
             chalk.red(`Opps... ${username} kindly check your device or pc internet connection and try again.`),
           );
         } else {
-          console.error(chalk.red("Commit failed:"), error.response?.data?.error || error.message);
+          const responseErr = (errObj as { response?: { data?: { error?: string } } }).response?.data?.error;
+          console.error(chalk.red("Commit failed:"), responseErr || errObj.message);
         }
         process.exit(1);
       }

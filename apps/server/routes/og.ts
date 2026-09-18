@@ -100,12 +100,13 @@ function generateSvgCard(metadata: {
 </svg>`.trim();
 }
 
-router.post("/og-metadata", async (req: Request, res: Response): Promise<any> => {
+router.post("/og-metadata", async (req: Request, res: Response): Promise<void> => {
   try {
     const { summary } = req.body;
 
     if (!summary) {
-      return res.status(400).json({ error: "No codebase summary provided." });
+      res.status(400).json({ error: "No codebase summary provided." });
+      return;
     }
 
     const systemPrompt = getOgInstruction();
@@ -134,23 +135,24 @@ router.post("/og-metadata", async (req: Request, res: Response): Promise<any> =>
           { label: "Learn More", variant: "secondary" },
         ];
       }
-      return res.status(200).json(parsed);
+      res.status(200).json(parsed);
     } catch (parseErr) {
       logger.error({ rawText, parseErr }, "Failed to parse AI response as JSON");
-      return res.status(500).json({ error: "The AI did not return valid JSON. Please try again." });
+      res.status(500).json({ error: "The AI did not return valid JSON. Please try again." });
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(error, "Error in /og-metadata");
-    return res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-router.post("/render-og", async (req: Request, res: Response): Promise<any> => {
+router.post("/render-og", async (req: Request, res: Response): Promise<void> => {
   try {
     const { title, tagline, techStack, theme, url, author, version, logo, buttons } = req.body;
 
     if (!title) {
-      return res.status(400).json({ error: "Missing title in render request." });
+      res.status(400).json({ error: "Missing title in render request." });
+      return;
     }
 
     const svgString = generateSvgCard({ title, tagline, techStack, theme, url, author, version, logo, buttons });
@@ -158,10 +160,10 @@ router.post("/render-og", async (req: Request, res: Response): Promise<any> => {
     const pngBuffer = await sharp(Buffer.from(svgString)).png().toBuffer();
 
     res.setHeader("Content-Type", "image/png");
-    return res.status(200).send(pngBuffer);
-  } catch (error: any) {
+    res.status(200).send(pngBuffer);
+  } catch (error: unknown) {
     logger.error(error, "Error in /render-og");
-    return res.status(500).json({ error: "Failed to render card image." });
+    res.status(500).json({ error: "Failed to render card image." });
   }
 });
 

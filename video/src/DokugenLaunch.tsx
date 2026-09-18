@@ -85,6 +85,7 @@ const GridBackground = () => {
         const size = index % 3 === 0 ? 8 : 5;
         return (
           <div
+            // biome-ignore lint/suspicious/noArrayIndexKey: Static particles
             key={index}
             style={{
               position: "absolute",

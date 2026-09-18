@@ -6,15 +6,17 @@ import logger from "../utils/logger";
 
 const router = Router();
 
-router.post("/track", async (req: Request, res: Response): Promise<any> => {
+router.post("/track", async (req: Request, res: Response): Promise<void> => {
   try {
     const { userInfo, usageType } = req.body;
     if (!userInfo || !userInfo.username || !userInfo.email) {
-      return res.status(400).json({ error: "Missing userInfo" });
+      res.status(400).json({ error: "Missing userInfo" });
+      return;
     }
     const ALLOWED_PUBLIC_TYPES = ["license", "revert"];
     if (!ALLOWED_PUBLIC_TYPES.includes(usageType)) {
-      return res.status(403).json({ error: "Invalid or forbidden usage type for this endpoint" });
+      res.status(403).json({ error: "Invalid or forbidden usage type for this endpoint" });
+      return;
     }
 
     // Check if user already exists (must have used a core feature first)
@@ -26,16 +28,17 @@ router.post("/track", async (req: Request, res: Response): Promise<any> => {
       .maybeSingle();
 
     if (!existingUser) {
-      return res.status(403).json({ error: "Forbidden" });
+      res.status(403).json({ error: "Forbidden" });
+      return;
     }
 
     const id = userInfo.id || uuidv4();
     await trackUser({ ...userInfo, id }, usageType);
     logger.info(`Tracked action for user ${userInfo.username} (type: ${usageType || "license"})`);
-    return res.status(200).json({ ok: true });
+    res.status(200).json({ ok: true });
   } catch (error) {
     logger.error(error, "Error in /api/track");
-    return res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 

@@ -13,6 +13,11 @@ import { backupReadme, generateReadme, restoreReadme } from "../helpers/readme.j
 //@ts-ignore
 import { detectProjectType } from "../projectDetect.mjs";
 
+interface GenerateOptions {
+  overwrite?: boolean;
+  template?: string;
+}
+
 export function registerGenerateCommand(program: Command) {
   const projectName = path.basename(process.cwd());
 
@@ -24,7 +29,7 @@ export function registerGenerateCommand(program: Command) {
       "--template <url>",
       "use a custom GitHub repo readme file as a template to generate a concise and strict readme for your project",
     )
-    .action(async (options: unknown) => {
+    .action(async (options: GenerateOptions) => {
       if (!isGitRepository()) {
         console.log(
           chalk.red(

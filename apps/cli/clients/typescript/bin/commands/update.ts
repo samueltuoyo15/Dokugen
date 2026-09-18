@@ -13,6 +13,10 @@ import { backupReadme, generateReadme, restoreReadme } from "../helpers/readme.j
 //@ts-ignore
 import { detectProjectType } from "../projectDetect.mjs";
 
+interface UpdateOptions {
+  template?: string;
+}
+
 export function registerUpdateCommand(program: Command) {
   const projectName = path.basename(process.cwd());
 
@@ -20,7 +24,7 @@ export function registerUpdateCommand(program: Command) {
     .command("update")
     .description(`Update auto-generated sections of ${projectName} README while preserving custom content`)
     .option("--template <url>", "use a custom GitHub repo readme file as a template")
-    .action(async (options: any) => {
+    .action(async (options: UpdateOptions) => {
       if (!isGitRepository()) {
         console.log(
           chalk.red(

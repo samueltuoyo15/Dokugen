@@ -8,6 +8,13 @@ import { createSpinner } from "nanospinner";
 import { getUserInfo, isGitRepository } from "../helpers/git.js";
 import { checkAndUpdate, checkInternetConnection, getBackendDomain } from "../helpers/network.js";
 
+interface ChangelogOptions {
+  versionTag?: string;
+  limit?: string;
+  model?: string;
+  outfile?: string;
+}
+
 export function registerChangelogCommand(program: Command) {
   program
     .command("changelog")
@@ -17,7 +24,7 @@ export function registerChangelogCommand(program: Command) {
     .option("-n, --limit <number>", "Number of git commits to analyze", "200")
     .option("-m, --model <modelName>", "Custom model configured on the server (e.g. google/gemini-3.1-flash-lite)")
     .option("-o, --outfile <filepath>", "Output changelog file path", "CHANGELOG.md")
-    .action(async (options: any) => {
+    .action(async (options: ChangelogOptions) => {
       await checkAndUpdate();
 
       if (!isGitRepository()) {
@@ -134,18 +141,19 @@ export function registerChangelogCommand(program: Command) {
         console.log(
           chalk.green(`CHANGELOG generated successfully in ${timeString}! Written to ${path.basename(outfile)}`),
         );
-      } catch (error: any) {
+      } catch (error: unknown) {
         if (spinner) {
           spinner.stop();
         }
-        const serverError = error.response?.data?.error;
+        const err = error as { response?: { data?: { error?: string } }; code?: string; message?: string };
+        const serverError = err.response?.data?.error;
         if (serverError) {
           console.log(`\n${chalk.blue(serverError)}`);
         } else if (
-          error.code === "ENOTFOUND" ||
-          error.code === "EAI_AGAIN" ||
-          error.code === "ECONNREFUSED" ||
-          !error.response
+          err.code === "ENOTFOUND" ||
+          err.code === "EAI_AGAIN" ||
+          err.code === "ECONNREFUSED" ||
+          !err.response
         ) {
           const rawUsername = getUserInfo()?.username;
           const username = rawUsername ? rawUsername.replace(/\d+/g, "") : "";
@@ -153,7 +161,7 @@ export function registerChangelogCommand(program: Command) {
             `\n${chalk.red(`Opps... ${username} kindly check your device or pc internet connection and try again.`)}`,
           );
         } else {
-          console.log(`\n${chalk.red(error.message)}`);
+          console.log(`\n${chalk.red(err.message || "An unexpected error occurred")}`);
         }
         process.exit(1);
       }

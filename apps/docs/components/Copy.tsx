@@ -20,25 +20,23 @@ const Copy = ({ code, className }: CopyProps) => {
   };
 
   return (
-    <div
+    <button
+      type="button"
       onClick={handleCopy}
-      className="bg-zinc-50 hover:bg-zinc-100/70 p-4 rounded-xl border border-zinc-200/80 hover:border-zinc-300 flex justify-between items-center transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-500/20 min-w-0 gap-3"
+      className="w-full text-left bg-zinc-50 hover:bg-zinc-100/70 p-4 rounded-xl border border-zinc-200/80 hover:border-zinc-300 flex justify-between items-center transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-500/20 min-w-0 gap-3"
+      aria-label="Copy code to clipboard"
     >
       <div className="flex items-center gap-2 min-w-0 overflow-x-auto scrollbar-hide">
         <code className={cn("text-zinc-800 font-mono text-xs whitespace-nowrap", className)}>{code}</code>
       </div>
-      <button
-        type="button"
-        className="text-zinc-400 hover:text-zinc-700 transition-colors p-1 flex-shrink-0"
-        aria-label="Copy code to clipboard"
-      >
+      <span className="text-zinc-400 hover:text-zinc-700 transition-colors p-1 flex-shrink-0" aria-hidden="true">
         {copied ? (
           <CopyCheckIcon className="w-4 h-4 text-emerald-600 transition-all scale-110" />
         ) : (
           <CopyIcon className="w-4 h-4" />
         )}
-      </button>
-    </div>
+      </span>
+    </button>
   );
 };
 

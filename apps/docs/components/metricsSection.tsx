@@ -276,89 +276,98 @@ export default function MetricsSection() {
               <thead className="bg-zinc-50">
                 <tr>
                   <th className="px-6 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide">User</th>
-                  <th
-                    onClick={() => handleSortChange("usage_count")}
-                    className="px-6 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
-                  >
-                    <span className="inline-flex items-center justify-end gap-1.5 w-full">
+                  <th className="px-6 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">
+                    <button
+                      type="button"
+                      onClick={() => handleSortChange("usage_count")}
+                      className="inline-flex items-center justify-end gap-1.5 w-full cursor-pointer hover:text-zinc-800 select-none transition-colors group"
+                    >
                       Total
                       {sortBy === "usage_count" ? (
                         <ArrowDown className="w-3.5 h-3.5 text-zinc-800" />
                       ) : (
                         <ArrowUpDown className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
                       )}
-                    </span>
+                    </button>
                   </th>
-                  <th
-                    onClick={() => handleSortChange("readme_usage")}
-                    className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
-                  >
-                    <span className="inline-flex items-center justify-end gap-1.5 w-full">
+                  <th className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">
+                    <button
+                      type="button"
+                      onClick={() => handleSortChange("readme_usage")}
+                      className="inline-flex items-center justify-end gap-1.5 w-full cursor-pointer hover:text-zinc-800 select-none transition-colors group"
+                    >
                       READMEs
                       {sortBy === "readme_usage" ? (
                         <ArrowDown className="w-3.5 h-3.5 text-zinc-800" />
                       ) : (
                         <ArrowUpDown className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
                       )}
-                    </span>
+                    </button>
                   </th>
-                  <th
-                    onClick={() => handleSortChange("commit_usage")}
-                    className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
-                  >
-                    <span className="inline-flex items-center justify-end gap-1.5 w-full">
+                  <th className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">
+                    <button
+                      type="button"
+                      onClick={() => handleSortChange("commit_usage")}
+                      className="inline-flex items-center justify-end gap-1.5 w-full cursor-pointer hover:text-zinc-800 select-none transition-colors group"
+                    >
                       Commits
                       {sortBy === "commit_usage" ? (
                         <ArrowDown className="w-3.5 h-3.5 text-zinc-800" />
                       ) : (
                         <ArrowUpDown className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
                       )}
-                    </span>
+                    </button>
                   </th>
-                  <th
-                    onClick={() => handleSortChange("license_usage")}
-                    className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
-                  >
-                    <span className="inline-flex items-center justify-end gap-1.5 w-full">
+                  <th className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">
+                    <button
+                      type="button"
+                      onClick={() => handleSortChange("license_usage")}
+                      className="inline-flex items-center justify-end gap-1.5 w-full cursor-pointer hover:text-zinc-800 select-none transition-colors group"
+                    >
                       Licenses
                       {sortBy === "license_usage" ? (
                         <ArrowDown className="w-3.5 h-3.5 text-zinc-800" />
                       ) : (
                         <ArrowUpDown className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
                       )}
-                    </span>
+                    </button>
                   </th>
-                  <th
-                    onClick={() => handleSortChange("revert_usage")}
-                    className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
-                  >
-                    <span className="inline-flex items-center justify-end gap-1.5 w-full">
+                  <th className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">
+                    <button
+                      type="button"
+                      onClick={() => handleSortChange("revert_usage")}
+                      className="inline-flex items-center justify-end gap-1.5 w-full cursor-pointer hover:text-zinc-800 select-none transition-colors group"
+                    >
                       Reverts
                       {sortBy === "revert_usage" ? (
                         <ArrowDown className="w-3.5 h-3.5 text-zinc-800" />
                       ) : (
                         <ArrowUpDown className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
                       )}
-                    </span>
+                    </button>
                   </th>
-                  <th
-                    onClick={() => handleSortChange("changelog_usage")}
-                    className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
-                  >
-                    <span className="inline-flex items-center justify-end gap-1.5 w-full">
+                  <th className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">
+                    <button
+                      type="button"
+                      onClick={() => handleSortChange("changelog_usage")}
+                      className="inline-flex items-center justify-end gap-1.5 w-full cursor-pointer hover:text-zinc-800 select-none transition-colors group"
+                    >
                       Changelogs
                       {sortBy === "changelog_usage" ? (
                         <ArrowDown className="w-3.5 h-3.5 text-zinc-800" />
                       ) : (
                         <ArrowUpDown className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
                       )}
-                    </span>
+                    </button>
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
                 {data?.activeUsers.map((user, index) => (
-                  <tr key={index} className="group hover:bg-zinc-50/30 transition-colors">
+                  <tr
+                    key={`user-${user.id || user.username || index}`}
+                    className="group hover:bg-zinc-50/30 transition-colors"
+                  >
                     <td className="px-6 py-3">
                       <GitHubUserLink username={user.username} />
                     </td>
@@ -390,6 +399,7 @@ export default function MetricsSection() {
 
           <div className="p-4 border-t border-zinc-100 flex justify-between items-center bg-zinc-50/50">
             <button
+              type="button"
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={!data?.pagination.hasPrev}
               className="px-3 py-1.5 text-xs font-semibold text-zinc-600 hover:text-zinc-900 disabled:opacity-30 disabled:hover:text-zinc-600 transition-colors"
@@ -402,6 +412,7 @@ export default function MetricsSection() {
             </span>
 
             <button
+              type="button"
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={!data?.pagination.hasNext}
               className="px-3 py-1.5 text-xs font-semibold text-zinc-600 hover:text-zinc-900 disabled:opacity-30 disabled:hover:text-zinc-600 transition-colors"
@@ -422,6 +433,7 @@ export default function MetricsSection() {
 
             <div className="flex flex-wrap gap-1 bg-zinc-100 p-1 rounded-xl border border-zinc-200/40">
               <button
+                type="button"
                 onClick={() => setActiveChartMetric("all")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold select-none transition-all cursor-pointer ${
                   activeChartMetric === "all"
@@ -433,6 +445,7 @@ export default function MetricsSection() {
                 All Features
               </button>
               <button
+                type="button"
                 onClick={() => setActiveChartMetric("READMEs")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold select-none transition-all cursor-pointer ${
                   activeChartMetric === "READMEs"
@@ -444,6 +457,7 @@ export default function MetricsSection() {
                 READMEs
               </button>
               <button
+                type="button"
                 onClick={() => setActiveChartMetric("Commits")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold select-none transition-all cursor-pointer ${
                   activeChartMetric === "Commits"
@@ -455,6 +469,7 @@ export default function MetricsSection() {
                 Commits
               </button>
               <button
+                type="button"
                 onClick={() => setActiveChartMetric("Licenses")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold select-none transition-all cursor-pointer ${
                   activeChartMetric === "Licenses"
@@ -466,6 +481,7 @@ export default function MetricsSection() {
                 Licenses
               </button>
               <button
+                type="button"
                 onClick={() => setActiveChartMetric("Reverts")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold select-none transition-all cursor-pointer ${
                   activeChartMetric === "Reverts"
@@ -477,6 +493,7 @@ export default function MetricsSection() {
                 Reverts
               </button>
               <button
+                type="button"
                 onClick={() => setActiveChartMetric("Changelogs")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold select-none transition-all cursor-pointer ${
                   activeChartMetric === "Changelogs"
@@ -524,8 +541,7 @@ export default function MetricsSection() {
                       toggleLine(e.dataKey as string);
                     }
                   }}
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  formatter={(value, entry: any) => {
+                  formatter={(value, entry) => {
                     const isHidden = hiddenLines[entry.dataKey as string];
                     return (
                       <span

@@ -70,8 +70,9 @@ export const checkAndUpdate = async (): Promise<void> => {
 };
 
 export const getBackendDomain = async (): Promise<string> => {
-  if (process.env.DOKUGEN_LOCAL_BACKEND_DOMAIN || process.env.BACKEND_DOMAIN) {
-    return process.env.DOKUGEN_LOCAL_BACKEND_DOMAIN || process.env.BACKEND_DOMAIN!;
+  const envDomain = process.env.DOKUGEN_LOCAL_BACKEND_DOMAIN || process.env.BACKEND_DOMAIN;
+  if (envDomain) {
+    return envDomain;
   }
 
   const ports = ["3000", "3002", "3001"];

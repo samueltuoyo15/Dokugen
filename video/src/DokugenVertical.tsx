@@ -39,6 +39,7 @@ const Grain = ({ strength = 0.18 }: { strength?: number }) => (
   <AbsoluteFill style={{ overflow: "hidden", opacity: strength, pointerEvents: "none" }}>
     {Array.from({ length: 108 }).map((_, index) => (
       <div
+        // biome-ignore lint/suspicious/noArrayIndexKey: Static particles
         key={index}
         style={{
           position: "absolute",
@@ -81,6 +82,7 @@ const PopBurst = ({ x, y, start, color = palette.yellow }: { x: number; y: numbe
     <div style={{ position: "absolute", left: x, top: y, width: 2, height: 2, opacity: fade }}>
       {Array.from({ length: 8 }).map((_, index) => (
         <div
+          // biome-ignore lint/suspicious/noArrayIndexKey: Static particles
           key={index}
           style={{
             position: "absolute",

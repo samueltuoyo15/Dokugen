@@ -61,11 +61,11 @@ export const matchesIgnorePattern = (filename: string, pattern: string): boolean
 export const extractFullCode = async (projectFiles: string[], projectDir: string): Promise<string> => {
   const fileGroups: Record<string, string[]> = {};
 
-  projectFiles.forEach((file) => {
+  for (const file of projectFiles) {
     const dir = path.dirname(file);
     if (!fileGroups[dir]) fileGroups[dir] = [];
     fileGroups[dir].push(file);
-  });
+  }
 
   const snippets = await Promise.all(
     Object.entries(fileGroups).map(async ([dir, files]) => {

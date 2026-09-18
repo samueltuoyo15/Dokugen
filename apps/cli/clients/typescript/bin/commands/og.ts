@@ -27,6 +27,10 @@ interface OgMetadata {
   buttons?: OgButton[];
 }
 
+interface OgOptions {
+  forceNew?: boolean;
+}
+
 export function registerOgCommand(program: Command) {
   const projectName = path.basename(process.cwd());
 
@@ -34,7 +38,7 @@ export function registerOgCommand(program: Command) {
     .command("og")
     .description(`Generate a beautiful 1200x630 OG social preview card for ${projectName}`)
     .option("--force-new", "Force recreate the .dokugen/card.json configuration file using AI")
-    .action(async (options: any) => {
+    .action(async (options: OgOptions) => {
       if (!isGitRepository()) {
         console.log(
           chalk.red("No Git repository found. Please navigate to a project directory that has a Git repository."),
@@ -123,10 +127,11 @@ export function registerOgCommand(program: Command) {
           await fs.writeJson(configPath, metadata, { spaces: 2 });
 
           console.log(chalk.green("✔ Created configuration: .dokugen/card.json"));
-        } catch (err: any) {
+        } catch (err: unknown) {
+          const error = err as Error;
           clearInterval(timerInterval);
           metadataSpinner.error({ text: "Failed to generate card profile." });
-          console.error(chalk.red(err.message));
+          console.error(chalk.red(error.message));
           return;
         }
       } else {
@@ -164,7 +169,7 @@ export function registerOgCommand(program: Command) {
         clearInterval(renderTimerInterval);
         renderSpinner.stop();
 
-        await fs.writeFile(pngPath, Buffer.from(response.data as any));
+        await fs.writeFile(pngPath, Buffer.from(response.data as ArrayBuffer));
 
         const seoText = `
 <!-- Open Graph Meta Tags (Copy & Paste into your HTML <head> or Next.js metadata) -->
@@ -183,10 +188,11 @@ ${metadata.tagline ? `<meta name="twitter:description" content="${metadata.tagli
 
         console.log(chalk.green("\n✔ Created card image: ./.dokugen/card.png"));
         console.log(chalk.green("✔ Created SEO meta tags: ./.dokugen/seo-instructions.txt"));
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const error = err as Error;
         clearInterval(renderTimerInterval);
         renderSpinner.error({ text: "Failed to render social card PNG." });
-        console.error(chalk.red(err.message));
+        console.error(chalk.red(error.message));
       }
     });
 }
