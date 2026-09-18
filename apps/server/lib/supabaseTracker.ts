@@ -9,7 +9,7 @@ interface UserInfo {
 }
 
 export async function trackUser(userInfo: UserInfo | undefined, usageType?: string) {
-  if (!supabase || !userInfo) return;
+  if (!userInfo) return;
   const osInfo = userInfo.osInfo;
   const username = userInfo.username?.toLowerCase();
   const email = userInfo.email?.toLowerCase();
