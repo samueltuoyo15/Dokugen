@@ -10,14 +10,18 @@ interface UserInfo {
 
 export async function trackUser(userInfo: UserInfo | undefined, usageType?: string) {
   if (!supabase || !userInfo) return;
-  const { username, email, osInfo } = userInfo;
+  const osInfo = userInfo.osInfo;
+  const username = userInfo.username?.toLowerCase();
+  const email = userInfo.email?.toLowerCase();
   if (!email && !username) return;
 
   const id = userInfo.id;
 
-  // Map usageType to database column
-  let columnToIncrement = "readme_usage";
-  if (usageType === "commit") {
+  // Map usageType to database column safely without defaulting to readme_usage
+  let columnToIncrement: string | null = null;
+  if (usageType === "readme" || usageType === "update") {
+    columnToIncrement = "readme_usage";
+  } else if (usageType === "commit") {
     columnToIncrement = "commit_usage";
   } else if (usageType === "license") {
     columnToIncrement = "license_usage";
@@ -69,14 +73,17 @@ export async function trackUser(userInfo: UserInfo | undefined, usageType?: stri
     }
 
     if (existingUser) {
-      const currentSpecificCount = (existingUser as any)[columnToIncrement] || 0;
       const updateData: Record<string, any> = {
         usage_count: (existingUser.usage_count || 0) + 1,
-        [columnToIncrement]: currentSpecificCount + 1,
       };
 
+      if (columnToIncrement) {
+        const currentSpecificCount = (existingUser as any)[columnToIncrement] || 0;
+        updateData[columnToIncrement] = currentSpecificCount + 1;
+      }
+
       // Keep username & email up to date if new info is available
-      if (username && existingUser.username !== username && username !== "Unknown") {
+      if (username && existingUser.username !== username && username !== "unknown") {
         updateData.username = username;
       }
       if (email && existingUser.email !== email && email !== "") {
@@ -92,16 +99,21 @@ export async function trackUser(userInfo: UserInfo | undefined, usageType?: stri
         .update(updateData)
         .eq("id", existingUser.id);
     } else {
+      const insertData: Record<string, any> = {
+        username: username || "unknown", 
+        email: email || "", 
+        id, 
+        osInfo: formattedOsInfo, 
+        usage_count: 1
+      };
+      
+      if (columnToIncrement) {
+        insertData[columnToIncrement] = 1;
+      }
+
       await supabase
         .from("active_users")
-        .insert([{ 
-          username: username || "Unknown", 
-          email: email || "", 
-          id, 
-          osInfo: formattedOsInfo, 
-          usage_count: 1,
-          [columnToIncrement]: 1
-        }]);
+        .insert([insertData]);
     }
     logger.info({ username, emailDomain: email ? email.split("@")[1] : undefined, usageType }, "Updated active user");
   } catch (error) {

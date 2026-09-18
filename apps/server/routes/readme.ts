@@ -13,7 +13,7 @@ const router = Router();
 
 router.post(
   "/generate-readme",
-  express.json({ limit: "500mb" }),
+  express.json({ limit: "100mb" }),
   async (req: Request, res: Response): Promise<any> => {
     const controller = new AbortController();
     let clientDisconnected = false;
@@ -113,8 +113,6 @@ router.post(
       }
       const modelName = getModelName(configuredModelName);
 
-      trackUser({ username, email, id, osInfo }, "readme").catch(() => {});
-
       const openai = await createOpenAIClient();
 
       const stream = await openai.chat.completions.create({
@@ -160,6 +158,7 @@ router.post(
       if (!clientDisconnected) {
         res.end();
         logger.info("README generated successfully");
+        trackUser({ username, email, id, osInfo }, "readme").catch(() => {});
       }
     } catch (error: any) {
       if (error.name === "AbortError" || error.name === "APIUserAbortError") {

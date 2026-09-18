@@ -13,6 +13,11 @@ router.post(
       if (!userInfo || !userInfo.username || !userInfo.email) {
         return res.status(400).json({ error: "Missing userInfo" });
       }
+      const ALLOWED_PUBLIC_TYPES = ["license", "revert"];
+      if (!ALLOWED_PUBLIC_TYPES.includes(usageType)) {
+        return res.status(403).json({ error: "Invalid or forbidden usage type for this endpoint" });
+      }
+
       const id = userInfo.id || uuidv4();
       await trackUser({ ...userInfo, id }, usageType);
       logger.info(`Tracked action for user ${userInfo.username} (type: ${usageType || "license"})`);
