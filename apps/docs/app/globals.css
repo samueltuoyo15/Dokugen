@@ -5,9 +5,9 @@
 :root {
   --background: #ffffff;
   --foreground: #09090b;
-  --font-plus-jakarta: 'Plus Jakarta Sans', sans-serif;
-  --font-jetbrains-mono: 'JetBrains Mono', monospace;
-  --font-caveat: 'Caveat', cursive;
+  --font-plus-jakarta: "Plus Jakarta Sans", sans-serif;
+  --font-jetbrains-mono: "JetBrains Mono", monospace;
+  --font-caveat: "Caveat", cursive;
 }
 
 html {

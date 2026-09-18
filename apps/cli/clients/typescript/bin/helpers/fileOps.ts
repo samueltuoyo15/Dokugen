@@ -1,8 +1,8 @@
-import * as path from "path";
-import fs from "fs-extra";
+import { createHash } from "node:crypto";
+import os from "node:os";
+import * as path from "node:path";
 import chalk from "chalk";
-import { createHash } from "crypto";
-import os from "os";
+import fs from "fs-extra";
 
 export interface DokugenCache {
   version: string;
@@ -23,29 +23,22 @@ export function getDokugenBackupPath(projectDir: string): string {
   return path.join(DOKUGEN_HOME, "backup", `${projectKey(projectDir)}.md`);
 }
 
-export const loadCache = async (
-  projectDir: string,
-): Promise<DokugenCache | null> => {
+export const loadCache = async (projectDir: string): Promise<DokugenCache | null> => {
   const cachePath = getDokugenCachePath(projectDir);
   try {
     if (await fs.pathExists(cachePath)) {
       return await fs.readJson(cachePath);
     }
-  } catch {
-  }
+  } catch {}
   return null;
 };
 
-export const saveCache = async (
-  projectDir: string,
-  cache: DokugenCache,
-): Promise<void> => {
+export const saveCache = async (projectDir: string, cache: DokugenCache): Promise<void> => {
   const cachePath = getDokugenCachePath(projectDir);
   try {
     await fs.ensureDir(path.dirname(cachePath));
     await fs.writeJson(cachePath, cache, { spaces: 2 });
-  } catch {
-  }
+  } catch {}
 };
 
 export const getFileHash = async (filePath: string): Promise<string> => {
@@ -57,10 +50,7 @@ export const getFileHash = async (filePath: string): Promise<string> => {
   }
 };
 
-export const matchesIgnorePattern = (
-  filename: string,
-  pattern: string,
-): boolean => {
+export const matchesIgnorePattern = (filename: string, pattern: string): boolean => {
   if (pattern.startsWith("*.")) {
     const ext = pattern.slice(1);
     return filename.endsWith(ext);
@@ -68,17 +58,14 @@ export const matchesIgnorePattern = (
   return filename === pattern;
 };
 
-export const extractFullCode = async (
-  projectFiles: string[],
-  projectDir: string,
-): Promise<string> => {
+export const extractFullCode = async (projectFiles: string[], projectDir: string): Promise<string> => {
   const fileGroups: Record<string, string[]> = {};
 
-  projectFiles.forEach((file) => {
+  for (const file of projectFiles) {
     const dir = path.dirname(file);
     if (!fileGroups[dir]) fileGroups[dir] = [];
     fileGroups[dir].push(file);
-  });
+  }
 
   const snippets = await Promise.all(
     Object.entries(fileGroups).map(async ([dir, files]) => {

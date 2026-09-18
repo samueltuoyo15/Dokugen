@@ -1,54 +1,54 @@
-"use client"
+"use client";
 
-import { useState, useRef } from "react"
-import { useQuery } from "@tanstack/react-query"
-import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
-import Image from "next/image"
-import { ArrowDown, ArrowUpDown, FileText, GitCommit, Award, RotateCcw, Users, Flame, Code2 } from "lucide-react"
+import { useQuery } from "@tanstack/react-query";
+import { ArrowDown, ArrowUpDown, Award, Code2, FileText, Flame, GitCommit, RotateCcw, Users } from "lucide-react";
+import Image from "next/image";
+import { useRef, useState } from "react";
+import { Bar, CartesianGrid, ComposedChart, Legend, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 interface UserMetrics {
-  id: string
-  username: string
-  email: string
-  usage_count: number
-  readme_usage?: number
-  commit_usage?: number
-  license_usage?: number
-  revert_usage?: number
-  changelog_usage?: number
+  id: string;
+  username: string;
+  email: string;
+  usage_count: number;
+  readme_usage?: number;
+  commit_usage?: number;
+  license_usage?: number;
+  revert_usage?: number;
+  changelog_usage?: number;
 }
 
 interface ApiResponse {
-  activeUsers: UserMetrics[]
+  activeUsers: UserMetrics[];
   pagination: {
-    currentPage: number
-    totalPages: number
-    totalUsers: number
-    hasNext: boolean
-    hasPrev: boolean
-  }
+    currentPage: number;
+    totalPages: number;
+    totalUsers: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
 }
 
-const fetchMetrics = async (page: number, sortBy: string = "usage_count"): Promise<ApiResponse> => {
+const fetchMetrics = async (page: number, sortBy = "usage_count"): Promise<ApiResponse> => {
   try {
-    let response = await fetch(`/api/active-users?page=${page}&limit=10&sortBy=${sortBy}`)
+    let response = await fetch(`/api/active-users?page=${page}&limit=10&sortBy=${sortBy}`);
     if (!response.ok) {
-      response = await fetch(`https://dokugen.samueltuoyo.com/api/active-users?page=${page}&limit=10&sortBy=${sortBy}`)
+      response = await fetch(`https://dokugen.samueltuoyo.com/api/active-users?page=${page}&limit=10&sortBy=${sortBy}`);
     }
     if (!response.ok) {
-      throw new Error(`Failed to fetch metrics: ${response.statusText}`)
+      throw new Error(`Failed to fetch metrics: ${response.statusText}`);
     }
-    return response.json()
+    return response.json();
   } catch (error) {
-    console.error("Fetch error:", error)
-    throw error
+    console.error("Fetch error:", error);
+    throw error;
   }
-}
+};
 
 const GitHubUserLink = ({ username }: { username: string }) => {
-  if (!username) return null
+  if (!username) return null;
 
-  const isGitHubHandle = !username.includes(" ")
+  const isGitHubHandle = !username.includes(" ");
 
   if (!isGitHubHandle) {
     const initials = username
@@ -57,7 +57,7 @@ const GitHubUserLink = ({ username }: { username: string }) => {
       .map((n) => n[0])
       .join("")
       .toUpperCase()
-      .slice(0, 2)
+      .slice(0, 2);
 
     return (
       <div className="flex items-center gap-3 text-zinc-600 font-medium text-sm select-none">
@@ -66,7 +66,7 @@ const GitHubUserLink = ({ username }: { username: string }) => {
         </div>
         <span>{username}</span>
       </div>
-    )
+    );
   }
 
   return (
@@ -87,14 +87,14 @@ const GitHubUserLink = ({ username }: { username: string }) => {
       </div>
       <span className="group-hover:text-zinc-900 font-medium text-sm">{username}</span>
     </a>
-  )
-}
+  );
+};
 
 export default function MetricsSection() {
-  const [currentPage, setCurrentPage] = useState(1)
-  const [sortBy, setSortBy] = useState<string>("usage_count")
-  const [activeChartMetric, setActiveChartMetric] = useState<string>("all")
-  const leaderboardRef = useRef<HTMLDivElement>(null)
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState<string>("usage_count");
+  const [activeChartMetric, setActiveChartMetric] = useState<string>("all");
+  const leaderboardRef = useRef<HTMLDivElement>(null);
   const [hiddenLines, setHiddenLines] = useState<Record<string, boolean>>({
     Total: false,
     READMEs: false,
@@ -102,96 +102,99 @@ export default function MetricsSection() {
     Licenses: false,
     Reverts: false,
     Changelogs: false,
-  })
+  });
 
   const { data: starsCount } = useQuery<number>({
     queryKey: ["githubStars"],
     queryFn: async () => {
       try {
-        const res = await fetch("https://api.github.com/repos/samueltuoyo15/Dokugen")
-        if (!res.ok) return 301
-        const data = await res.json()
-        return data.stargazers_count
+        const res = await fetch("https://api.github.com/repos/samueltuoyo15/Dokugen");
+        if (!res.ok) return 301;
+        const data = await res.json();
+        return data.stargazers_count;
       } catch {
-        return 301
+        return 301;
       }
     },
     staleTime: 1000 * 60 * 10,
-  })
+  });
 
   const { data: statsData } = useQuery<{
-    totalUsers: number
-    totalGenerations: number
-    totalReadmes: number
-    totalCommits: number
+    totalUsers: number;
+    totalGenerations: number;
+    totalReadmes: number;
+    totalCommits: number;
   }>({
     queryKey: ["siteStats"],
     queryFn: async () => {
       try {
-        const res = await fetch("/api/stats")
+        const res = await fetch("/api/stats");
         if (!res.ok) {
-          const fallbackRes = await fetch("https://dokugen.samueltuoyo.com/api/stats")
-          if (!fallbackRes.ok) return { totalUsers: 238, totalGenerations: 2137, totalReadmes: 2084, totalCommits: 49 }
-          return fallbackRes.json()
+          const fallbackRes = await fetch("https://dokugen.samueltuoyo.com/api/stats");
+          if (!fallbackRes.ok) return { totalUsers: 238, totalGenerations: 2137, totalReadmes: 2084, totalCommits: 49 };
+          return fallbackRes.json();
         }
-        return res.json()
+        return res.json();
       } catch {
-        return { totalUsers: 238, totalGenerations: 2137, totalReadmes: 2084, totalCommits: 49 }
+        return { totalUsers: 238, totalGenerations: 2137, totalReadmes: 2084, totalCommits: 49 };
       }
     },
     staleTime: 1000 * 60 * 5,
-  })
+  });
 
   const toggleLine = (dataKey: string) => {
     setHiddenLines((prev) => ({
       ...prev,
       [dataKey]: !prev[dataKey],
-    }))
-  }
+    }));
+  };
 
   const handleSortChange = (column: string) => {
-    setSortBy(column)
-    setCurrentPage(1)
-  }
+    setSortBy(column);
+    setCurrentPage(1);
+  };
 
   const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage)
+    setCurrentPage(newPage);
     if (leaderboardRef.current) {
-      leaderboardRef.current.scrollIntoView({ behavior: "smooth", block: "start" })
+      leaderboardRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-  }
+  };
 
   const { data, error, isLoading } = useQuery<ApiResponse>({
     queryKey: ["metrics", currentPage, sortBy],
     queryFn: () => fetchMetrics(currentPage, sortBy),
     staleTime: 1000 * 60 * 5,
-  })
+  });
 
-  if (isLoading) return (
-    <div className="mt-16 w-full h-[400px] flex justify-center items-center bg-zinc-50 rounded-xl border border-zinc-200/80">
-      <div className="flex flex-col items-center gap-2">
-        <div className="w-5 h-5 border-2 border-zinc-300 border-t-zinc-800 rounded-full animate-spin"></div>
-        <span className="text-zinc-500 text-sm">Loading metrics...</span>
+  if (isLoading)
+    return (
+      <div className="mt-16 w-full h-[400px] flex justify-center items-center bg-zinc-50 rounded-xl border border-zinc-200/80">
+        <div className="flex flex-col items-center gap-2">
+          <div className="w-5 h-5 border-2 border-zinc-300 border-t-zinc-800 rounded-full animate-spin" />
+          <span className="text-zinc-500 text-sm">Loading metrics...</span>
+        </div>
       </div>
-    </div>
-  )
+    );
 
-  if (error) return (
-    <div className="mt-16 p-6 bg-red-50 border border-red-200/60 rounded-xl text-red-600 text-center text-sm font-medium">
-      Unable to load metrics. Please try again later.
-    </div>
-  )
+  if (error)
+    return (
+      <div className="mt-16 p-6 bg-red-50 border border-red-200/60 rounded-xl text-red-600 text-center text-sm font-medium">
+        Unable to load metrics. Please try again later.
+      </div>
+    );
 
-  const chartData = data?.activeUsers.map((user) => ({
-    name: user.username,
-    Total: user.usage_count,
-    READMEs: user.readme_usage || 0,
-    Commits: user.commit_usage || 0,
-    Licenses: user.license_usage || 0,
-    Reverts: user.revert_usage || 0,
-    Changelogs: user.changelog_usage || 0,
-    profileUrl: `https://github.com/${user.username}`
-  })) || []
+  const chartData =
+    data?.activeUsers.map((user) => ({
+      name: user.username,
+      Total: user.usage_count,
+      READMEs: user.readme_usage || 0,
+      Commits: user.commit_usage || 0,
+      Licenses: user.license_usage || 0,
+      Reverts: user.revert_usage || 0,
+      Changelogs: user.changelog_usage || 0,
+      profileUrl: `https://github.com/${user.username}`,
+    })) || [];
 
   return (
     <div className="mt-20 space-y-10 font-sans">
@@ -216,10 +219,8 @@ export default function MetricsSection() {
               ★
             </div>
             <span className="text-yellow-950 text-[10px] sm:text-xs md:text-sm whitespace-nowrap overflow-hidden text-ellipsis">
-              <strong className="font-extrabold font-mono">
-                {(starsCount ?? 301).toLocaleString()}
-              </strong>{" "}
-              Stars on GitHub
+              <strong className="font-extrabold font-mono">{(starsCount ?? 301).toLocaleString()}</strong> Stars on
+              GitHub
             </span>
           </a>
 
@@ -262,7 +263,10 @@ export default function MetricsSection() {
       </div>
 
       <div className="flex flex-col gap-8 w-full">
-        <div ref={leaderboardRef} className="w-full flex flex-col rounded-xl border border-zinc-200/80 bg-white overflow-hidden scroll-mt-24">
+        <div
+          ref={leaderboardRef}
+          className="w-full flex flex-col rounded-xl border border-zinc-200/80 bg-white overflow-hidden scroll-mt-24"
+        >
           <div className="p-5 border-b border-zinc-100 bg-zinc-50/50">
             <h3 className="text-sm font-semibold text-zinc-800 uppercase tracking-wider">Leaderboard</h3>
           </div>
@@ -272,89 +276,98 @@ export default function MetricsSection() {
               <thead className="bg-zinc-50">
                 <tr>
                   <th className="px-6 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide">User</th>
-                  <th
-                    onClick={() => handleSortChange("usage_count")}
-                    className="px-6 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
-                  >
-                    <span className="inline-flex items-center justify-end gap-1.5 w-full">
+                  <th className="px-6 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">
+                    <button
+                      type="button"
+                      onClick={() => handleSortChange("usage_count")}
+                      className="inline-flex items-center justify-end gap-1.5 w-full cursor-pointer hover:text-zinc-800 select-none transition-colors group"
+                    >
                       Total
                       {sortBy === "usage_count" ? (
                         <ArrowDown className="w-3.5 h-3.5 text-zinc-800" />
                       ) : (
                         <ArrowUpDown className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
                       )}
-                    </span>
+                    </button>
                   </th>
-                  <th
-                    onClick={() => handleSortChange("readme_usage")}
-                    className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
-                  >
-                    <span className="inline-flex items-center justify-end gap-1.5 w-full">
+                  <th className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">
+                    <button
+                      type="button"
+                      onClick={() => handleSortChange("readme_usage")}
+                      className="inline-flex items-center justify-end gap-1.5 w-full cursor-pointer hover:text-zinc-800 select-none transition-colors group"
+                    >
                       READMEs
                       {sortBy === "readme_usage" ? (
                         <ArrowDown className="w-3.5 h-3.5 text-zinc-800" />
                       ) : (
                         <ArrowUpDown className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
                       )}
-                    </span>
+                    </button>
                   </th>
-                  <th
-                    onClick={() => handleSortChange("commit_usage")}
-                    className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
-                  >
-                    <span className="inline-flex items-center justify-end gap-1.5 w-full">
+                  <th className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">
+                    <button
+                      type="button"
+                      onClick={() => handleSortChange("commit_usage")}
+                      className="inline-flex items-center justify-end gap-1.5 w-full cursor-pointer hover:text-zinc-800 select-none transition-colors group"
+                    >
                       Commits
                       {sortBy === "commit_usage" ? (
                         <ArrowDown className="w-3.5 h-3.5 text-zinc-800" />
                       ) : (
                         <ArrowUpDown className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
                       )}
-                    </span>
+                    </button>
                   </th>
-                  <th
-                    onClick={() => handleSortChange("license_usage")}
-                    className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
-                  >
-                    <span className="inline-flex items-center justify-end gap-1.5 w-full">
+                  <th className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">
+                    <button
+                      type="button"
+                      onClick={() => handleSortChange("license_usage")}
+                      className="inline-flex items-center justify-end gap-1.5 w-full cursor-pointer hover:text-zinc-800 select-none transition-colors group"
+                    >
                       Licenses
                       {sortBy === "license_usage" ? (
                         <ArrowDown className="w-3.5 h-3.5 text-zinc-800" />
                       ) : (
                         <ArrowUpDown className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
                       )}
-                    </span>
+                    </button>
                   </th>
-                  <th
-                    onClick={() => handleSortChange("revert_usage")}
-                    className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
-                  >
-                    <span className="inline-flex items-center justify-end gap-1.5 w-full">
+                  <th className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">
+                    <button
+                      type="button"
+                      onClick={() => handleSortChange("revert_usage")}
+                      className="inline-flex items-center justify-end gap-1.5 w-full cursor-pointer hover:text-zinc-800 select-none transition-colors group"
+                    >
                       Reverts
                       {sortBy === "revert_usage" ? (
                         <ArrowDown className="w-3.5 h-3.5 text-zinc-800" />
                       ) : (
                         <ArrowUpDown className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
                       )}
-                    </span>
+                    </button>
                   </th>
-                  <th
-                    onClick={() => handleSortChange("changelog_usage")}
-                    className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right cursor-pointer hover:text-zinc-800 select-none transition-colors group"
-                  >
-                    <span className="inline-flex items-center justify-end gap-1.5 w-full">
+                  <th className="px-4 py-4 font-medium text-zinc-500 text-xs uppercase tracking-wide text-right">
+                    <button
+                      type="button"
+                      onClick={() => handleSortChange("changelog_usage")}
+                      className="inline-flex items-center justify-end gap-1.5 w-full cursor-pointer hover:text-zinc-800 select-none transition-colors group"
+                    >
                       Changelogs
                       {sortBy === "changelog_usage" ? (
                         <ArrowDown className="w-3.5 h-3.5 text-zinc-800" />
                       ) : (
                         <ArrowUpDown className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
                       )}
-                    </span>
+                    </button>
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
                 {data?.activeUsers.map((user, index) => (
-                  <tr key={index} className="group hover:bg-zinc-50/30 transition-colors">
+                  <tr
+                    key={`user-${user.id || user.username || index}`}
+                    className="group hover:bg-zinc-50/30 transition-colors"
+                  >
                     <td className="px-6 py-3">
                       <GitHubUserLink username={user.username} />
                     </td>
@@ -386,6 +399,7 @@ export default function MetricsSection() {
 
           <div className="p-4 border-t border-zinc-100 flex justify-between items-center bg-zinc-50/50">
             <button
+              type="button"
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={!data?.pagination.hasPrev}
               className="px-3 py-1.5 text-xs font-semibold text-zinc-600 hover:text-zinc-900 disabled:opacity-30 disabled:hover:text-zinc-600 transition-colors"
@@ -398,6 +412,7 @@ export default function MetricsSection() {
             </span>
 
             <button
+              type="button"
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={!data?.pagination.hasNext}
               className="px-3 py-1.5 text-xs font-semibold text-zinc-600 hover:text-zinc-900 disabled:opacity-30 disabled:hover:text-zinc-600 transition-colors"
@@ -411,11 +426,14 @@ export default function MetricsSection() {
           <div className="mb-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
               <h3 className="text-sm font-semibold text-zinc-800 uppercase tracking-wider">Activity Trends</h3>
-              <p className="text-xs text-zinc-500 mt-1">Usage frequency by feature type per top user. Click tabs to isolate metrics.</p>
+              <p className="text-xs text-zinc-500 mt-1">
+                Usage frequency by feature type per top user. Click tabs to isolate metrics.
+              </p>
             </div>
-            
+
             <div className="flex flex-wrap gap-1 bg-zinc-100 p-1 rounded-xl border border-zinc-200/40">
               <button
+                type="button"
                 onClick={() => setActiveChartMetric("all")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold select-none transition-all cursor-pointer ${
                   activeChartMetric === "all"
@@ -427,6 +445,7 @@ export default function MetricsSection() {
                 All Features
               </button>
               <button
+                type="button"
                 onClick={() => setActiveChartMetric("READMEs")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold select-none transition-all cursor-pointer ${
                   activeChartMetric === "READMEs"
@@ -438,6 +457,7 @@ export default function MetricsSection() {
                 READMEs
               </button>
               <button
+                type="button"
                 onClick={() => setActiveChartMetric("Commits")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold select-none transition-all cursor-pointer ${
                   activeChartMetric === "Commits"
@@ -449,6 +469,7 @@ export default function MetricsSection() {
                 Commits
               </button>
               <button
+                type="button"
                 onClick={() => setActiveChartMetric("Licenses")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold select-none transition-all cursor-pointer ${
                   activeChartMetric === "Licenses"
@@ -460,6 +481,7 @@ export default function MetricsSection() {
                 Licenses
               </button>
               <button
+                type="button"
                 onClick={() => setActiveChartMetric("Reverts")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold select-none transition-all cursor-pointer ${
                   activeChartMetric === "Reverts"
@@ -471,6 +493,7 @@ export default function MetricsSection() {
                 Reverts
               </button>
               <button
+                type="button"
                 onClick={() => setActiveChartMetric("Changelogs")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold select-none transition-all cursor-pointer ${
                   activeChartMetric === "Changelogs"
@@ -490,54 +513,49 @@ export default function MetricsSection() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#f4f4f5" vertical={false} />
                 <XAxis
                   dataKey="username"
-                  tick={{ fill: '#71717a', fontSize: 10 }}
+                  tick={{ fill: "#71717a", fontSize: 10 }}
                   axisLine={false}
                   tickLine={false}
                   dy={15}
                   interval="preserveStartEnd"
                 />
-                <YAxis
-                  tick={{ fill: '#71717a', fontSize: 10 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
+                <YAxis tick={{ fill: "#71717a", fontSize: 10 }} axisLine={false} tickLine={false} />
                 <Tooltip
-                  cursor={{ fill: '#f4f4f5', opacity: 0.4 }}
+                  cursor={{ fill: "#f4f4f5", opacity: 0.4 }}
                   contentStyle={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #e4e4e7',
-                    borderRadius: '8px',
-                    color: '#09090b',
-                    fontSize: '12px'
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #e4e4e7",
+                    borderRadius: "8px",
+                    color: "#09090b",
+                    fontSize: "12px",
                   }}
-                  itemStyle={{ color: '#09090b' }}
-                  labelStyle={{ color: '#71717a', marginBottom: '4px', display: 'block' }}
+                  itemStyle={{ color: "#09090b" }}
+                  labelStyle={{ color: "#71717a", marginBottom: "4px", display: "block" }}
                 />
                 <Legend
                   verticalAlign="top"
                   height={36}
-                  wrapperStyle={{ fontSize: '11px', fontFamily: 'sans-serif' }}
+                  wrapperStyle={{ fontSize: "11px", fontFamily: "sans-serif" }}
                   onClick={(e) => {
-                    if (e && e.dataKey) {
-                      toggleLine(e.dataKey as string)
+                    if (e?.dataKey) {
+                      toggleLine(e.dataKey as string);
                     }
                   }}
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  formatter={(value, entry: any) => {
-                    const isHidden = hiddenLines[entry.dataKey as string]
+                  formatter={(value, entry) => {
+                    const isHidden = hiddenLines[entry.dataKey as string];
                     return (
                       <span
                         style={{
-                          color: isHidden ? '#cbd5e1' : entry.color,
-                          textDecoration: isHidden ? 'line-through' : 'none',
-                          cursor: 'pointer',
-                          userSelect: 'none',
+                          color: isHidden ? "#cbd5e1" : entry.color,
+                          textDecoration: isHidden ? "line-through" : "none",
+                          cursor: "pointer",
+                          userSelect: "none",
                           fontWeight: 500,
                         }}
                       >
                         {value}
                       </span>
-                    )
+                    );
                   }}
                 />
                 {(activeChartMetric === "all" || activeChartMetric === "READMEs") && (
@@ -598,8 +616,8 @@ export default function MetricsSection() {
                     stroke="#7c3aed"
                     strokeWidth={3}
                     name="Total Usage"
-                    dot={{ r: 4, fill: '#ffffff', stroke: '#7c3aed', strokeWidth: 2 }}
-                    activeDot={{ r: 6, fill: '#7c3aed', stroke: '#ffffff', strokeWidth: 2 }}
+                    dot={{ r: 4, fill: "#ffffff", stroke: "#7c3aed", strokeWidth: 2 }}
+                    activeDot={{ r: 6, fill: "#7c3aed", stroke: "#ffffff", strokeWidth: 2 }}
                   />
                 )}
               </ComposedChart>
@@ -608,5 +626,5 @@ export default function MetricsSection() {
         </div>
       </div>
     </div>
-  )
+  );
 }

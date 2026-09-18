@@ -1,17 +1,17 @@
-import pino from "pino"
-import dotenv from "dotenv"
-dotenv.config()
+import dotenv from "dotenv";
+import pino from "pino";
+dotenv.config();
 
 const logger = pino({
-  level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-  ...(process.env.NODE_ENV !== 'production' && {
+  level: process.env.NODE_ENV === "production" ? "info" : "debug",
+  ...(process.env.NODE_ENV !== "production" && {
     transport: {
-      target: 'pino-pretty',
+      target: "pino-pretty",
       options: {
-        colorize: true
-      }
-    }
-  })
-})
+        colorize: true,
+      },
+    },
+  }),
+});
 
-export default logger 
+export default logger;

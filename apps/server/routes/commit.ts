@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { type Request, type Response, Router } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { createOpenAIClient, getModelName } from "../lib/openaiClient";
 import { trackUser } from "../lib/supabaseTracker";
@@ -52,53 +52,52 @@ Git diff:
 Commit message:
 `.trim();
 
-router.post(
-  "/generate-commit",
-  async (req: Request, res: Response): Promise<any> => {
-    try {
-      const { diff, userInfo } = req.body;
+router.post("/generate-commit", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { diff, userInfo } = req.body;
 
-      if (!diff) {
-        return res.status(400).json({ error: "No git diff provided" });
-      }
-
-      let processedDiff = diff;
-      const MAX_DIFF_CHARS = 100_000; // ~100k characters for a git diff is plenty and keeps payload small
-      if (processedDiff.length > MAX_DIFF_CHARS) {
-        processedDiff = processedDiff.substring(0, MAX_DIFF_CHARS) + "\n\n...[TRUNCATED FOR PAYLOAD SIZE LIMIT]...";
-        logger.info(`Truncating git diff from ${diff.length} to ${MAX_DIFF_CHARS} chars`);
-      }
-
-      if (userInfo?.username && userInfo?.email) {
-        trackUser({ ...userInfo, id: userInfo.id || uuidv4() }, "commit").catch(() => {});
-      }
-
-      const configuredModelName = process.env.COMMIT_MODEL_NAME;
-
-      if(!configuredModelName) {
-        throw new Error("COMMIT_MODEL_NAME is missing")
-      }
-      const modelName = getModelName(configuredModelName);
-
-      const prompt = buildCommitPrompt(processedDiff);
-
-      const openai = await createOpenAIClient();
-
-      const completion = await openai.chat.completions.create({
-        model: modelName,
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: 300,
-      });
-
-      const message = completion.choices[0]?.message?.content?.trim() || "chore: update code";
-      const cleanMessage = message.replace(/^["']|["']$/g, "");
-      return res.status(200).json({ message: cleanMessage });
-    } catch (error: any) {
-      logger.error(error, "Error generating commit message");
-      const errorMessage = error?.response?.data?.error?.message || error?.message || "Internal Server Error";
-      return res.status(500).json({ error: errorMessage });
+    if (!diff) {
+      res.status(400).json({ error: "No git diff provided" });
+      return;
     }
-  },
-);
+
+    let processedDiff = diff;
+    const MAX_DIFF_CHARS = 100_000; // ~100k characters for a git diff is plenty and keeps payload small
+    if (processedDiff.length > MAX_DIFF_CHARS) {
+      processedDiff = `${processedDiff.substring(0, MAX_DIFF_CHARS)}\n\n...[TRUNCATED FOR PAYLOAD SIZE LIMIT]...`;
+      logger.info(`Truncating git diff from ${diff.length} to ${MAX_DIFF_CHARS} chars`);
+    }
+
+    if (userInfo?.username && userInfo?.email) {
+      trackUser({ ...userInfo, id: userInfo.id || uuidv4() }, "commit").catch(() => {});
+    }
+
+    const configuredModelName = process.env.COMMIT_MODEL_NAME;
+
+    if (!configuredModelName) {
+      throw new Error("COMMIT_MODEL_NAME is missing");
+    }
+    const modelName = getModelName(configuredModelName);
+
+    const prompt = buildCommitPrompt(processedDiff);
+
+    const openai = await createOpenAIClient();
+
+    const completion = await openai.chat.completions.create({
+      model: modelName,
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 300,
+    });
+
+    const message = completion.choices[0]?.message?.content?.trim() || "chore: update code";
+    const cleanMessage = message.replace(/^["']|["']$/g, "");
+    res.status(200).json({ message: cleanMessage });
+  } catch (error: unknown) {
+    logger.error(error, "Error generating commit message");
+    const err = error as { response?: { data?: { error?: { message?: string } } }; message?: string };
+    const errorMessage = err?.response?.data?.error?.message || err?.message || "Internal Server Error";
+    res.status(500).json({ error: errorMessage });
+  }
+});
 
 export default router;

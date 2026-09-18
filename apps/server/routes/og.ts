@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { type Request, type Response, Router } from "express";
 import sharp from "sharp";
 import { createOpenAIClient, getModelName } from "../lib/openaiClient";
 import { getOgInstruction } from "../prompts/ogInstruction";
@@ -38,20 +38,22 @@ function generateSvgCard(metadata: {
   const url = escapeXml(metadata.url || "");
 
   // Measure approximate text width for buttons (9px per char + 48px padding)
-  const btnMarkup = buttons.map((btn, i) => {
-    const label = escapeXml(btn.label);
-    const w = Math.max(140, label.length * 10 + 48);
-    const x = i === 0 ? 100 : 100 + Math.max(140, (buttons[0]?.label?.length ?? 0) * 10 + 48) + 16;
-    const isPrimary = btn.variant === "primary";
-    const bg = isPrimary ? "#4F46E5" : "#FFFFFF";
-    const stroke = isPrimary ? "#4F46E5" : "#D4D4D8";
-    const color = isPrimary ? "#FFFFFF" : "#18181B";
-    return `
+  const btnMarkup = buttons
+    .map((btn, i) => {
+      const label = escapeXml(btn.label);
+      const w = Math.max(140, label.length * 10 + 48);
+      const x = i === 0 ? 100 : 100 + Math.max(140, (buttons[0]?.label?.length ?? 0) * 10 + 48) + 16;
+      const isPrimary = btn.variant === "primary";
+      const bg = isPrimary ? "#4F46E5" : "#FFFFFF";
+      const stroke = isPrimary ? "#4F46E5" : "#D4D4D8";
+      const color = isPrimary ? "#FFFFFF" : "#18181B";
+      return `
       <g>
         <rect x="${x}" y="460" width="${w}" height="52" rx="10" fill="${bg}" stroke="${stroke}" stroke-width="1.5"/>
         <text x="${x + w / 2}" y="492" font-family="Inter, Arial, Helvetica, sans-serif" font-size="17" font-weight="600" fill="${color}" text-anchor="middle">${label}</text>
       </g>`;
-  }).join("");
+    })
+    .join("");
 
   // Footer text
   const footerParts = [url, author ? `by ${author}` : ""].filter(Boolean);
@@ -63,20 +65,23 @@ function generateSvgCard(metadata: {
   const titleLines: string[] = [];
   let line = "";
   for (const word of words) {
-    if ((line + " " + word).trim().length > 20) {
+    if (`${line} ${word}`.trim().length > 20) {
       if (line) titleLines.push(escapeXml(line.trim()));
       line = word;
     } else {
-      line = line ? line + " " + word : word;
+      line = line ? `${line} ${word}` : word;
     }
   }
   if (line) titleLines.push(escapeXml(line.trim()));
 
   const titleLineHeight = 86;
   const titleYStart = 220;
-  const titleMarkup = titleLines.map((l, i) =>
-    `<text x="100" y="${titleYStart + i * titleLineHeight}" font-family="Inter, Arial, Helvetica, sans-serif" font-size="80" font-weight="800" fill="#09090B" letter-spacing="-3">${l}</text>`
-  ).join("");
+  const titleMarkup = titleLines
+    .map(
+      (l, i) =>
+        `<text x="100" y="${titleYStart + i * titleLineHeight}" font-family="Inter, Arial, Helvetica, sans-serif" font-size="80" font-weight="800" fill="#09090B" letter-spacing="-3">${l}</text>`,
+    )
+    .join("");
 
   const taglineY = titleYStart + titleLines.length * titleLineHeight + 16;
 
@@ -95,12 +100,13 @@ function generateSvgCard(metadata: {
 </svg>`.trim();
 }
 
-router.post("/og-metadata", async (req: Request, res: Response): Promise<any> => {
+router.post("/og-metadata", async (req: Request, res: Response): Promise<void> => {
   try {
     const { summary } = req.body;
 
     if (!summary) {
-      return res.status(400).json({ error: "No codebase summary provided." });
+      res.status(400).json({ error: "No codebase summary provided." });
+      return;
     }
 
     const systemPrompt = getOgInstruction();
@@ -126,39 +132,38 @@ router.post("/og-metadata", async (req: Request, res: Response): Promise<any> =>
       if (!parsed.buttons || parsed.buttons.length === 0) {
         parsed.buttons = [
           { label: "Get Started", variant: "primary" },
-          { label: "Learn More", variant: "secondary" }
+          { label: "Learn More", variant: "secondary" },
         ];
       }
-      return res.status(200).json(parsed);
+      res.status(200).json(parsed);
     } catch (parseErr) {
       logger.error({ rawText, parseErr }, "Failed to parse AI response as JSON");
-      return res.status(500).json({ error: "The AI did not return valid JSON. Please try again." });
+      res.status(500).json({ error: "The AI did not return valid JSON. Please try again." });
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(error, "Error in /og-metadata");
-    return res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-router.post("/render-og", async (req: Request, res: Response): Promise<any> => {
+router.post("/render-og", async (req: Request, res: Response): Promise<void> => {
   try {
     const { title, tagline, techStack, theme, url, author, version, logo, buttons } = req.body;
 
     if (!title) {
-      return res.status(400).json({ error: "Missing title in render request." });
+      res.status(400).json({ error: "Missing title in render request." });
+      return;
     }
 
     const svgString = generateSvgCard({ title, tagline, techStack, theme, url, author, version, logo, buttons });
 
-    const pngBuffer = await sharp(Buffer.from(svgString))
-      .png()
-      .toBuffer();
+    const pngBuffer = await sharp(Buffer.from(svgString)).png().toBuffer();
 
     res.setHeader("Content-Type", "image/png");
-    return res.status(200).send(pngBuffer);
-  } catch (error: any) {
+    res.status(200).send(pngBuffer);
+  } catch (error: unknown) {
     logger.error(error, "Error in /render-og");
-    return res.status(500).json({ error: "Failed to render card image." });
+    res.status(500).json({ error: "Failed to render card image." });
   }
 });
 

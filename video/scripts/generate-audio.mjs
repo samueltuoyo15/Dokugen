@@ -1,5 +1,5 @@
-import fs from 'node:fs';
-import path from 'node:path';
+import fs from "node:fs";
+import path from "node:path";
 
 const sampleRate = 48000;
 const duration = 30;
@@ -18,17 +18,29 @@ const envelope = (t, start, length, attack = 0.03, release = 0.18) => {
 };
 
 const tonalEvents = [
-  [0.10, 0.32, 220, 0.16], [0.52, 0.22, 330, 0.10], [1.00, 0.18, 440, 0.09],
-  [3.05, 0.50, 196, 0.18], [3.24, 0.55, 293.66, 0.14], [3.48, 0.62, 440, 0.12],
-  [7.55, 0.16, 523.25, 0.09], [8.05, 0.16, 659.25, 0.08],
-  [10.20, 0.18, 392, 0.09], [11.55, 0.18, 493.88, 0.08], [13.00, 0.18, 587.33, 0.08],
-  [16.95, 0.45, 261.63, 0.12], [17.12, 0.48, 392, 0.10],
-  [23.55, 0.30, 329.63, 0.10], [24.05, 0.30, 392, 0.10], [24.55, 0.45, 493.88, 0.11],
-  [28.15, 0.55, 392, 0.14], [28.35, 0.65, 493.88, 0.13], [28.55, 0.85, 659.25, 0.12],
+  [0.1, 0.32, 220, 0.16],
+  [0.52, 0.22, 330, 0.1],
+  [1.0, 0.18, 440, 0.09],
+  [3.05, 0.5, 196, 0.18],
+  [3.24, 0.55, 293.66, 0.14],
+  [3.48, 0.62, 440, 0.12],
+  [7.55, 0.16, 523.25, 0.09],
+  [8.05, 0.16, 659.25, 0.08],
+  [10.2, 0.18, 392, 0.09],
+  [11.55, 0.18, 493.88, 0.08],
+  [13.0, 0.18, 587.33, 0.08],
+  [16.95, 0.45, 261.63, 0.12],
+  [17.12, 0.48, 392, 0.1],
+  [23.55, 0.3, 329.63, 0.1],
+  [24.05, 0.3, 392, 0.1],
+  [24.55, 0.45, 493.88, 0.11],
+  [28.15, 0.55, 392, 0.14],
+  [28.35, 0.65, 493.88, 0.13],
+  [28.55, 0.85, 659.25, 0.12],
 ];
 
-const clickEvents = [4.62, 5.04, 5.46, 5.88, 6.30, 6.72, 7.14, 8.72, 9.12, 9.52, 10.80, 12.18];
-const whooshEvents = [2.85, 7.35, 16.70, 23.30, 27.90];
+const clickEvents = [4.62, 5.04, 5.46, 5.88, 6.3, 6.72, 7.14, 8.72, 9.12, 9.52, 10.8, 12.18];
+const whooshEvents = [2.85, 7.35, 16.7, 23.3, 27.9];
 
 for (let i = 0; i < frames; i++) {
   const t = i / sampleRate;
@@ -36,11 +48,12 @@ for (let i = 0; i < frames; i++) {
   const pulse = Math.exp(-barPhase * 12);
   const sub = Math.sin(Math.PI * 2 * 55 * t) * pulse * 0.035;
   const padEnvelope = Math.min(1, t / 1.5) * Math.min(1, (duration - t) / 2.2);
-  const pad = (
-    Math.sin(Math.PI * 2 * 110 * t) +
-    0.55 * Math.sin(Math.PI * 2 * 164.81 * t + 0.4) +
-    0.35 * Math.sin(Math.PI * 2 * 220 * t + 1.1)
-  ) * 0.018 * padEnvelope;
+  const pad =
+    (Math.sin(Math.PI * 2 * 110 * t) +
+      0.55 * Math.sin(Math.PI * 2 * 164.81 * t + 0.4) +
+      0.35 * Math.sin(Math.PI * 2 * 220 * t + 1.1)) *
+    0.018 *
+    padEnvelope;
 
   let tone = 0;
   for (const [start, length, frequency, gain] of tonalEvents) {
@@ -76,10 +89,10 @@ for (let i = 0; i < frames; i++) {
 
 const byteLength = data.byteLength;
 const header = Buffer.alloc(44);
-header.write('RIFF', 0);
+header.write("RIFF", 0);
 header.writeUInt32LE(36 + byteLength, 4);
-header.write('WAVE', 8);
-header.write('fmt ', 12);
+header.write("WAVE", 8);
+header.write("fmt ", 12);
 header.writeUInt32LE(16, 16);
 header.writeUInt16LE(1, 20);
 header.writeUInt16LE(channels, 22);
@@ -87,10 +100,10 @@ header.writeUInt32LE(sampleRate, 24);
 header.writeUInt32LE(sampleRate * channels * 2, 28);
 header.writeUInt16LE(channels * 2, 32);
 header.writeUInt16LE(16, 34);
-header.write('data', 36);
+header.write("data", 36);
 header.writeUInt32LE(byteLength, 40);
 
-const output = path.resolve('public', 'dokugen-score.wav');
-fs.mkdirSync(path.dirname(output), {recursive: true});
+const output = path.resolve("public", "dokugen-score.wav");
+fs.mkdirSync(path.dirname(output), { recursive: true });
 fs.writeFileSync(output, Buffer.concat([header, Buffer.from(data.buffer)]));
 console.log(`Generated ${output} (${duration}s stereo WAV)`);

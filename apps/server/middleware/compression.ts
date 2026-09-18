@@ -1,4 +1,4 @@
-import { gunzip } from "zlib";
-import { promisify } from "util";
+import { promisify } from "node:util";
+import { gunzip } from "node:zlib";
 
 export const gunzipAsync = promisify(gunzip);

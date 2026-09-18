@@ -1,11 +1,11 @@
-import { select, text, isCancel } from "@clack/prompts";
-import chalk from "chalk";
-import fs from "fs-extra";
+import * as path from "node:path";
+import { isCancel, select, text } from "@clack/prompts";
 import axios from "axios";
-import * as path from "path";
+import chalk from "chalk";
+import type { Command } from "commander";
+import fs from "fs-extra";
 import { getUserInfo } from "../helpers/git.js";
 import { checkAndUpdate, getBackendDomain } from "../helpers/network.js";
-import { Command } from "commander";
 
 const LICENSES: Record<string, (year: number, author: string) => string> = {
   MIT: (year, author) => `MIT License
@@ -167,35 +167,35 @@ export function registerLicenseCommand(program: Command) {
       const licenseType = await select({
         message: "Which license?",
         options: [
-          { 
-            value: "MIT", 
-            label: "MIT License", 
-            hint: `Anyone can use, modify, and sell ${projectName}. Must include your copyright notice. You aren't liable if it breaks.` 
+          {
+            value: "MIT",
+            label: "MIT License",
+            hint: `Anyone can use, modify, and sell ${projectName}. Must include your copyright notice. You aren't liable if it breaks.`,
           },
-          { 
-            value: "ISC", 
-            label: "ISC License", 
-            hint: `Same as MIT but shorter. Anyone can use, edit, and sell ${projectName}. Must include your copyright notice.` 
+          {
+            value: "ISC",
+            label: "ISC License",
+            hint: `Same as MIT but shorter. Anyone can use, edit, and sell ${projectName}. Must include your copyright notice.`,
           },
-          { 
-            value: "Apache-2.0", 
-            label: "Apache 2.0", 
-            hint: `Permissive. Allows commercial use and edits to ${projectName}. Requires copyright notices. Grants patent rights.` 
+          {
+            value: "Apache-2.0",
+            label: "Apache 2.0",
+            hint: `Permissive. Allows commercial use and edits to ${projectName}. Requires copyright notices. Grants patent rights.`,
           },
-          { 
-            value: "GPL-3.0", 
-            label: "GNU GPLv3", 
-            hint: `Strong copyleft. If anyone modifies or shares ${projectName}, they must make their source code open-source too.` 
+          {
+            value: "GPL-3.0",
+            label: "GNU GPLv3",
+            hint: `Strong copyleft. If anyone modifies or shares ${projectName}, they must make their source code open-source too.`,
           },
-          { 
-            value: "BSD-2-Clause", 
-            label: "BSD 2-Clause", 
-            hint: `Permissive. Allows commercial use of ${projectName}. Must keep copyright notice. Cannot use your name for promotion.` 
+          {
+            value: "BSD-2-Clause",
+            label: "BSD 2-Clause",
+            hint: `Permissive. Allows commercial use of ${projectName}. Must keep copyright notice. Cannot use your name for promotion.`,
           },
-          { 
-            value: "Unlicense", 
-            label: "Unlicense", 
-            hint: `Public domain. Anyone can do absolutely anything with ${projectName} with no rules, attribution, or conditions.` 
+          {
+            value: "Unlicense",
+            label: "Unlicense",
+            hint: `Public domain. Anyone can do absolutely anything with ${projectName} with no rules, attribution, or conditions.`,
           },
         ],
       });
@@ -206,10 +206,12 @@ export function registerLicenseCommand(program: Command) {
       }
 
       const userInfo = await getUserInfo();
-      const author = userInfo?.username || (await text({
-        message: "Author name:",
-        placeholder: "Your Name",
-      }) as string);
+      const author =
+        userInfo?.username ||
+        ((await text({
+          message: "Author name:",
+          placeholder: "Your Name",
+        })) as string);
 
       if (isCancel(author)) {
         console.log(chalk.yellow("Cancelled."));
@@ -229,6 +231,8 @@ export function registerLicenseCommand(program: Command) {
         if (userInfo?.username && userInfo?.email) {
           axios.post(`${backendDomain}/api/track`, { userInfo, usageType: "license" }).catch(() => {});
         }
-      } catch { /* never block the user */ }
+      } catch {
+        /* never block the user */
+      }
     });
 }

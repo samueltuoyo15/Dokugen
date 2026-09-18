@@ -1,10 +1,10 @@
-import express, { Router, Request, Response } from "express";
-import os from "os";
+import os from "node:os";
+import express, { Router, type Request, type Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import { createOpenAIClient, getModelName } from "../lib/openaiClient";
 import { fetchGitHubReadme } from "../lib/fetchGitHubReadme";
-import { gunzipAsync } from "../middleware/compression";
+import { createOpenAIClient, getModelName } from "../lib/openaiClient";
 import { trackUser } from "../lib/supabaseTracker";
+import { gunzipAsync } from "../middleware/compression";
 import { getSystemInstruction } from "../prompts/systemInstruction";
 import { buildUserPrompt } from "../prompts/userPrompt";
 import logger from "../utils/logger";
@@ -13,8 +13,8 @@ const router = Router();
 
 router.post(
   "/generate-readme",
-  express.json({ limit: "500mb" }),
-  async (req: Request, res: Response): Promise<any> => {
+  express.json({ limit: "100mb" }),
+  async (req: Request, res: Response): Promise<void> => {
     const controller = new AbortController();
     let clientDisconnected = false;
 
@@ -39,7 +39,7 @@ router.post(
 
       logger.info(
         { projectType, compressed, hasExistingReadme: !!rawExistingReadme },
-        "Generate README request received (OpenAI-compatible SDK)"
+        "Generate README request received (OpenAI-compatible SDK)",
       );
 
       let fullCode = rawFullCode;
@@ -51,7 +51,8 @@ router.post(
           const buffer = Buffer.from(rawFullCode, "base64");
           const decompressed = await gunzipAsync(buffer);
           if (decompressed.length > MAX_DECOMPRESSED_BYTES) {
-            return res.status(413).json({ error: "Payload too large after decompression (max 50 MB)" });
+            res.status(413).json({ error: "Payload too large after decompression (max 50 MB)" });
+            return;
           }
           fullCode = decompressed.toString("utf-8");
         }
@@ -59,32 +60,28 @@ router.post(
           const buffer = Buffer.from(rawExistingReadme, "base64");
           const decompressed = await gunzipAsync(buffer);
           if (decompressed.length > MAX_DECOMPRESSED_BYTES) {
-            return res.status(413).json({ error: "Payload too large after decompression (max 50 MB)" });
+            res.status(413).json({ error: "Payload too large after decompression (max 50 MB)" });
+            return;
           }
           existingReadme = decompressed.toString("utf-8");
         }
       }
 
-      if (
-        !projectType ||
-        !projectFiles ||
-        !fullCode ||
-        (!userInfo && os.platform() !== "linux")
-      ) {
-        return res.status(400).json({ error: "Missing required fields in request body" });
+      if (!projectType || !projectFiles || !fullCode || (!userInfo && os.platform() !== "linux")) {
+        res.status(400).json({ error: "Missing required fields in request body" });
+        return;
       }
 
       const MAX_CODE_CHARS = 2_500_000; // ~2.5MB to safely stay under Vertex 10MB payload limit
       if (fullCode && fullCode.length > MAX_CODE_CHARS) {
         logger.info(`Truncating fullCode from ${fullCode.length} to ${MAX_CODE_CHARS} chars`);
-        fullCode = fullCode.substring(0, MAX_CODE_CHARS) + "\n\n...[TRUNCATED FOR PAYLOAD SIZE]...";
+        fullCode = `${fullCode.substring(0, MAX_CODE_CHARS)}\n\n...[TRUNCATED FOR PAYLOAD SIZE]...`;
       }
 
-      const MAX_README_CHARS = 50_000; 
+      const MAX_README_CHARS = 50_000;
       if (existingReadme && existingReadme.length > MAX_README_CHARS) {
-        existingReadme = existingReadme.substring(0, MAX_README_CHARS) + "\n...[TRUNCATED]...";
+        existingReadme = `${existingReadme.substring(0, MAX_README_CHARS)}\n...[TRUNCATED]...`;
       }
-
 
       let formatTemplate = "";
       if (customReadmeFormat) {
@@ -92,7 +89,10 @@ router.post(
       }
 
       const { username, email, osInfo } = userInfo || {};
-      if (!username) return res.status(400).json({ message: "Missing OS username and ID" });
+      if (!username) {
+        res.status(400).json({ message: "Missing OS username and ID" });
+        return;
+      }
 
       const id = userInfo?.id || uuidv4();
 
@@ -104,29 +104,30 @@ router.post(
         projectFiles,
         fullCode,
         existingReadme,
-        options
+        options,
       );
 
       const configuredModelName = process.env.README_MODEL_NAME;
-      if(!configuredModelName) {
-        throw new Error("Model name is missing")
+      if (!configuredModelName) {
+        throw new Error("Model name is missing");
       }
       const modelName = getModelName(configuredModelName);
 
-      trackUser({ username, email, id, osInfo }, "readme").catch(() => {});
-
       const openai = await createOpenAIClient();
 
-      const stream = await openai.chat.completions.create({
-        model: modelName,
-        messages: [
-          { role: "system", content: systemInstruction },
-          { role: "user", content: userPrompt },
-        ],
-        stream: true,
-      }, {
-        signal: controller.signal,
-      });
+      const stream = await openai.chat.completions.create(
+        {
+          model: modelName,
+          messages: [
+            { role: "system", content: systemInstruction },
+            { role: "user", content: userPrompt },
+          ],
+          stream: true,
+        },
+        {
+          signal: controller.signal,
+        },
+      );
 
       res.setHeader("Content-Type", "text/event-stream");
       res.setHeader("Cache-Control", "no-cache");
@@ -160,19 +161,28 @@ router.post(
       if (!clientDisconnected) {
         res.end();
         logger.info("README generated successfully");
+        const finalUsageType = rawExistingReadme ? "update" : "readme";
+        trackUser({ username, email, id, osInfo }, finalUsageType).catch(() => {});
       }
-    } catch (error: any) {
-      if (error.name === "AbortError" || error.name === "APIUserAbortError") {
+    } catch (error: unknown) {
+      const errorObj = error as { name?: string; message?: string };
+      if (errorObj.name === "AbortError" || errorObj.name === "APIUserAbortError") {
         logger.info("Request successfully aborted after client disconnect.");
         return;
       }
 
       logger.error(error, "Error generating readme");
 
-      const isRateLimitedOrOverloaded = (err: any): boolean => {
+      const isRateLimitedOrOverloaded = (err: unknown): boolean => {
         if (!err) return false;
-        const msg = typeof err.message === "string" ? err.message : JSON.stringify(err);
-        return msg.includes("429") || msg.includes("503") || msg.includes("RESOURCE_EXHAUSTED") || msg.includes("Insufficient Balance");
+        const errRecord = err as { message?: string };
+        const msg = typeof errRecord.message === "string" ? errRecord.message : JSON.stringify(err);
+        return (
+          msg.includes("429") ||
+          msg.includes("503") ||
+          msg.includes("RESOURCE_EXHAUSTED") ||
+          msg.includes("Insufficient Balance")
+        );
       };
 
       if (res.headersSent) {

@@ -1,35 +1,29 @@
-import * as path from "path";
-import fs from "fs-extra";
-import chalk from "chalk";
+import { execFile } from "node:child_process";
+import * as path from "node:path";
+import type { Readable } from "node:stream";
+import { isCancel, select } from "@clack/prompts";
 import axios from "axios";
-import { execFile } from "child_process";
-import { Readable } from "stream";
+import chalk from "chalk";
+import fs from "fs-extra";
 import { createSpinner } from "nanospinner";
-import { select, isCancel } from "@clack/prompts";
-import { askYesNo, askSocialHandles } from "./prompts.js";
-import {
-  extractFullCode,
-  loadCache,
-  saveCache,
-  getFileHash,
-  getDokugenBackupPath,
-} from "./fileOps.js";
-import { getUserInfo, getGitRepoUrl } from "./git.js";
-import { compressData, getBackendDomain } from "./network.js";
 import { API_TIMEOUT } from "./constants.js";
+import { extractFullCode, getDokugenBackupPath, getFileHash, loadCache, saveCache } from "./fileOps.js";
+import { getGitRepoUrl, getUserInfo } from "./git.js";
+import { compressData, getBackendDomain } from "./network.js";
+import { askSocialHandles, askYesNo } from "./prompts.js";
 
 function terminalLink(text: string, url: string): string {
   const supports = !!(
     process.env.FORCE_HYPERLINK === "1" ||
     (process.stdout.isTTY &&
-      (!process.env.CI &&
-        (process.env.WT_SESSION ||
-          process.env.TERM_PROGRAM === "vscode" ||
-          process.env.TERM_PROGRAM === "iTerm.app" ||
-          process.env.TERM_PROGRAM === "Hyper" ||
-          process.env.TERM_PROGRAM === "WezTerm" ||
-          process.env.TERM_PROGRAM === "Alacritty" ||
-          process.env.VTE_VERSION)))
+      !process.env.CI &&
+      (process.env.WT_SESSION ||
+        process.env.TERM_PROGRAM === "vscode" ||
+        process.env.TERM_PROGRAM === "iTerm.app" ||
+        process.env.TERM_PROGRAM === "Hyper" ||
+        process.env.TERM_PROGRAM === "WezTerm" ||
+        process.env.TERM_PROGRAM === "Alacritty" ||
+        process.env.VTE_VERSION))
   );
   if (supports) {
     return `\u001b]8;;${url}\u001b\\${text}\u001b]8;;\u001b\\`;
@@ -38,7 +32,7 @@ function terminalLink(text: string, url: string): string {
 }
 
 let readmeBackup: string | null = null;
-let currentReadmePath: string = "";
+let currentReadmePath = "";
 
 function openBrowser(url: string): void {
   const platform = process.platform;
@@ -52,7 +46,9 @@ function openBrowser(url: string): void {
 
   // Use execFile (not exec) to avoid shell injection via a crafted URL
   if (isTermux) {
-    execFile("termux-open-url", [url], (err) => { if (err) fallback(); });
+    execFile("termux-open-url", [url], (err) => {
+      if (err) fallback();
+    });
   } else if (isWsl) {
     execFile("wslview", [url], (err) => {
       if (err) {
@@ -69,9 +65,13 @@ function openBrowser(url: string): void {
   } else if (platform === "win32") {
     // Escape special shell characters to prevent cmd.exe from splitting the URL at '&'
     const escapedUrl = url.replace(/[&^<>|]/g, "^$&");
-    execFile("cmd", ["/c", "start", "", escapedUrl], (err) => { if (err) fallback(); });
+    execFile("cmd", ["/c", "start", "", escapedUrl], (err) => {
+      if (err) fallback();
+    });
   } else if (platform === "darwin") {
-    execFile("open", [url], (err) => { if (err) fallback(); });
+    execFile("open", [url], (err) => {
+      if (err) fallback();
+    });
   } else {
     // Linux: try xdg-open first, fall back to printing the URL if unavailable
     execFile("xdg-open", [url], (err) => {
@@ -108,10 +108,9 @@ async function promptMyhappr(): Promise<void> {
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
-        const res = await axios.get<{ data: { uri: string } }>(
-          "https://api.myhappr.com/api/v1/auth/google-auth",
-          { timeout: 5000 },
-        );
+        const res = await axios.get<{ data: { uri: string } }>("https://api.myhappr.com/api/v1/auth/google-auth", {
+          timeout: 5000,
+        });
         uri = res.data?.data?.uri ?? null;
         if (uri) break;
       } catch {
@@ -125,8 +124,7 @@ async function promptMyhappr(): Promise<void> {
     } else {
       spinner.error({ text: chalk.yellow("Something went wrong connecting to myhappr. Please try again later.") });
     }
-  } catch {
-  }
+  } catch {}
 }
 
 export const backupReadme = async (readmePath: string): Promise<void> => {
@@ -138,13 +136,8 @@ export const backupReadme = async (readmePath: string): Promise<void> => {
       try {
         await fs.ensureDir(path.dirname(backupFile));
         await fs.writeFile(backupFile, readmeBackup, "utf-8");
-      } catch {
-      }
-      console.log(
-        chalk.green(
-          `[${new Date().toISOString()}] Current README backed up in memory`,
-        ),
-      );
+      } catch {}
+      console.log(chalk.green(`[${new Date().toISOString()}] Current README backed up in memory`));
     }
   } catch (error) {
     console.error(chalk.red("Failed to backup README:"), error);
@@ -172,14 +165,16 @@ export const restoreReadme = async (): Promise<string | null> => {
   }
 };
 
-function getHttpErrorLabel(error: any): string {
-  const status =
-    error?.response?.status ||
-    error?.response?.data?.error?.code ||
-    error?.code;
+function getHttpErrorLabel(error: unknown): string {
+  const err = error as {
+    response?: { status?: number; data?: { error?: { code?: number } } };
+    code?: number | string;
+    message?: string;
+  };
+  const status = err?.response?.status || err?.response?.data?.error?.code || err?.code;
 
   if (!status) {
-    const msg = (error?.message || "").toLowerCase();
+    const msg = (err?.message || "").toLowerCase();
     if (msg.includes("timeout") || msg.includes("timedout") || msg.includes("econnaborted")) {
       return "Request Timed Out";
     }
@@ -226,27 +221,19 @@ export const generateReadme = async (
     let twitterUsername: string | undefined;
 
     if (!templateUrl) {
-      const setupAnswer = await askYesNo(
-        "Do you want to include setup instructions in the README?",
-      );
+      const setupAnswer = await askYesNo("Do you want to include setup instructions in the README?");
       if (setupAnswer === "cancel") return null;
       includeSetup = setupAnswer === true;
 
-      const contributionAnswer = await askYesNo(
-        "Include contribution guidelines in README?",
-      );
+      const contributionAnswer = await askYesNo("Include contribution guidelines in README?");
       if (contributionAnswer === "cancel") return null;
       includeContributionGuideLine = contributionAnswer === true;
 
-      const apiDocsAnswer = await askYesNo(
-        "Include API documentation in README?",
-      );
+      const apiDocsAnswer = await askYesNo("Include API documentation in README?");
       if (apiDocsAnswer === "cancel") return null;
       includeApiDocs = apiDocsAnswer === true;
 
-      const diagramAnswer = await askYesNo(
-        "Include system design diagrams in README?",
-      );
+      const diagramAnswer = await askYesNo("Include system design diagrams in README?");
       if (diagramAnswer === "cancel") return null;
       includeDiagrams = diagramAnswer === true;
 
@@ -256,13 +243,11 @@ export const generateReadme = async (
     }
 
     let isIncremental = false;
-    let modifiedFiles: string[] = [];
+    const modifiedFiles: string[] = [];
     const cache = await loadCache(projectDir);
 
     if (existingReadme && cache) {
-      console.log(
-        chalk.blue("Checking for codebase changes since last generation..."),
-      );
+      console.log(chalk.blue("Checking for codebase changes since last generation..."));
       for (const file of projectFiles) {
         const filePath = path.resolve(projectDir, file);
         const currentHash = await getFileHash(filePath);
@@ -273,16 +258,10 @@ export const generateReadme = async (
       }
 
       const cacheFilePaths = Object.keys(cache.files);
-      const deletedFiles = cacheFilePaths.filter(
-        (f) => !projectFiles.includes(f),
-      );
+      const deletedFiles = cacheFilePaths.filter((f) => !projectFiles.includes(f));
 
       if (modifiedFiles.length === 0 && deletedFiles.length === 0) {
-        console.log(
-          chalk.green(
-            "No changes detected in codebase. README is already up to date!",
-          ),
-        );
+        console.log(chalk.green("No changes detected in codebase. README is already up to date!"));
         return readmePath;
       }
 
@@ -294,15 +273,12 @@ export const generateReadme = async (
       );
     }
 
-    const fullCode = await extractFullCode(
-      isIncremental ? modifiedFiles : projectFiles,
-      projectDir,
-    );
+    const fullCode = await extractFullCode(isIncremental ? modifiedFiles : projectFiles, projectDir);
     const startTime = Date.now();
     spinner = createSpinner(chalk.blue("Generating README...")).start();
     timerInterval = setInterval(() => {
       const elapsedSec = ((Date.now() - startTime) / 1000).toFixed(1);
-      spinner!.update({
+      spinner?.update({
         text: chalk.blue(`Generating README... (${elapsedSec}s)`),
       });
     }, 100);
@@ -314,16 +290,10 @@ export const generateReadme = async (
     const repoUrl = getGitRepoUrl();
 
     const compressedFullCode = await compressData(fullCode);
-    const compressedExistingReadme = existingReadme
-      ? await compressData(existingReadme)
-      : undefined;
+    const compressedExistingReadme = existingReadme ? await compressData(existingReadme) : undefined;
 
-    const linkedinUrl = linkedinUsername
-      ? `https://linkedin.com/in/${linkedinUsername}`
-      : undefined;
-    const twitterUrl = twitterUsername
-      ? `https://x.com/${twitterUsername}`
-      : undefined;
+    const linkedinUrl = linkedinUsername ? `https://linkedin.com/in/${linkedinUsername}` : undefined;
+    const twitterUrl = twitterUsername ? `https://x.com/${twitterUsername}` : undefined;
 
     const response = await axios.post(
       `${backendDomain}/api/generate-readme`,
@@ -359,7 +329,7 @@ export const generateReadme = async (
       const MAX_BUFFER_SIZE = 1024 * 1024;
       let isCleanedUp = false;
 
-      const cleanup = async (success: boolean, error?: any) => {
+      const cleanup = async (success: boolean, error?: unknown) => {
         if (isCleanedUp) return;
         isCleanedUp = true;
         if (timerInterval) clearInterval(timerInterval);
@@ -390,17 +360,12 @@ export const generateReadme = async (
             timeString = parts.join(" ");
           }
 
-          spinner!.success({
+          spinner?.success({
             text: chalk.green(`\nREADME.md created successfully in ${timeString}`),
           });
           console.log(
             chalk.cyan("\nYou like what you see? Support Dokugen financially: ") +
-              chalk.blue.underline(
-                terminalLink(
-                  "https://myhappr.com/samueltuoyo",
-                  "https://myhappr.com/samueltuoyo",
-                ),
-              ) +
+              chalk.blue.underline(terminalLink("https://myhappr.com/samueltuoyo", "https://myhappr.com/samueltuoyo")) +
               chalk.dim(" (Ctrl+Click or Cmd+Click to follow link)"),
           );
           readmeBackup = null;
@@ -416,7 +381,7 @@ export const generateReadme = async (
 
           resolve(readmePath);
         } else {
-          spinner!.error({ text: chalk.red("Failed to generate README") });
+          spinner?.error({ text: chalk.red("Failed to generate README") });
           const restoredContent = await restoreReadme();
           reject(restoredContent || error);
         }
@@ -432,7 +397,7 @@ export const generateReadme = async (
 
         const lines = buffer.split("\n");
         buffer = lines.pop() || "";
-        lines.forEach((line) => {
+        for (const line of lines) {
           if (line.startsWith("data:")) {
             try {
               const json = JSON.parse(line.replace("data: ", "").trim());
@@ -444,7 +409,7 @@ export const generateReadme = async (
               console.error("Skipping invalid event data:", line);
             }
           }
-        });
+        }
       });
 
       responseStream.on("end", () => {

@@ -90,7 +90,9 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
           - Relative paths work seamlessly across all branches, forks, and offline markdown viewers.
           - This rule applies to ALL internal markdown file links.
 
-      Remember: The goal is to make someone understand what this project does and why they'd want to use it, not to impress them with technology names.      ${options.includeDiagrams === true ? `
+      Remember: The goal is to make someone understand what this project does and why they'd want to use it, not to impress them with technology names.      ${
+        options.includeDiagrams === true
+          ? `
       ## System Design Diagram Generation
 
       The user has requested system design diagrams. Embed relevant Mermaid diagrams in the README. Aim for a minimum of 2 and a maximum of 4 diagrams total. Each diagram must accurately reflect the actual code, not be invented.
@@ -226,6 +228,8 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
            - If any check fails, fix the Mermaid code before responding!
 
       10. **If you are not confident a diagram will render correctly, omit it.** A missing diagram is far better than a broken one.
-      ` : ""}
+      `
+          : ""
+      }
       `;
 }

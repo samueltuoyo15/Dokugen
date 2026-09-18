@@ -1,26 +1,24 @@
 #!/usr/bin/env node
-import { program } from "commander";
 import chalk from "chalk";
-import { registerGenerateCommand } from "./commands/generate.js";
-import { registerUpdateCommand } from "./commands/update.js";
+import { program } from "commander";
 import { registerAicCommand } from "./commands/aic.js";
-import { registerRevertCommand } from "./commands/revert.js";
+import { registerChangelogCommand } from "./commands/changelog.js";
+import { registerGenerateCommand } from "./commands/generate.js";
 import { registerLicenseCommand } from "./commands/license.js";
 import { registerOgCommand } from "./commands/og.js";
-import { registerChangelogCommand } from "./commands/changelog.js";
-import { runInteractiveMenu, isRunAsStandaloneBinary, waitForKeypress } from "./helpers/menu.js";
+import { registerRevertCommand } from "./commands/revert.js";
+import { registerUpdateCommand } from "./commands/update.js";
 import { CURRENT_VERSION } from "./helpers/constants.js";
+import { isRunAsStandaloneBinary, runInteractiveMenu, waitForKeypress } from "./helpers/menu.js";
 
-import path from "path";
+import path from "node:path";
 
 const projectName = path.basename(process.cwd());
 
 program
   .name("dokugen")
   .version(CURRENT_VERSION)
-  .description(
-    `Automatically generate high-quality README for ${projectName}`,
-  );
+  .description(`Automatically generate high-quality README for ${projectName}`);
 
 registerGenerateCommand(program);
 registerUpdateCommand(program);
@@ -56,8 +54,7 @@ process.on("SIGINT", async () => {
   try {
     const { restoreReadme } = await import("./helpers/readme.js");
     await restoreReadme();
-  } catch (err) {
-  }
+  } catch (err) {}
   process.exit(0);
 });
 
