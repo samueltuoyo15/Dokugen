@@ -53,7 +53,7 @@ export async function trackUser(userInfo: UserInfo | undefined, usageType?: stri
     if (email) {
       const { data, error } = await supabase
         .from("active_users")
-        .select("id, username, email, usage_count, readme_usage, commit_usage, license_usage, revert_usage, changelog_usage")
+        .select("id, username, email, usage_count, readme_usage, update_usage, commit_usage, license_usage, revert_usage, changelog_usage")
         .eq("email", email)
         .maybeSingle();
 
@@ -65,7 +65,7 @@ export async function trackUser(userInfo: UserInfo | undefined, usageType?: stri
     if (!existingUser && username) {
       const { data, error } = await supabase
         .from("active_users")
-        .select("id, username, email, usage_count, readme_usage, commit_usage, license_usage, revert_usage, changelog_usage")
+        .select("id, username, email, usage_count, readme_usage, update_usage, commit_usage, license_usage, revert_usage, changelog_usage")
         .eq("username", username)
         .maybeSingle();
 
