@@ -8,6 +8,23 @@ Dokugen is a lightweight, AI-powered CLI tool that automatically generates and m
 
 ---
 
+## Official AI Partner & Sponsor
+
+<p align="center">
+  <a href="https://www.apismart.ai" target="_blank" rel="noopener noreferrer">
+    <img src="https://raw.githubusercontent.com/samueltuoyo15/Dokugen/main/public/api-smart.png" alt="ApiSmart Logo" width="200" />
+  </a>
+</p>
+
+<p align="center">
+  <strong><a href="https://www.apismart.ai">ApiSmart</a></strong> (Singapore) is an official sponsor and the recommended AI routing infrastructure for Dokugen.
+</p>
+
+> ApiSmart provides unified access to leading AI models through a single API. Use one API key to connect with LLM, image, and video models through an OpenAI-compatible interface, without managing multiple providers separately.
+
+
+---
+
 ## Quick Start
 
 ### Installation
