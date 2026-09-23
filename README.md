@@ -3,7 +3,22 @@
 ![Demo GIF](./public/Demo.gif)
 
 ## Overview
-Dokugen helps developers automate their documentation workflow by analyzing your codebase and generating exactly what you need.  It takes a look at your codebase, figures out what your project does, and then writes a clear, detailed README so you don't have to spend time doing it yourself. It's built to make sure your project always has professional and accurate documentation. No complicated setup is required, just straightforward functionality that keeps your documentation in sync with your actual code.
+Dokugen helps developers automate their documentation workflow by analyzing your codebase and generating exactly what you need. It takes a look at your codebase, figures out what your project does, and then writes a clear, detailed README so you don't have to spend time doing it yourself. It's built to make sure your project always has professional and accurate documentation. No complicated setup is required, just straightforward functionality that keeps your documentation in sync with your actual code.
+
+## Official AI Partner & Sponsor
+
+<p align="center">
+  <a href="https://www.apismart.ai" target="_blank" rel="noopener noreferrer">
+    <img src="./public/api-smart.png" alt="ApiSmart Logo" width="220" />
+  </a>
+</p>
+
+<p align="center">
+  <strong><a href="https://www.apismart.ai">ApiSmart</a></strong> (Singapore) is an official sponsor and the recommended AI routing infrastructure for Dokugen.
+</p>
+
+> ApiSmart provides unified access to leading AI models through a single API. Use one API key to connect with LLM, image, and video models through an OpenAI-compatible interface, without managing multiple providers separately. Switch models easily, simplify billing, and improve reliability with intelligent routing and automatic failover. Build and scale AI applications faster with one streamlined API platform.
+
 
 ## System Architecture / Design
 

@@ -2,8 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
-## [14.0.11] - 2026-09-18
+## [14.0.12] - 2026-09-23
 
+### Added
+- **Official Sponsorship**: Added ApiSmart as an official project sponsor and partner.
+
+### Changed
+- **Documentation UI overhaul**: Cleaned up the docs landing page layout, streamlined the "Contribute" and "Sponsors" sections into a cleaner side-by-side view, added native FAQ accordions, and fully modernized the footer.
+
+## [14.0.11] - 2026-09-18
 ### Added
 - **Smarter AI Commits**: Completely revamped the AI prompt and upgraded the model powering the `aic` (AI Git Commit) command. The model is now much smarter and flawlessly generates standard Conventional Commit messages (`feat`, `fix`, `chore`, etc.) with proper scopes.
 
