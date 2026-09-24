@@ -31,9 +31,9 @@ interface ApiResponse {
 
 const fetchMetrics = async (page: number, sortBy = "usage_count"): Promise<ApiResponse> => {
   try {
-    let response = await fetch(`/api/active-users?page=${page}&limit=10&sortBy=${sortBy}`);
+    let response = await fetch(`/api/active-users?page=${page}&limit=50&sortBy=${sortBy}`);
     if (!response.ok) {
-      response = await fetch(`https://dokugen.samueltuoyo.com/api/active-users?page=${page}&limit=10&sortBy=${sortBy}`);
+      response = await fetch(`https://dokugen.samueltuoyo.com/api/active-users?page=${page}&limit=50&sortBy=${sortBy}`);
     }
     if (!response.ok) {
       throw new Error(`Failed to fetch metrics: ${response.statusText}`);

@@ -16,7 +16,7 @@ export async function OPTIONS() {
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const page = Number.parseInt(searchParams.get("page") || "1");
-  const limit = Number.parseInt(searchParams.get("limit") || "10");
+  const limit = Number.parseInt(searchParams.get("limit") || "50");
   const sortBy = searchParams.get("sortBy") || "usage_count";
 
   const allowedSorts = ["usage_count", "readme_usage", "commit_usage", "changelog_usage"];
