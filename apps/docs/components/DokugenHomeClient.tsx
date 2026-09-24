@@ -179,20 +179,24 @@ export default function DokugenHomeClient() {
           <h2 className="text-3xl font-bold mb-10 text-zinc-900 tracking-tight text-left">Sponsors</h2>
           <div className="bg-white p-8 rounded-3xl border border-zinc-200/80 flex flex-col md:flex-row items-center md:items-start gap-8">
             <div className="shrink-0 bg-zinc-50 border border-zinc-100 p-4 rounded-2xl flex items-center justify-center w-full md:w-48 h-32">
-              <Image
-                src="/api-smart.png"
-                alt="ApiSmart Logo"
-                width={160}
-                height={80}
-                className="object-contain"
-              />
+              <Image src="/api-smart.png" alt="ApiSmart Logo" width={160} height={80} className="object-contain" />
             </div>
             <div className="flex-grow text-left">
               <h3 className="text-xl font-bold text-zinc-900 mb-2">
-                Powered & Sponsored by <a href="https://www.apismart.ai" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">ApiSmart</a> (Singapore)
+                Powered & Sponsored by{" "}
+                <a
+                  href="https://www.apismart.ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  ApiSmart
+                </a>
               </h3>
               <p className="text-zinc-600 text-sm leading-relaxed mb-4 font-normal">
-                ApiSmart provides unified access to leading AI models through a single API. Use one API key to connect with LLM, image, and video models through an OpenAI-compatible interface, without managing multiple providers separately.
+                ApiSmart provides unified access to leading AI models through a single API. Use one API key to connect
+                with LLM, image, and video models through an OpenAI-compatible interface, without managing multiple
+                providers separately.
               </p>
               <a
                 href="https://www.apismart.ai"
@@ -297,7 +301,6 @@ export default function DokugenHomeClient() {
             </div>
           </motion.div>
         )}
-
 
         {!searchQuery && (
           <motion.div
@@ -491,8 +494,6 @@ export default function DokugenHomeClient() {
           <MetricsSection />
         </motion.div>
 
-
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -504,7 +505,8 @@ export default function DokugenHomeClient() {
             <div className="flex flex-col items-center justify-center text-center">
               <h3 className="text-3xl font-bold text-zinc-900 mb-4">Contribute</h3>
               <p className="text-zinc-500 max-w-sm leading-relaxed font-light text-sm mb-8">
-                Dokugen is free and open-source. If it's saved you time, a star or a contribution goes a long way in keeping it alive and growing.
+                Dokugen is free and open-source. If it's saved you time, a star or a contribution goes a long way in
+                keeping it alive and growing.
               </p>
               <Link href="https://github.com/samueltuoyo15/Dokugen/" target="_blank" rel="noopener noreferrer">
                 <Button className="bg-zinc-900 text-white hover:bg-zinc-800 border-0 font-semibold px-8 py-6 text-base rounded-full transition-all">
@@ -535,25 +537,29 @@ export default function DokugenHomeClient() {
             transition={{ duration: 0.8, delay: 0.8 }}
             className="mt-6 pt-10 w-full border-t border-zinc-100"
           >
-            <h2 className="text-3xl font-bold mb-10 text-zinc-900 tracking-tight text-center">Frequently Asked Questions</h2>
+            <h2 className="text-3xl font-bold mb-10 text-zinc-900 tracking-tight text-center">
+              Frequently Asked Questions
+            </h2>
             <div className="space-y-4 max-w-4xl mx-auto mb-20 px-4">
-              {searchableContent.filter(item => item.type === "faq").map((faq) => (
-                <details key={faq.id} className="group bg-zinc-50 rounded-2xl border border-zinc-200/60 transition-all duration-200 [&_summary::-webkit-details-marker]:hidden open:bg-white open:shadow-sm">
-                  <summary className="flex items-center justify-between p-6 font-semibold text-[15px] text-zinc-900 cursor-pointer list-none select-none">
-                    {faq.title}
-                    <span className="transition duration-300 group-open:-rotate-180 text-zinc-400">
-                      <ChevronDown className="w-5 h-5" />
-                    </span>
-                  </summary>
-                  <div className="px-6 pb-6 text-zinc-600 leading-relaxed text-sm">
-                    {faq.content}
-                  </div>
-                </details>
-              ))}
+              {searchableContent
+                .filter((item) => item.type === "faq")
+                .map((faq) => (
+                  <details
+                    key={faq.id}
+                    className="group bg-zinc-50 rounded-2xl border border-zinc-200/60 transition-all duration-200 [&_summary::-webkit-details-marker]:hidden open:bg-white open:shadow-sm"
+                  >
+                    <summary className="flex items-center justify-between p-6 font-semibold text-[15px] text-zinc-900 cursor-pointer list-none select-none">
+                      {faq.title}
+                      <span className="transition duration-300 group-open:-rotate-180 text-zinc-400">
+                        <ChevronDown className="w-5 h-5" />
+                      </span>
+                    </summary>
+                    <div className="px-6 pb-6 text-zinc-600 leading-relaxed text-sm">{faq.content}</div>
+                  </details>
+                ))}
             </div>
           </motion.div>
         )}
-
       </div>
 
       {/* Footer */}
@@ -566,7 +572,8 @@ export default function DokugenHomeClient() {
               <span className="text-2xl font-bold text-zinc-900">Dokugen</span>
             </div>
             <p className="text-base text-zinc-500 leading-relaxed font-light">
-              The easiest way to generate beautiful and accurate READMEs, colorized flowcharts, and quality commit messages without leaving your terminal.
+              The easiest way to generate beautiful and accurate READMEs, colorized flowcharts, and quality commit
+              messages without leaving your terminal.
             </p>
           </div>
 
@@ -574,33 +581,52 @@ export default function DokugenHomeClient() {
           <div className="flex gap-16 md:gap-24 flex-wrap">
             <div className="flex flex-col gap-5">
               <h4 className="font-bold text-zinc-900 text-[13px] tracking-widest uppercase mb-2">Product</h4>
-              <Link href="#features" className="text-[15px] text-zinc-500 hover:text-zinc-900 transition-colors">Features</Link>
-              <Link href="https://github.com/samueltuoyo15/Dokugen/blob/main/CHANGELOG.md" target="_blank" className="text-[15px] text-zinc-500 hover:text-zinc-900 transition-colors">Changelog</Link>
-              <Link href="https://github.com/samueltuoyo15/Dokugen" target="_blank" className="text-[15px] text-zinc-500 hover:text-zinc-900 transition-colors">GitHub</Link>
+              <Link href="#features" className="text-[15px] text-zinc-500 hover:text-zinc-900 transition-colors">
+                Features
+              </Link>
+              <Link
+                href="https://github.com/samueltuoyo15/Dokugen/blob/main/CHANGELOG.md"
+                target="_blank"
+                className="text-[15px] text-zinc-500 hover:text-zinc-900 transition-colors"
+              >
+                Changelog
+              </Link>
+              <Link
+                href="https://github.com/samueltuoyo15/Dokugen"
+                target="_blank"
+                className="text-[15px] text-zinc-500 hover:text-zinc-900 transition-colors"
+              >
+                GitHub
+              </Link>
             </div>
             <div className="flex flex-col gap-5">
               <h4 className="font-bold text-zinc-900 text-[13px] tracking-widest uppercase mb-2">Support</h4>
-              <a href="mailto:hello@samueltuoyo.com" className="text-[15px] text-zinc-500 hover:text-zinc-900 transition-colors">hello@samueltuoyo.com</a>
+              <a
+                href="mailto:hello@samueltuoyo.com"
+                className="text-[15px] text-zinc-500 hover:text-zinc-900 transition-colors"
+              >
+                hello@samueltuoyo.com
+              </a>
             </div>
             <div className="flex flex-col gap-5">
               <h4 className="font-bold text-zinc-900 text-[13px] tracking-widest uppercase mb-2">Legal</h4>
-              <Link href="/terms" className="text-[15px] text-zinc-500 hover:text-zinc-900 transition-colors">Terms of Service</Link>
-              <Link href="/privacy" className="text-[15px] text-zinc-500 hover:text-zinc-900 transition-colors">Privacy Policy</Link>
+              <Link href="/terms" className="text-[15px] text-zinc-500 hover:text-zinc-900 transition-colors">
+                Terms of Service
+              </Link>
+              <Link href="/privacy" className="text-[15px] text-zinc-500 hover:text-zinc-900 transition-colors">
+                Privacy Policy
+              </Link>
             </div>
           </div>
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto mt-24 flex flex-col items-start">
-          <p className="text-zinc-400 text-sm">
-            &copy; 2026 Dokugen. All rights reserved.
-          </p>
+          <p className="text-zinc-400 text-sm">&copy; 2026 Dokugen. All rights reserved.</p>
         </div>
 
         {/* Big Background Text */}
         <div className="pointer-events-none absolute bottom-[-10%] left-0 right-0 flex justify-center overflow-hidden select-none z-0">
-          <span className="text-[30vw] font-black text-zinc-100 leading-[0.8] tracking-tighter">
-            DOKUGEN
-          </span>
+          <span className="text-[30vw] font-black text-zinc-100 leading-[0.8] tracking-tighter">DOKUGEN</span>
         </div>
       </footer>
     </div>

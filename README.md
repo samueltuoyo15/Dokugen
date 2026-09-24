@@ -14,7 +14,7 @@ Dokugen helps developers automate their documentation workflow by analyzing your
 </p>
 
 <p align="center">
-  <strong><a href="https://www.apismart.ai">ApiSmart</a></strong> (Singapore) is an official sponsor and the recommended AI routing infrastructure for Dokugen.
+  <strong><a href="https://www.apismart.ai">ApiSmart</a></strong> is an official sponsor and the recommended AI routing infrastructure for Dokugen.
 </p>
 
 > ApiSmart provides unified access to leading AI models through a single API. Use one API key to connect with LLM, image, and video models through an OpenAI-compatible interface, without managing multiple providers separately. Switch models easily, simplify billing, and improve reliability with intelligent routing and automatic failover. Build and scale AI applications faster with one streamlined API platform.
