@@ -12,3 +12,5 @@ export const DOKUGEN_BANNER = `
 `;
 
 export const API_TIMEOUT = 300000;
+
+export const GITHUB_CLIENT_ID = "Ov23lijkkVQnSyY7s17q";

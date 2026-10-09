@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
 import os from "node:os";
 import * as path from "node:path";
 import chalk from "chalk";
@@ -51,11 +52,13 @@ export const getFileHash = async (filePath: string): Promise<string> => {
 };
 
 export const matchesIgnorePattern = (filename: string, pattern: string): boolean => {
-  if (pattern.startsWith("*.")) {
-    const ext = pattern.slice(1);
-    return filename.endsWith(ext);
+  const normalizedFilename = filename.toLowerCase();
+  const normalizedPattern = pattern.toLowerCase();
+  if (normalizedPattern.includes("*")) {
+    const escapedPattern = normalizedPattern.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*");
+    return new RegExp(`^${escapedPattern}$`).test(normalizedFilename);
   }
-  return filename === pattern;
+  return normalizedFilename === normalizedPattern;
 };
 
 export const extractFullCode = async (projectFiles: string[], projectDir: string): Promise<string> => {
@@ -286,6 +289,15 @@ export const scanFiles = async (dir: string): Promise<string[]> => {
     ".env.development",
     ".env.test",
     ".env.production",
+    ".env*",
+    "*.pem",
+    "*.key",
+    "*.p12",
+    "*.pfx",
+    "id_rsa",
+    "id_ed25519",
+    "credentials.json",
+    "service-account*.json",
     "*.log",
     "npm-debug.log",
     "yarn-debug.log",
@@ -305,8 +317,11 @@ export const scanFiles = async (dir: string): Promise<string[]> => {
       const list = await fs.readdir(currentDir);
       for (const file of list) {
         const fullPath = path.resolve(currentDir, file);
-        const stat = await fs.stat(fullPath);
+        const stat = await fs.lstat(fullPath);
         const relativePath = path.relative(dir, fullPath);
+
+        // Never follow repository-controlled symlinks outside the project.
+        if (stat.isSymbolicLink()) continue;
 
         if (stat.isDirectory()) {
           if (!ignoreDirs.has(file)) {
@@ -331,5 +346,18 @@ export const scanFiles = async (dir: string): Promise<string[]> => {
   };
 
   await walk(dir);
+
+  // Respect the repository's ignore rules so local, untracked secrets are not uploaded.
+  if (results.length > 0) {
+    const checkIgnored = spawnSync("git", ["check-ignore", "--stdin", "-z"], {
+      cwd: dir,
+      input: `${results.join("\0")}\0`,
+      encoding: "utf-8",
+      maxBuffer: 10 * 1024 * 1024,
+    });
+    const ignored = new Set((checkIgnored.stdout || "").split("\0").filter(Boolean));
+    return results.filter((file) => !ignored.has(file));
+  }
+
   return results;
 };

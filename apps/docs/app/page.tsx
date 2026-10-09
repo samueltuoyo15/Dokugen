@@ -57,7 +57,7 @@ const jsonLd = {
       operatingSystem: "Windows, macOS, Linux",
       applicationCategory: "DeveloperApplication",
       description:
-        "Dokugen is an open-source command-line tool and generator that effortlessly generates high-quality README.md files, architecture flowcharts, licenses, and AI commits for your projects.",
+        "Dokugen is an open-source CLI that turns your repositories into job-ready portfolio pieces with recruiter-ready READMEs, architecture flowcharts, licenses, and senior-grade Conventional Commits.",
       url: "https://dokugen.samueltuoyo.com",
       offers: {
         "@type": "Offer",
@@ -180,7 +180,7 @@ const jsonLd = {
 export default function Home() {
   return (
     <>
-      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Valid JSON-LD structured data */}
+      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Static JSON-LD structured data */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <DokugenHomeClient />
     </>

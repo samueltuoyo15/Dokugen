@@ -18,5 +18,14 @@
   "packageManager": "pnpm@9.0.0",
   "engines": {
     "node": ">=18"
+  },
+  "pnpm": {
+    "overrides": {
+      "diff": "8.0.3",
+      "serialize-javascript": "7.0.5",
+      "sharp": "0.35.5",
+      "source-map-js": "1.2.2",
+      "ws": "8.22.0"
+    }
   }
 }

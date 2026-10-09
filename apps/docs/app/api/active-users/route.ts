@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
       .select("username, usage_count, readme_usage, commit_usage, license_usage, revert_usage, changelog_usage", {
         count: "exact",
       })
+      .neq("opted_out", true)
       .order(sortColumn, { ascending: false })
       .range(startIndex, endIndex);
 

@@ -17,7 +17,9 @@ export async function GET() {
   try {
     const { data, error, count } = await supabase
       .from("active_users")
-      .select("usage_count, readme_usage, commit_usage, license_usage, revert_usage", { count: "exact" });
+      .select("usage_count, readme_usage, commit_usage, license_usage, revert_usage", {
+        count: "exact",
+      });
 
     if (error) throw error;
 

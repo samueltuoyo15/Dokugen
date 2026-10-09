@@ -2,6 +2,7 @@ import base64
 import datetime
 import gzip
 import hashlib
+import fnmatch
 import json
 import os
 import platform
@@ -9,6 +10,7 @@ import subprocess
 import sys
 import time
 import threading
+import webbrowser
 from pathlib import Path
 
 import pathspec
@@ -23,9 +25,144 @@ current_readme_path = ""
 
 PACKAGE_NAME = "dokugen"
 PYPI_URL = f"https://pypi.org/pypi/{PACKAGE_NAME}/json"
+GITHUB_CLIENT_ID = "Ov23lijkkVQnSyY7s17q"
+CONFIG_DIR = os.path.join(os.path.expanduser("~"), ".dokugen")
+CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
 
 # Sentinel: prevents double check_and_update when interactive menu + subcommand both call it
 _update_checked = False
+
+
+def get_stored_config():
+    try:
+        with open(CONFIG_FILE, "r", encoding="utf-8") as config_file:
+            data = json.load(config_file)
+            return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
+def save_stored_config(updates):
+    try:
+        os.makedirs(CONFIG_DIR, mode=0o700, exist_ok=True)
+        config = get_stored_config()
+        config.update(updates)
+        descriptor = os.open(CONFIG_FILE, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(descriptor, "w", encoding="utf-8") as config_file:
+            json.dump(config, config_file, indent=2)
+        os.chmod(CONFIG_FILE, 0o600)
+        return True
+    except Exception as error:
+        console.print(f"[red]Failed to save Dokugen config: {error}[/red]")
+        return False
+
+
+def clear_stored_config():
+    try:
+        if os.path.exists(CONFIG_FILE):
+            os.remove(CONFIG_FILE)
+    except Exception as error:
+        console.print(f"[red]Failed to clear Dokugen config: {error}[/red]")
+
+
+def login_with_github():
+    try:
+        device_response = requests.post(
+            "https://github.com/login/device/code",
+            json={"client_id": GITHUB_CLIENT_ID, "scope": "read:user user:email"},
+            headers={"Accept": "application/json"},
+            timeout=15,
+        )
+        device_response.raise_for_status()
+        device = device_response.json()
+        console.print(f"\n1. Open: [cyan underline]{device['verification_uri']}[/cyan underline]")
+        console.print(f"2. Enter code: [bold yellow]{device['user_code']}[/bold yellow]\n")
+        webbrowser.open(device["verification_uri"])
+
+        interval = int(device.get("interval", 5))
+        expires_at = time.time() + int(device.get("expires_in", 900))
+        while time.time() < expires_at:
+            time.sleep(interval)
+            token_response = requests.post(
+                "https://github.com/login/oauth/access_token",
+                json={
+                    "client_id": GITHUB_CLIENT_ID,
+                    "device_code": device["device_code"],
+                    "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
+                },
+                headers={"Accept": "application/json"},
+                timeout=15,
+            )
+            data = token_response.json()
+            if data.get("error") == "authorization_pending":
+                continue
+            if data.get("error") == "slow_down":
+                interval = int(data.get("interval", interval)) + 5
+                continue
+            if data.get("error"):
+                console.print(f"[red]Authentication failed: {data.get('error_description', data['error'])}[/red]")
+                return None
+
+            access_token = data.get("access_token")
+            if not access_token:
+                continue
+            headers = {"Authorization": f"Bearer {access_token}", "Accept": "application/json"}
+            profile_response = requests.get("https://api.github.com/user", headers=headers, timeout=15)
+            profile_response.raise_for_status()
+            profile = profile_response.json()
+            email = profile.get("email") or ""
+            if not email:
+                emails_response = requests.get("https://api.github.com/user/emails", headers=headers, timeout=15)
+                emails_response.raise_for_status()
+                primary = next((item for item in emails_response.json() if item.get("primary") and item.get("verified")), None)
+                email = primary.get("email", "") if primary else ""
+
+            existing = get_stored_config()
+            config = {
+                "username": profile["login"],
+                "email": email,
+                "opted_out": bool(existing.get("opted_out", False)),
+                "access_token": access_token,
+            }
+            if not save_stored_config(config):
+                return None
+            console.print(f"[green]Successfully authenticated as @{profile['login']}![/green]")
+            return config
+    except Exception as error:
+        console.print(f"[red]GitHub login failed: {error}[/red]")
+    return None
+
+
+def ensure_authenticated():
+    config = get_stored_config()
+    if config.get("username") and config.get("access_token"):
+        return config
+    console.print("[cyan]GitHub authentication required. Please log in to continue.[/cyan]")
+    config = login_with_github()
+    if not config:
+        console.print("[red]Authentication required. Run 'dokugen login' to sign in.[/red]")
+        raise SystemExit(1)
+    return config
+
+
+def get_auth_headers():
+    token = get_stored_config().get("access_token")
+    if not token:
+        raise RuntimeError("GitHub authentication required. Run 'dokugen login'.")
+    return {"Authorization": f"Bearer {token}"}
+
+
+def update_leaderboard_preference(opted_out):
+    ensure_authenticated()
+    response = requests.post(
+        f"{get_backend_domain()}/api/auth/preferences",
+        json={"opted_out": bool(opted_out)},
+        headers=get_auth_headers(),
+        timeout=10,
+    )
+    response.raise_for_status()
+    if not save_stored_config({"opted_out": bool(opted_out)}):
+        raise RuntimeError("Server preference updated, but local config could not be saved")
 
 
 def create_spinner(text):
@@ -183,6 +320,7 @@ def check_and_update():
 
 
 def get_user_info():
+    stored = get_stored_config()
     git_name = ""
     git_email = ""
     try:
@@ -199,7 +337,7 @@ def get_user_info():
     except Exception:
         pass
 
-    username = git_name
+    username = stored.get("username") or git_name
     if not username and git_email and "@users.noreply.github.com" in git_email:
         parts = git_email.split("@")[0]
         if "+" in parts:
@@ -221,8 +359,9 @@ def get_user_info():
 
     return {
         "username": username,
-        "email": git_email,
+        "email": stored.get("email") or git_email,
         "osInfo": os_info,
+        "opted_out": bool(stored.get("opted_out", False)),
     }
 
 
@@ -252,23 +391,10 @@ def get_dokugen_backup_path(project_dir):
     return os.path.join(DOKUGEN_HOME, "backup", f"{get_project_key(project_dir)}.md")
 
 def load_profile():
-    profile_path = os.path.join(DOKUGEN_HOME, "config.json")
-    try:
-        if os.path.exists(profile_path):
-            with open(profile_path, "r", encoding="utf-8") as f:
-                return json.load(f)
-    except Exception:
-        pass
-    return {}
+    return get_stored_config()
 
 def save_profile(profile):
-    profile_path = os.path.join(DOKUGEN_HOME, "config.json")
-    try:
-        os.makedirs(os.path.dirname(profile_path), exist_ok=True)
-        with open(profile_path, "w", encoding="utf-8") as f:
-            json.dump(profile, f, indent=2)
-    except Exception:
-        pass
+    return save_stored_config(profile)
 
 def backup_readme(readme_path):
     global readme_backup, current_readme_path
@@ -291,7 +417,7 @@ def backup_readme(readme_path):
 def restore_readme():
     """Restore the backed up README and clear global state."""
     global readme_backup, current_readme_path
-    if readme_backup and current_readme_path:
+    if readme_backup is not None and current_readme_path:
         try:
             with open(current_readme_path, "w", encoding="utf-8") as f:
                 f.write(readme_backup)
@@ -310,6 +436,13 @@ def restore_readme():
     else:
         console.print("[yellow]No README backup available to restore[/yellow]")
         return None
+
+
+def discard_readme_backup():
+    """Clear the in-memory backup after a successful write."""
+    global readme_backup, current_readme_path
+    readme_backup = None
+    current_readme_path = ""
 
 
 def revert_readme_from_disk(project_dir=None):
@@ -384,10 +517,7 @@ def save_cache(project_dir, cache):
 
 
 def matches_ignore_pattern(filename, pattern):
-    if pattern.startswith("*."):
-        ext = pattern[1:]
-        return filename.endswith(ext)
-    return filename == pattern
+    return fnmatch.fnmatch(filename.lower(), pattern.lower())
 
 
 def scan_files(root_dir):
@@ -586,6 +716,15 @@ def scan_files(root_dir):
         ".env.development",
         ".env.test",
         ".env.production",
+        ".env*",
+        "*.pem",
+        "*.key",
+        "*.p12",
+        "*.pfx",
+        "id_rsa",
+        "id_ed25519",
+        "credentials.json",
+        "service-account*.json",
         "Dockerfile",
         "docker-compose.yml",
         "Makefile",
@@ -622,7 +761,10 @@ def scan_files(root_dir):
     found_files = []
 
     for dirpath, dirnames, filenames in os.walk(root_dir):
-        dirnames[:] = [d for d in dirnames if d not in ignore_dirs]
+        dirnames[:] = [
+            d for d in dirnames
+            if d not in ignore_dirs and not os.path.islink(os.path.join(dirpath, d))
+        ]
 
         rel_dir = os.path.relpath(dirpath, root_dir)
         if rel_dir == ".":
@@ -633,6 +775,9 @@ def scan_files(root_dir):
             continue
 
         for filename in filenames:
+            full_path = os.path.join(dirpath, filename)
+            if os.path.islink(full_path):
+                continue
             should_ignore = False
             for pattern in ignore_files:
                 if matches_ignore_pattern(filename, pattern):
@@ -643,8 +788,6 @@ def scan_files(root_dir):
                 continue
 
             rel_file_path = os.path.join(rel_dir, filename)
-            full_path = os.path.join(dirpath, filename)
-
             try:
                 if os.path.getsize(full_path) >= 150 * 1024:
                     continue

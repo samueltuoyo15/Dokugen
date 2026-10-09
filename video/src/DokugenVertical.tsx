@@ -100,8 +100,14 @@ const PopBurst = ({ x, y, start, color = palette.yellow }: { x: number; y: numbe
 
 const CutFlash = () => {
   const frame = useCurrentFrame();
-  const opacity = interpolate(frame, [0, 2, 7], [0, 0.28, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const height = interpolate(frame, [0, 5, 8], [0, 1920, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const opacity = interpolate(frame, [0, 2, 7], [0, 0.28, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const height = interpolate(frame, [0, 5, 8], [0, 1920, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
   return (
     <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", opacity, pointerEvents: "none" }}>
       <div style={{ width: "100%", height, backgroundColor: palette.yellow }} />
@@ -142,17 +148,38 @@ const ChatScene = () => {
       <AbsoluteFill style={{ backgroundColor: palette.ink, padding: "96px 68px 74px", boxSizing: "border-box" }}>
         <Grain strength={0.13} />
         <div
-          style={{ height: 88, display: "flex", alignItems: "center", justifyContent: "space-between", opacity: intro }}
+          style={{
+            height: 88,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            opacity: intro,
+          }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-            <div style={{ width: 50, height: 50, borderRadius: "50%", backgroundColor: palette.yellow }} />
+            <div
+              style={{
+                width: 50,
+                height: 50,
+                borderRadius: "50%",
+                backgroundColor: palette.yellow,
+              }}
+            />
             <span style={{ fontFamily: font, color: palette.paper, fontWeight: 800, fontSize: 29 }}>
               Lagos Dev Community
             </span>
           </div>
           <span style={{ fontFamily: mono, color: palette.muted, fontSize: 22 }}>2:17 PM</span>
         </div>
-        <div style={{ width: 100, height: 7, backgroundColor: palette.yellow, marginTop: 42, marginBottom: 52 }} />
+        <div
+          style={{
+            width: 100,
+            height: 7,
+            backgroundColor: palette.yellow,
+            marginTop: 42,
+            marginBottom: 52,
+          }}
+        />
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <Message delay={14}>yo, I shipped the project. Now I have to write a README and I am tired.</Message>
           <Message delay={46} mine>
@@ -188,7 +215,12 @@ const WebsiteScene = () => {
   return (
     <Scene duration={330}>
       <AbsoluteFill
-        style={{ backgroundColor: palette.yellow, padding: "84px 0", boxSizing: "border-box", alignItems: "center" }}
+        style={{
+          backgroundColor: palette.yellow,
+          padding: "84px 0",
+          boxSizing: "border-box",
+          alignItems: "center",
+        }}
       >
         <div style={{ position: "absolute", top: 78, left: 68 }}>
           <ProgressMark label="Dokugen checks your code and turns it into README/documentation people can actually understand." />
@@ -260,11 +292,22 @@ const GenerateScene = () => {
   const frame = useCurrentFrame();
   const typed = "dokugen generate".slice(
     0,
-    Math.floor(interpolate(frame, [18, 42], [0, 16], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })),
+    Math.floor(
+      interpolate(frame, [18, 42], [0, 16], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      }),
+    ),
   );
   return (
     <Scene duration={155}>
-      <AbsoluteFill style={{ backgroundColor: palette.charcoal, padding: "102px 66px", boxSizing: "border-box" }}>
+      <AbsoluteFill
+        style={{
+          backgroundColor: palette.charcoal,
+          padding: "102px 66px",
+          boxSizing: "border-box",
+        }}
+      >
         <Grain strength={0.09} />
         <ProgressMark label="Run Dokugen, answer a few real questions, and get something clean enough to share." />
         <div
@@ -327,7 +370,14 @@ const GenerateScene = () => {
             X (Twitter) username: <span style={{ color: palette.green }}>Use saved details (@TuoyoS26091)</span>
           </TerminalRow>
           <div style={{ height: 24 }} />
-          <div style={{ height: 8, backgroundColor: "#34332e", overflow: "hidden", opacity: ease(frame, 96, 8) }}>
+          <div
+            style={{
+              height: 8,
+              backgroundColor: "#34332e",
+              overflow: "hidden",
+              opacity: ease(frame, 96, 8),
+            }}
+          >
             <div
               style={{
                 width: `${interpolate(frame, [104, 132], [0, 100], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })}%`,
@@ -397,7 +447,10 @@ const AicScene = () => {
   const typed = command.slice(
     0,
     Math.floor(
-      interpolate(frame, [8, 28], [0, command.length], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
+      interpolate(frame, [8, 28], [0, command.length], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      }),
     ),
   );
   return (
@@ -522,7 +575,15 @@ const FinalScene = () => {
             handled properly.
           </div>
         </div>
-        <div style={{ fontFamily: mono, color: palette.ink, fontSize: 24, fontWeight: 700, opacity: p }}>
+        <div
+          style={{
+            fontFamily: mono,
+            color: palette.ink,
+            fontSize: 24,
+            fontWeight: 700,
+            opacity: p,
+          }}
+        >
           Clearer projects. Happier contributors.
         </div>
       </AbsoluteFill>

@@ -36,6 +36,7 @@ def cmd_og(args):
         console.print("[red]No Git repository found. Please navigate to a project directory that has a Git repository.[/red]")
         sys.exit(1)
 
+    utils.ensure_authenticated()
     utils.check_and_update()
     console.print(DOKUGEN_BANNER, style="#000080")
 
@@ -96,6 +97,7 @@ def cmd_og(args):
                 res = requests.post(
                     f"{backend_url}/api/og-metadata",
                     json={"summary": codebase_summary},
+                    headers=utils.get_auth_headers(),
                     timeout=30,
                 )
 
@@ -131,6 +133,7 @@ def cmd_og(args):
             res = requests.post(
                 f"{backend_url}/api/render-og",
                 json=metadata,
+                headers=utils.get_auth_headers(),
                 timeout=20,
             )
 

@@ -74,10 +74,24 @@ const GridBackground = () => {
         }}
       />
       <div
-        style={{ position: "absolute", left: 0, top: 0, width: 18, height: "100%", backgroundColor: colors.purple }}
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          width: 18,
+          height: "100%",
+          backgroundColor: colors.purple,
+        }}
       />
       <div
-        style={{ position: "absolute", right: 0, top: 0, width: 18, height: "100%", backgroundColor: colors.yellow }}
+        style={{
+          position: "absolute",
+          right: 0,
+          top: 0,
+          width: 18,
+          height: "100%",
+          backgroundColor: colors.yellow,
+        }}
       />
       {Array.from({ length: 16 }).map((_, index) => {
         const x = 80 + ((index * 151 + frame * (0.4 + (index % 3) * 0.1)) % 1760);
@@ -282,7 +296,12 @@ const BrandScene = () => {
   return (
     <Scene duration={150}>
       <AbsoluteFill style={{ alignItems: "center", justifyContent: "center" }}>
-        <div style={{ transform: `translateY(${(1 - pop) * 55}px) scale(${0.88 + pop * 0.12})`, opacity: pop }}>
+        <div
+          style={{
+            transform: `translateY(${(1 - pop) * 55}px) scale(${0.88 + pop * 0.12})`,
+            opacity: pop,
+          }}
+        >
           <Wordmark />
         </div>
         <div
@@ -423,7 +442,7 @@ const TerminalScene = () => {
           Scan the project. Understand the stack. Generate the README, architecture, and onboarding path.
         </p>
         <div style={{ marginTop: 48, opacity: ease(frame, 160, 20) }}>
-          <Pill label="zero config · no login · no API key" color={colors.green} background={colors.greenSoft} />
+          <Pill label="one-time GitHub sign-in · no API key" color={colors.green} background={colors.greenSoft} />
         </div>
       </div>
     </Scene>
@@ -456,7 +475,15 @@ const Callout = ({
       }}
     >
       <div style={{ fontFamily: sans, fontWeight: 900, color: colors.ink, fontSize: 28 }}>{title}</div>
-      <div style={{ fontFamily: sans, color: colors.muted, fontSize: 21, marginTop: 8, lineHeight: 1.35 }}>
+      <div
+        style={{
+          fontFamily: sans,
+          color: colors.muted,
+          fontSize: 21,
+          marginTop: 8,
+          lineHeight: 1.35,
+        }}
+      >
         {detail}
       </div>
     </div>
@@ -626,7 +653,13 @@ const FinalScene = () => {
     <Scene duration={60}>
       <AbsoluteFill style={{ backgroundColor: colors.ink }}>
         <div
-          style={{ position: "absolute", left: 120, top: 125, opacity: p, transform: `translateY(${(1 - p) * 40}px)` }}
+          style={{
+            position: "absolute",
+            left: 120,
+            top: 125,
+            opacity: p,
+            transform: `translateY(${(1 - p) * 40}px)`,
+          }}
         >
           <Wordmark />
         </div>
@@ -679,7 +712,13 @@ const FinalScene = () => {
           }}
         >
           <div
-            style={{ fontFamily: mono, fontSize: 23, fontWeight: 700, color: "#713f12", textTransform: "uppercase" }}
+            style={{
+              fontFamily: mono,
+              fontSize: 23,
+              fontWeight: 700,
+              color: "#713f12",
+              textTransform: "uppercase",
+            }}
           >
             Free · Open source · Zero config
           </div>

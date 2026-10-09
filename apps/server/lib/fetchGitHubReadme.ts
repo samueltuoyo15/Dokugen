@@ -8,7 +8,13 @@ export const fetchGitHubReadme = async (url: string): Promise<string> => {
 
     const rawUrl = url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/");
 
-    const response = await axios.get<string>(rawUrl, { responseType: "text" });
+    const response = await axios.get<string>(rawUrl, {
+      responseType: "text",
+      timeout: 10_000,
+      maxContentLength: 1024 * 1024,
+      maxBodyLength: 1024 * 1024,
+      maxRedirects: 3,
+    });
     return response.data;
   } catch (error) {
     console.error("Failed to fetch GitHub README:", error);

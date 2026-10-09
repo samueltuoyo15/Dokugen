@@ -7,6 +7,7 @@ import chalk from "chalk";
 import fs from "fs-extra";
 import { createSpinner } from "nanospinner";
 import { API_TIMEOUT } from "./constants.js";
+import { getAuthHeaders } from "./auth.js";
 import { extractFullCode, getDokugenBackupPath, getFileHash, loadCache, saveCache } from "./fileOps.js";
 import { getGitRepoUrl, getUserInfo } from "./git.js";
 import { compressData, getBackendDomain } from "./network.js";
@@ -119,10 +120,14 @@ async function promptMyhappr(): Promise<void> {
     }
 
     if (uri) {
-      spinner.success({ text: chalk.green("Browser opened. Make sure to complete account setup on myhappr.") });
+      spinner.success({
+        text: chalk.green("Browser opened. Make sure to complete account setup on myhappr."),
+      });
       openBrowser(uri);
     } else {
-      spinner.error({ text: chalk.yellow("Something went wrong connecting to myhappr. Please try again later.") });
+      spinner.error({
+        text: chalk.yellow("Something went wrong connecting to myhappr. Please try again later."),
+      });
     }
   } catch {}
 }
@@ -145,7 +150,7 @@ export const backupReadme = async (readmePath: string): Promise<void> => {
 };
 
 export const restoreReadme = async (): Promise<string | null> => {
-  if (readmeBackup && currentReadmePath) {
+  if (readmeBackup !== null && currentReadmePath) {
     try {
       await fs.writeFile(currentReadmePath, readmeBackup);
       console.log(chalk.green("Original README content restored successfully"));
@@ -210,10 +215,11 @@ export const generateReadme = async (
 ): Promise<string | null> => {
   let spinner: ReturnType<typeof createSpinner> | null = null;
   let timerInterval: ReturnType<typeof setInterval> | null = null;
+  const readmePath = path.join(projectDir, "README.md");
+  const readmeExistedBefore = await fs.pathExists(readmePath);
 
   try {
     console.log(chalk.blue("Analyzing project files..."));
-    const readmePath = path.join(projectDir, "README.md");
 
     let includeSetup = false;
     let includeContributionGuideLine = false;
@@ -285,8 +291,6 @@ export const generateReadme = async (
       });
     }, 100);
 
-    const fileStream = fs.createWriteStream(readmePath);
-
     const backendDomain = await getBackendDomain();
     const userInfo = getUserInfo();
     const repoUrl = getGitRepoUrl();
@@ -322,9 +326,11 @@ export const generateReadme = async (
       {
         responseType: "stream",
         timeout: API_TIMEOUT,
+        headers: getAuthHeaders(),
       },
     );
 
+    const fileStream = fs.createWriteStream(readmePath);
     const responseStream = response.data as Readable;
     return new Promise((resolve, reject) => {
       let buffer = "";
@@ -339,9 +345,7 @@ export const generateReadme = async (
         responseStream.removeAllListeners();
         fileStream.removeAllListeners();
 
-        if (!fileStream.closed) {
-          fileStream.end();
-        }
+        if (!fileStream.closed) await new Promise<void>((done) => fileStream.end(done));
 
         buffer = "";
 
@@ -371,6 +375,7 @@ export const generateReadme = async (
               chalk.dim(" (Ctrl+Click or Cmd+Click to follow link)"),
           );
           readmeBackup = null;
+          currentReadmePath = "";
 
           const newCacheFiles: Record<string, string> = {};
           for (const file of projectFiles) {
@@ -385,7 +390,10 @@ export const generateReadme = async (
         } else {
           spinner?.error({ text: chalk.red("Failed to generate README") });
           const restoredContent = await restoreReadme();
-          reject(restoredContent || error);
+          if (restoredContent === null && !readmeExistedBefore) {
+            await fs.remove(readmePath).catch(() => {});
+          }
+          reject(error instanceof Error ? error : new Error("README generation failed"));
         }
       };
 
@@ -406,6 +414,9 @@ export const generateReadme = async (
               if (json.response && typeof json.response === "string") {
                 fileStream.write(json.response);
                 fileStream.uncork();
+              } else if (json.error && typeof json.error === "string") {
+                void cleanup(false, new Error(json.error));
+                return;
               }
             } catch (error) {
               console.error("Skipping invalid event data:", line);
@@ -415,15 +426,15 @@ export const generateReadme = async (
       });
 
       responseStream.on("end", () => {
-        cleanup(true);
+        void cleanup(true);
       });
 
       fileStream.on("error", async (err) => {
-        cleanup(false, err);
+        void cleanup(false, err);
       });
 
       responseStream.on("error", async (err: Error) => {
-        cleanup(false, err);
+        void cleanup(false, err);
       });
     });
   } catch (error: unknown) {
@@ -433,6 +444,9 @@ export const generateReadme = async (
       spinner.error({ text: chalk.red(`Something went wrong: ${label}`) });
     }
     const restoredContent = await restoreReadme();
-    return restoredContent || null;
+    if (restoredContent === null && !readmeExistedBefore) {
+      await fs.remove(readmePath).catch(() => {});
+    }
+    throw error instanceof Error ? error : new Error("README generation failed");
   }
 };

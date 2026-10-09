@@ -11,6 +11,7 @@ console = Console()
 
 
 def cmd_aic(args):
+    utils.ensure_authenticated()
     utils.check_and_update()
     if not utils.is_git_repository():
         console.print("[red]Opps... No Git repository found. Please navigate to a project directory that has a Git repository, or initialize one using 'git init'.[/red]")
@@ -64,6 +65,7 @@ def cmd_aic(args):
                     "diff": diff,
                     "userInfo": user_info,
                 },
+                headers=utils.get_auth_headers(),
                 timeout=30,
             )
 
@@ -119,6 +121,7 @@ def cmd_aic(args):
                                 "diff": diff,
                                 "userInfo": utils.get_user_info(),
                             },
+                            headers=utils.get_auth_headers(),
                             timeout=30,
                         )
                         if response.status_code == 200:

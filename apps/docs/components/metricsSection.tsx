@@ -129,7 +129,13 @@ export default function MetricsSection() {
         const res = await fetch("/api/stats");
         if (!res.ok) {
           const fallbackRes = await fetch("https://dokugen.samueltuoyo.com/api/stats");
-          if (!fallbackRes.ok) return { totalUsers: 238, totalGenerations: 2137, totalReadmes: 2084, totalCommits: 49 };
+          if (!fallbackRes.ok)
+            return {
+              totalUsers: 238,
+              totalGenerations: 2137,
+              totalReadmes: 2084,
+              totalCommits: 49,
+            };
           return fallbackRes.json();
         }
         return res.json();

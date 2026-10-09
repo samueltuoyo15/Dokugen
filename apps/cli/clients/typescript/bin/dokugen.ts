@@ -2,6 +2,7 @@
 import chalk from "chalk";
 import { program } from "commander";
 import { registerAicCommand } from "./commands/aic.js";
+import { registerAuthCommands } from "./commands/auth.js";
 import { registerChangelogCommand } from "./commands/changelog.js";
 import { registerGenerateCommand } from "./commands/generate.js";
 import { registerLicenseCommand } from "./commands/license.js";
@@ -27,6 +28,7 @@ registerRevertCommand(program);
 registerLicenseCommand(program);
 registerOgCommand(program);
 registerChangelogCommand(program);
+registerAuthCommands(program);
 
 const main = async (): Promise<void> => {
   try {

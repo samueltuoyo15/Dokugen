@@ -2,6 +2,7 @@ import { type Request, type Response, Router } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { createOpenAIClient, getModelName } from "../lib/openaiClient";
 import { trackUser } from "../lib/supabaseTracker";
+import { getVerifiedGitHubUser } from "../middleware/githubAuth";
 import { buildChangelogPrompt } from "../prompts/changelogPrompt";
 import logger from "../utils/logger";
 
@@ -49,18 +50,41 @@ router.post("/generate-changelog", async (req: Request, res: Response): Promise<
   try {
     const { logs, version = "Unreleased", existingChangelog, userInfo, model: clientModel } = req.body;
 
-    if (!logs) {
+    if (typeof logs !== "string" || !logs.trim()) {
       res.status(400).json({ error: "No git log history provided" });
       return;
     }
-
-    if (userInfo?.username && userInfo?.email) {
-      trackUser({ ...userInfo, id: userInfo.id || uuidv4() }, "changelog").catch(() => {});
+    if (typeof version !== "string" || version.length > 100) {
+      res.status(400).json({ error: "Invalid changelog version" });
+      return;
+    }
+    if (existingChangelog !== undefined && typeof existingChangelog !== "string") {
+      res.status(400).json({ error: "Invalid existing changelog" });
+      return;
     }
 
-    const modelName = getModelName(clientModel || process.env.CHANGELOG_MODEL_NAME || "gemini-3.1-flash-lite");
+    const verifiedUser = getVerifiedGitHubUser(res);
+    trackUser({ ...userInfo, ...verifiedUser, id: userInfo?.id || uuidv4() }, "changelog").catch(() => {});
 
-    const prompt = buildChangelogPrompt(logs, version);
+    const configuredModel = process.env.CHANGELOG_MODEL_NAME || "gemini-3.1-flash-lite";
+    const allowedModels = new Set([
+      configuredModel,
+      ...(process.env.CHANGELOG_ALLOWED_MODELS || "")
+        .split(",")
+        .map((model) => model.trim())
+        .filter(Boolean),
+    ]);
+    if (clientModel !== undefined && (typeof clientModel !== "string" || !allowedModels.has(clientModel))) {
+      res.status(400).json({ error: "Requested changelog model is not allowed" });
+      return;
+    }
+    const modelName = getModelName(clientModel || configuredModel);
+
+    const MAX_LOG_CHARS = 200_000;
+    const MAX_CHANGELOG_CHARS = 500_000;
+    const safeLogs = logs.slice(0, MAX_LOG_CHARS);
+    const safeExistingChangelog = existingChangelog?.slice(0, MAX_CHANGELOG_CHARS);
+    const prompt = buildChangelogPrompt(safeLogs, version);
 
     const openai = await createOpenAIClient();
 
@@ -73,14 +97,17 @@ router.post("/generate-changelog", async (req: Request, res: Response): Promise<
     const rawBlock = completion.choices[0]?.message?.content?.trim() || "";
     const cleanBlock = rawBlock.replace(/^```markdown\n?|^```\n?|```$/g, "").trim();
 
-    const finalChangelog = existingChangelog
-      ? mergeChangelog(existingChangelog, cleanBlock, version)
+    const finalChangelog = safeExistingChangelog
+      ? mergeChangelog(safeExistingChangelog, cleanBlock, version)
       : `# Changelog\n\nAll notable changes to this project will be documented in this file.\n\n${cleanBlock}\n`;
 
     res.status(200).json({ changelog: finalChangelog });
   } catch (error: unknown) {
     logger.error(error, "Error generating changelog");
-    const err = error as { response?: { data?: { error?: { message?: string } } }; message?: string };
+    const err = error as {
+      response?: { data?: { error?: { message?: string } } };
+      message?: string;
+    };
     const errorMessage = err?.response?.data?.error?.message || err?.message || "Internal Server Error";
     res.status(500).json({ error: errorMessage });
   }

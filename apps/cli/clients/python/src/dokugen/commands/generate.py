@@ -178,9 +178,10 @@ def prompt_myhappr():
 
 
 def generate_readme_remote(project_type, project_files, project_dir, existing_readme=None, template_url=None):
+    readme_path = os.path.join(project_dir, "README.md")
+    readme_existed_before = os.path.exists(readme_path)
     try:
         console.print("[blue]Analyzing project files...[/blue]")
-        readme_path = os.path.join(project_dir, "README.md")
 
         include_setup = False
         include_contrib = False
@@ -281,6 +282,7 @@ def generate_readme_remote(project_type, project_files, project_dir, existing_re
                 response = requests.post(
                     f"{backend_domain}/api/generate-readme",
                     json=payload,
+                    headers=utils.get_auth_headers(),
                     stream=True,
                     timeout=API_TIMEOUT,
                 )
@@ -302,7 +304,9 @@ def generate_readme_remote(project_type, project_files, project_dir, existing_re
                                     if "response" in data and isinstance(data["response"], str):
                                         f.write(data["response"])
                                         f.flush()
-                                except Exception:
+                                    elif isinstance(data.get("error"), str):
+                                        raise RuntimeError(data["error"])
+                                except json.JSONDecodeError:
                                     pass
             finally:
                 if response is not None:
@@ -316,7 +320,7 @@ def generate_readme_remote(project_type, project_files, project_dir, existing_re
         console.print("[cyan]\nYou like what you see? Support Dokugen financially: [/cyan]"
                       "[blue underline][link=https://myhappr.com/samueltuoyo]https://myhappr.com/samueltuoyo[/link][/blue underline]"
                       "[dim] (Ctrl+Click or Cmd+Click to follow link)[/dim]")
-        utils.readme_backup = None
+        utils.discard_readme_backup()
 
         # Save cache
         new_cache_files = {}
@@ -335,6 +339,11 @@ def generate_readme_remote(project_type, project_files, project_dir, existing_re
         else:
             console.print(f"[red]\n Error Generating Readme: {e}[/red]")
         utils.restore_readme()
+        if not readme_existed_before and os.path.exists(readme_path):
+            try:
+                os.remove(readme_path)
+            except OSError as cleanup_error:
+                console.print(f"[red]Failed to remove partial README: {cleanup_error}[/red]")
         return None
 
 
@@ -343,6 +352,7 @@ def cmd_generate(args):
         console.print("[red]Opps... No Git repository found. Please navigate to a project directory that has a Git repository, or initialize one using 'git init'.[/red]")
         sys.exit(1)
 
+    utils.ensure_authenticated()
     utils.check_and_update()
     console.print(DOKUGEN_BANNER, style="#000080")
 
@@ -383,7 +393,6 @@ def cmd_generate(args):
                 with open(readme_path, "r", encoding="utf-8") as f:
                     existing_content = f.read()
             generate_readme_remote(project_type, project_files, project_dir, existing_content, template_url)
-            console.print("[green]README.md generated from template![/green]")
             return
 
         if readme_exists:

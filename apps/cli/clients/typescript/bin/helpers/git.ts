@@ -1,12 +1,16 @@
 import { execSync } from "node:child_process";
 import os from "node:os";
 import chalk from "chalk";
+import { getStoredConfig } from "./auth.js";
 
 export const getUserInfo = (): {
   username: string;
   email?: string;
   osInfo: { platform: string; arch: string; release: string };
+  opted_out?: boolean;
 } => {
+  const stored = getStoredConfig();
+
   let gitName = "";
   let gitEmail = "";
 
@@ -24,10 +28,11 @@ export const getUserInfo = (): {
     gitEmail = execSync("git config --get user.email", { encoding: "utf-8" }).trim();
   } catch {}
 
-  let username = gitName;
+  let username = stored.username || gitName;
+  const email = stored.email || gitEmail;
 
-  if (!username && gitEmail && gitEmail.includes("@users.noreply.github.com")) {
-    const match = gitEmail.match(/^(?:\d+\+)?([^@]+)@users\.noreply\.github\.com$/i);
+  if (!username && email && email.includes("@users.noreply.github.com")) {
+    const match = email.match(/^(?:\d+\+)?([^@]+)@users\.noreply\.github\.com$/i);
     if (match?.[1]) {
       username = match[1];
     }
@@ -45,8 +50,9 @@ export const getUserInfo = (): {
 
   return {
     username,
-    email: gitEmail,
+    email: email || undefined,
     osInfo,
+    opted_out: stored.opted_out ?? false,
   };
 };
 

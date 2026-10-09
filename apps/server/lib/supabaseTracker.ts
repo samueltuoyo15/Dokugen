@@ -6,6 +6,7 @@ interface UserInfo {
   email?: string;
   id?: string;
   osInfo?: unknown;
+  opted_out?: boolean;
 }
 
 export async function trackUser(userInfo: UserInfo | undefined, usageType?: string) {
@@ -13,6 +14,7 @@ export async function trackUser(userInfo: UserInfo | undefined, usageType?: stri
   const osInfo = userInfo.osInfo;
   const username = userInfo.username?.toLowerCase();
   const email = userInfo.email?.toLowerCase();
+  const opted_out = typeof userInfo.opted_out === "boolean" ? userInfo.opted_out : undefined;
   if (!email && !username) return;
 
   const id = userInfo.id;
@@ -49,11 +51,14 @@ export async function trackUser(userInfo: UserInfo | undefined, usageType?: stri
     if (email) {
       const { data, error } = await supabase
         .from("active_users")
-        .select("id, username, email, usage_count, readme_usage, update_usage, commit_usage, changelog_usage")
+        .select(
+          "id, username, email, usage_count, readme_usage, update_usage, commit_usage, changelog_usage, opted_out",
+        )
         .eq("email", email)
         .maybeSingle();
 
-      if (!error && data) {
+      if (error) throw error;
+      if (data) {
         existingUser = data as Record<string, unknown>;
       }
     }
@@ -61,11 +66,14 @@ export async function trackUser(userInfo: UserInfo | undefined, usageType?: stri
     if (!existingUser && username) {
       const { data, error } = await supabase
         .from("active_users")
-        .select("id, username, email, usage_count, readme_usage, update_usage, commit_usage, changelog_usage")
+        .select(
+          "id, username, email, usage_count, readme_usage, update_usage, commit_usage, changelog_usage, opted_out",
+        )
         .eq("username", username)
         .maybeSingle();
 
-      if (!error && data) {
+      if (error) throw error;
+      if (data) {
         existingUser = data as Record<string, unknown>;
       }
     }
@@ -93,7 +101,8 @@ export async function trackUser(userInfo: UserInfo | undefined, usageType?: stri
         updateData.osInfo = formattedOsInfo;
       }
 
-      await supabase.from("active_users").update(updateData).eq("id", existingUser.id);
+      const { error } = await supabase.from("active_users").update(updateData).eq("id", existingUser.id);
+      if (error) throw error;
     } else {
       const insertData: Record<string, unknown> = {
         username: username || "unknown",
@@ -101,13 +110,15 @@ export async function trackUser(userInfo: UserInfo | undefined, usageType?: stri
         id,
         osInfo: formattedOsInfo,
         usage_count: 1,
+        opted_out: opted_out ?? false,
       };
 
       if (columnToIncrement) {
         insertData[columnToIncrement] = 1;
       }
 
-      await supabase.from("active_users").insert([insertData]);
+      const { error } = await supabase.from("active_users").insert([insertData]);
+      if (error) throw error;
     }
     logger.info({ username, emailDomain: email ? email.split("@")[1] : undefined, usageType }, "Updated active user");
   } catch (error) {

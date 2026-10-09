@@ -91,7 +91,12 @@ export default function TermsPage() {
             </div>
 
             <div className="mt-12 pt-8 border-t border-zinc-200 text-sm text-zinc-400 text-center">
-              Last updated: {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+              Last updated:{" "}
+              {new Date().toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
             </div>
           </div>
         </motion.div>

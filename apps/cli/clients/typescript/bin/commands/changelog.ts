@@ -1,10 +1,11 @@
-import { execSync } from "node:child_process";
+import { execFileSync, execSync } from "node:child_process";
 import path from "node:path";
 import axios from "axios";
 import chalk from "chalk";
 import type { Command } from "commander";
 import fs from "fs-extra";
 import { createSpinner } from "nanospinner";
+import { ensureAuthenticated, getAuthHeaders } from "../helpers/auth.js";
 import { getUserInfo, isGitRepository } from "../helpers/git.js";
 import { checkAndUpdate, checkInternetConnection, getBackendDomain } from "../helpers/network.js";
 
@@ -25,6 +26,7 @@ export function registerChangelogCommand(program: Command) {
     .option("-m, --model <modelName>", "Custom model configured on the server (e.g. google/gemini-3.1-flash-lite)")
     .option("-o, --outfile <filepath>", "Output changelog file path", "CHANGELOG.md")
     .action(async (options: ChangelogOptions) => {
+      await ensureAuthenticated();
       await checkAndUpdate();
 
       if (!isGitRepository()) {
@@ -53,19 +55,19 @@ export function registerChangelogCommand(program: Command) {
           }).trim();
         } catch {}
 
-        let gitCmd = `git log --pretty=format:"%h - %s (%an, %ad)" --date=short`;
+        const gitArgs = ["log", "--pretty=format:%h - %s (%an, %ad)", "--date=short"];
         if (options.limit && options.limit !== "all") {
           const limitNum = Number.parseInt(options.limit, 10);
-          if (!Number.isNaN(limitNum)) {
-            gitCmd = `git log -n ${limitNum} --pretty=format:"%h - %s (%an, %ad)" --date=short`;
+          if (!Number.isNaN(limitNum) && limitNum > 0) {
+            gitArgs.splice(1, 0, "-n", String(limitNum));
           }
         } else if (lastTag) {
-          gitCmd = `git log ${lastTag}..HEAD --pretty=format:"%h - %s (%an, %ad)" --date=short`;
+          gitArgs.splice(1, 0, `${lastTag}..HEAD`);
         }
 
         let gitLogs = "";
         try {
-          gitLogs = execSync(gitCmd, { encoding: "utf-8" }).trim();
+          gitLogs = execFileSync("git", gitArgs, { encoding: "utf-8" }).trim();
           if (!gitLogs) {
             gitLogs = execSync(`git log -n 200 --pretty=format:"%h - %s (%an, %ad)" --date=short`, {
               encoding: "utf-8",
@@ -115,13 +117,17 @@ export function registerChangelogCommand(program: Command) {
         const backendDomain = await getBackendDomain();
         const userInfo = getUserInfo();
 
-        const response = await axios.post<{ changelog: string }>(`${backendDomain}/api/generate-changelog`, {
-          logs: gitLogs,
-          version,
-          existingChangelog,
-          userInfo,
-          model: options.model || process.env.OPENAI_MODEL,
-        });
+        const response = await axios.post<{ changelog: string }>(
+          `${backendDomain}/api/generate-changelog`,
+          {
+            logs: gitLogs,
+            version,
+            existingChangelog,
+            userInfo,
+            model: options.model || process.env.OPENAI_MODEL,
+          },
+          { headers: getAuthHeaders() },
+        );
 
         const generatedContent = response.data.changelog;
         if (!generatedContent) {
@@ -145,7 +151,11 @@ export function registerChangelogCommand(program: Command) {
         if (spinner) {
           spinner.stop();
         }
-        const err = error as { response?: { data?: { error?: string } }; code?: string; message?: string };
+        const err = error as {
+          response?: { data?: { error?: string } };
+          code?: string;
+          message?: string;
+        };
         const serverError = err.response?.data?.error;
         if (serverError) {
           console.log(`\n${chalk.blue(serverError)}`);

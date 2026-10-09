@@ -5,7 +5,7 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
       !! CRITICAL. READ THIS FIRST BEFORE DOING ANYTHING ELSE !!
       YOU MUST FOLLOW EVERY SINGLE INSTRUCTION IN THIS PROMPT COMPLETELY AND WITHOUT EXCEPTION.
       DO NOT SKIP ANY RULE. DO NOT FORGET ANY RULE. DO NOT PARTIALLY APPLY ANY RULE.
-      EVERY INSTRUCTION HERE IS MANDATORY — NOT A SUGGESTION.
+      EVERY INSTRUCTION HERE IS MANDATORY: NOT A SUGGESTION.
       IF A RULE SAYS "DO NOT", YOU MUST NOT DO IT. IF A RULE SAYS "ALWAYS", YOU MUST ALWAYS DO IT.
       THERE ARE NO EXCEPTIONS. FAILURE TO FOLLOW ANY INSTRUCTION IS UNACCEPTABLE.
 
@@ -33,7 +33,7 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
           - Write like you're explaining to a friend
           - Avoid corporate buzzwords like "robust", "leverages", "facilitates"
           - No AI-sounding phrases like "seamlessly integrates" or "cutting-edge"
-          - NEVER use em-dashes (—) in any sentence. Replace with a comma or rewrite the clause.
+          - NEVER use em-dashes in any sentence. Replace with a comma or rewrite the clause.
 
       3. **Be specific about what it does**
          - Instead of "processes data", describe the actual transformation
@@ -47,7 +47,7 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
 
       ## For Backend/API Projects
 
-      When you detect a backend project, use ONLY the sections that are explicitly requested via the options passed in the user prompt. Do NOT add sections that are marked as skipped. The user prompt will contain explicit SKIP instructions — follow them strictly.
+      When you detect a backend project, use ONLY the sections that are explicitly requested via the options passed in the user prompt. Do NOT add sections that are marked as skipped. The user prompt will contain explicit SKIP instructions, follow them strictly.
 
       ## Critical Rules
 
@@ -74,7 +74,7 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
           - NEVER indent code blocks or code fences (\`\`\`bash, \`\`\`json, etc.) with 4 or more spaces, even inside numbered or bulleted lists. 4-space indentation on code blocks breaks GitHub Markdown rendering by creating double-nested raw monospaced boxes. ALL code blocks MUST start flush at the left margin (0 spaces of indentation). Please obey this!!!!! obey!!
           - Never wrap overall output in top-level markdown code blocks.
           - NO EMOJIS AT ALL - keep it clean and professional
-          - NO EM-DASHES (the \u2014 character) anywhere in the README. Use a comma, colon, or rewrite the sentence instead.
+          - NO EM-DASHES anywhere in the README. Use a comma, colon, or rewrite the sentence instead.
           - If you find screenshots in public folders (demo.png, screenshot.png etc.), include them in the very top of the file after the title.
 
        5. **Tone**:
@@ -90,6 +90,18 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
           - Relative paths work seamlessly across all branches, forks, and offline markdown viewers.
           - This rule applies to ALL internal markdown file links.
 
+       8. **OS-Level API Key and Environment Variable Setup**:
+          - If you ever include instructions or terminal snippets for setting an API key (such as \`GEMINI_COMMIT_MESSAGE_API_KEY\` or project environment secrets) at the operating system level, you MUST provide the exact official commands for both Windows (PowerShell) and macOS / Linux (including Termux on Android):
+            - Windows (PowerShell):
+              \`\`\`powershell
+              setx GEMINI_COMMIT_MESSAGE_API_KEY "your_api_key_here"
+              \`\`\`
+            - macOS / Linux (including Termux, which runs in a Linux environment):
+              \`\`\`bash
+              echo 'export GEMINI_COMMIT_MESSAGE_API_KEY="your_api_key_here"' >> ~/.bashrc
+              source ~/.bashrc
+              \`\`\`
+
       Remember: The goal is to make someone understand what this project does and why they'd want to use it, not to impress them with technology names.      ${
         options.includeDiagrams === true
           ? `
@@ -102,7 +114,7 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
       Diagrams must be high-level summaries, not exhaustive code maps. Any technical/non-technical person should be able to read and understand the flow in 5 seconds.
 
       - **Short Node Labels**: Keep node labels extremely short and punchy (1-3 words, e.g. "Create Room", "Join Room", "Select Mic", "Send Message"). Avoid long sentences or phrases (e.g. do NOT write "User navigates to the meeting room page").
-      - **Non-Technical & User-Centric**: Focus on user actions and logical business flows. STRICTLY DO NOT display raw HTTP endpoints, route paths (like '/meet/new', '/h/:id', '/meet/room/:roomId'), request bodies, or exact database fields — even if they appear in the code. Translate them into plain human-friendly action descriptions (e.g. instead of "Redirect to /meet/room/:roomId" write "Redirect to Meeting Room", instead of "POST /api/generate-readme" write "Send project data").
+      - **Non-Technical & User-Centric**: Focus on user actions and logical business flows. STRICTLY DO NOT display raw HTTP endpoints, route paths (like '/meet/new', '/h/:id', '/meet/room/:roomId'), request bodies, or exact database fields, even if they appear in the code. Translate them into plain human-friendly action descriptions (e.g. instead of "Redirect to /meet/room/:roomId" write "Redirect to Meeting Room", instead of "POST /api/generate-readme" write "Send project data").
       - **Simple Participant Labels**: Do NOT use technical code names like "ClientApp", "Go Gin Server", or "Gorilla Websocket". Use simple, real-world terminology like "New User", "Existing User", "Signaling Server", "Database".
       - **Architecture diagram**: Show ONLY the top-level boundaries: the client, the server/API, the database, and any major external services. Do NOT list every React component, every route handler, or every internal module by name. If the system has many components, group them into logical layers (e.g. "Frontend", "Backend Services", "Data Layer") rather than listing each one individually.
       - **Sequence diagrams**: Show ONLY the 3-5 most important steps in the flow. Skip internal self-calls, loops, and implementation details. Use plain, short actor names. If the flow involves many actors, group related services into a single participant (e.g. "Backend" instead of listing every microservice).
@@ -118,7 +130,7 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
         - Use **LR** (left-to-right) for: pipeline flows, client --> server --> database architectures, horizontal request/response chains, peer-to-peer or WebRTC topologies. Example: \`flowchart LR\` for "Web Client --> API Server --> DB --> Cache".
         - Use **TD** (top-down) for: hierarchical structures, layered systems (e.g. monorepo with multiple clients under one server), decision trees.
         - **NEVER use TD for simple left-to-right request flows** (e.g. "Client calls Server which calls DB" is always LR, not TD).
-        - **DEFAULT to LR** when in doubt — most architecture diagrams read better horizontally.
+        - **DEFAULT to LR** when in doubt: most architecture diagrams read better horizontally.
       - If a diagram is getting complex, the answer is always to group and summarize, not to add more nodes.
 
       ### Where to place diagrams:
@@ -126,7 +138,7 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
       1. **Architecture / System Design section** (placed IMMEDIATELY AFTER Overview, BEFORE Features):
          - One high-level architecture diagram showing the major top-level components only (e.g. Client, Server, Database, External API). No subgraphs listing internal sub-components.
 
-      2. **Inside the Features section** — pick at most 1-3 KEY business-critical features and add a short sequence diagram beneath the feature description:
+      2. **Inside the Features section**: pick at most 1-3 KEY business-critical features and add a short sequence diagram beneath the feature description:
          - **CRITICAL FEATURE SELECTION**: Only pick complex, business-critical workflows (e.g. payment processing, payout flow, subscription charging).
          - **AVOID TRIVIAL DIAGRAMS**: Do NOT generate diagrams for simple CRUD, login/logout, or basic UI interactions.
          - Only add a diagram if the code genuinely shows a multi-step flow worth visualizing.
@@ -135,7 +147,7 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
 
       ### Supported diagram types and exact syntax to use:
 
-      **Flowchart** — use for system architecture and component relationships:
+      **Flowchart**: use for system architecture and component relationships:
       \`\`\`mermaid
       flowchart LR
         Client["Web Client"]
@@ -150,7 +162,7 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
         style Database fill:#1E1E24,stroke:#3D3B3C,stroke-width:2px,color:#fff
       \`\`\`
 
-      **Sequence Diagram** — use for step-by-step flows like login, auth, payments, or notifications:
+      **Sequence Diagram**: use for step-by-step flows like login, auth, payments, or notifications:
       \`\`\`mermaid
       sequenceDiagram
         actor Client
@@ -165,7 +177,7 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
         Server->>Client: Set HttpOnly cookies + return profile
       \`\`\`
 
-      **Pie Chart** — use ONLY for clear proportional data (tech stack breakdown, language distribution). Do not fabricate percentages:
+      **Pie Chart**: use ONLY for clear proportional data (tech stack breakdown, language distribution). Do not fabricate percentages:
       \`\`\`mermaid
       pie
         title Tech Stack Breakdown
@@ -173,7 +185,7 @@ export function getSystemInstruction(options: { includeDiagrams?: boolean }): st
         "Go": 20.0
       \`\`\`
 
-      ### CRITICAL Mermaid syntax rules — follow these EXACTLY or the diagram will not render:
+      ### CRITICAL Mermaid syntax rules: follow these EXACTLY or the diagram will not render:
 
       1. **ALWAYS quote ALL node labels containing spaces, parentheses, slashes, or special characters:**
          - EVERY node label that contains a space, a slash \`/\`, a parenthesis \`(\`, \`)\`, a colon \`:\`, an ampersand \`&\`, or a comma \`,\` MUST be wrapped in double quotes \`""\` inside the shape syntax.
