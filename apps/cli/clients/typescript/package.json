@@ -1,13 +1,13 @@
 {
   "name": "dokugen",
-  "version": "14.0.12",
+  "version": "14.2.0",
   "private": false,
   "main": "dist/bin/dokugen.mjs",
   "type": "module",
   "scripts": {
     "build": "tsc",
     "postinstall": "node -e \"import('fs').then(fs => { if (fs.existsSync('dist/scripts/postinstall.mjs')) import('./dist/scripts/postinstall.mjs'); }).catch(() => {})\"",
-    "test": "vitest",
+    "test": "npm run build && node dist/_tests_/security.test.mjs",
     "postbuild": "node --no-warnings --loader ts-node/esm lib/rename.ts",
     "build:binaries": "bun run scripts/build-binaries.ts"
   },
@@ -29,13 +29,10 @@
   "dependencies": {
     "@clack/prompts": "^0.10.1",
     "@jaames/iro": "^5.5.2",
-    "@types/marked-terminal": "^6.1.1",
     "axios": "^1.20.0",
     "chalk": "^5.6.2",
-    "cli-md": "^1.2.0",
     "commander": "^13.1.0",
     "esbuild": "^0.25.12",
-    "fs": "0.0.1-security",
     "fs-extra": "^11.4.0",
     "gradient-string": "^3.0.0",
     "nanospinner": "^1.2.2"
@@ -43,7 +40,6 @@
   "devDependencies": {
     "@types/axios": "^0.9.36",
     "@types/fs-extra": "^11.0.4",
-    "@types/marked": "^5.0.2",
     "@types/node": "^22.20.3",
     "supertest": "^7.2.2",
     "ts-node": "^10.9.2",

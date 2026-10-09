@@ -13,6 +13,7 @@ def cmd_update(args):
         console.print("[red]Opps... No Git repository found. Please navigate to a project directory that has a Git repository, or initialize one using 'git init'.[/red]")
         sys.exit(1)
 
+    utils.ensure_authenticated()
     utils.check_and_update()
     console.print(DOKUGEN_BANNER, style="#000080")
 
@@ -59,7 +60,6 @@ def cmd_update(args):
                 console.print(f"[yellow]Found: {len(project_files)} files in the project[/yellow]")
 
                 generate_readme_remote(project_type, project_files, project_dir, None, template_url)
-                console.print("[green]README.md regenerated successfully![/green]")
                 return
             else:
                 console.print("[yellow]Update cancelled.[/yellow]")
@@ -77,7 +77,6 @@ def cmd_update(args):
         console.print("[blue]Updating auto-generated sections...[/blue]")
 
         generate_readme_remote(project_type, project_files, project_dir, existing_content, template_url)
-        console.print("[green]README.md updated successfully! Custom sections preserved.[/green]")
 
     except (Exception, KeyboardInterrupt) as e:
         if isinstance(e, KeyboardInterrupt):

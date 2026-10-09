@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [14.1.0] - 2026-10-09
+
+### Added
+- **GitHub Device Authentication (`dokugen login`)**: One-time terminal authentication with GitHub OAuth Device Flow for the TypeScript and Python CLIs.
+- **Server-Verified Usage**: AI endpoints now validate the GitHub access token and derive leaderboard identity from GitHub instead of trusting client-supplied names.
+- **Leaderboard Privacy Config (`dokugen config`)**: Added an opt-out toggle (`--opt-out-leaderboard`) that hides the user from the public leaderboard while preserving aggregate usage counts.
+
 ## [14.0.12] - 2026-09-23
 
 ### Added

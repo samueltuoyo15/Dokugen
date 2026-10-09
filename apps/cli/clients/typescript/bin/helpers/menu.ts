@@ -2,6 +2,7 @@ import path from "node:path";
 import { isCancel, select } from "@clack/prompts";
 import chalk from "chalk";
 import { program } from "commander";
+import { getStoredConfig } from "./auth.js";
 import { CURRENT_VERSION, DOKUGEN_BANNER } from "./constants.js";
 import { checkAndUpdate } from "./network.js";
 
@@ -34,11 +35,20 @@ export const runInteractiveMenu = async (): Promise<void> => {
   console.log(chalk.blue(`Welcome to Dokugen (v${CURRENT_VERSION}) - Automatic README Generator\n`));
 
   const projectName = path.basename(process.cwd());
+  const storedConfig = getStoredConfig();
+  const authLabel = storedConfig.username ? `Account Settings (@${storedConfig.username})` : "Login with GitHub";
+  const authHint = storedConfig.username
+    ? "Manage your account or leaderboard privacy"
+    : "Authenticate with GitHub to track your developer stats";
 
   const action = await select({
     message: "What would you like to do?",
     options: [
-      { value: "generate", label: "Generate README", hint: `Scan ${projectName} and create a new README.md` },
+      {
+        value: "generate",
+        label: "Generate README",
+        hint: `Scan ${projectName} and create a new README.md`,
+      },
       {
         value: "update",
         label: "Update README",
@@ -68,6 +78,11 @@ export const runInteractiveMenu = async (): Promise<void> => {
         value: "og",
         label: "Generate Social Card (OG)",
         hint: "Create a beautiful 1200x630 preview card for Twitter & GitHub",
+      },
+      {
+        value: storedConfig.username ? "config" : "login",
+        label: authLabel,
+        hint: authHint,
       },
       { value: "help", label: "View Help", hint: "Show all available commands and options" },
       { value: "exit", label: "Exit" },

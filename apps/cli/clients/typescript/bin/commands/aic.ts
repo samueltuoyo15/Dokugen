@@ -4,6 +4,7 @@ import axios from "axios";
 import chalk from "chalk";
 import type { Command } from "commander";
 import { createSpinner } from "nanospinner";
+import { ensureAuthenticated, getAuthHeaders } from "../helpers/auth.js";
 import { getUserInfo, isGitRepository } from "../helpers/git.js";
 import { checkAndUpdate, checkInternetConnection, getBackendDomain } from "../helpers/network.js";
 
@@ -18,6 +19,7 @@ export function registerAicCommand(program: Command) {
     .description("AI-powered Git commit generator")
     .option("-p, --push", "Push after committing")
     .action(async (options: AicOptions) => {
+      await ensureAuthenticated();
       await checkAndUpdate();
 
       if (!isGitRepository()) {
@@ -47,7 +49,9 @@ export function registerAicCommand(program: Command) {
           console.log(chalk.yellow("No staged changes detected. Staging all files..."));
           try {
             execSync("git add .");
-            diff = execSync("git diff --cached --ignore-space-at-eol", { encoding: "utf-8" }).trim();
+            diff = execSync("git diff --cached --ignore-space-at-eol", {
+              encoding: "utf-8",
+            }).trim();
           } catch (err) {
             console.error(chalk.red("Failed to stage files:"), err);
             process.exit(1);
@@ -79,10 +83,14 @@ export function registerAicCommand(program: Command) {
           const backendDomain = await getBackendDomain();
           const userInfo = getUserInfo();
 
-          const response = await axios.post<{ message: string }>(`${backendDomain}/api/generate-commit`, {
-            diff,
-            userInfo,
-          });
+          const response = await axios.post<{ message: string }>(
+            `${backendDomain}/api/generate-commit`,
+            {
+              diff,
+              userInfo,
+            },
+            { headers: getAuthHeaders() },
+          );
 
           commitMessage = response.data.message;
           if (!commitMessage) {
@@ -152,25 +160,36 @@ export function registerAicCommand(program: Command) {
           } else if (action === "regenerate") {
             const regenSpinner = createSpinner(chalk.blue("Regenerating commit message...")).start();
             try {
-              const response = await axios.post<{ message: string }>(`${backendDomain}/api/generate-commit`, {
-                diff,
-                userInfo: getUserInfo(),
-              });
+              const response = await axios.post<{ message: string }>(
+                `${backendDomain}/api/generate-commit`,
+                {
+                  diff,
+                  userInfo: getUserInfo(),
+                },
+                { headers: getAuthHeaders() },
+              );
               finalCommitMessage = response.data.message;
               if (!finalCommitMessage) {
                 throw new Error("No commit message generated from backend");
               }
-              regenSpinner.success({ text: chalk.green("New commit message generated successfully") });
+              regenSpinner.success({
+                text: chalk.green("New commit message generated successfully"),
+              });
               console.log(chalk.green(`"${finalCommitMessage}"\n`));
             } catch (err: unknown) {
-              const errorObj = err as { response?: { data?: { error?: string } }; message?: string };
+              const errorObj = err as {
+                response?: { data?: { error?: string } };
+                message?: string;
+              };
               regenSpinner.error({ text: chalk.red("Failed to regenerate commit message") });
               console.error(chalk.red("Error details:"), errorObj.response?.data?.error || errorObj.message);
             }
           }
         }
 
-        const commitResult = spawnSync("git", ["commit", "-m", finalCommitMessage], { stdio: "inherit" });
+        const commitResult = spawnSync("git", ["commit", "-m", finalCommitMessage], {
+          stdio: "inherit",
+        });
         if (commitResult.status !== 0) {
           throw new Error(`Git commit failed with exit status ${commitResult.status}`);
         }

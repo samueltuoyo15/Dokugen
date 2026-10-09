@@ -2,7 +2,7 @@ import os from "node:os";
 import * as path from "node:path";
 import { isCancel, select, text } from "@clack/prompts";
 import chalk from "chalk";
-import fs from "fs-extra";
+import { getStoredConfig, saveStoredConfig } from "./auth.js";
 
 const DOKUGEN_CONFIG_DIR = path.join(os.homedir(), ".dokugen");
 const DOKUGEN_CONFIG_FILE = path.join(DOKUGEN_CONFIG_DIR, "config.json");
@@ -13,19 +13,13 @@ interface DokugenProfile {
 }
 
 const loadProfile = async (): Promise<DokugenProfile> => {
-  try {
-    if (await fs.pathExists(DOKUGEN_CONFIG_FILE)) {
-      return await fs.readJson(DOKUGEN_CONFIG_FILE);
-    }
-  } catch {}
-  return {};
+  return getStoredConfig();
 };
 
 const saveProfile = async (profile: DokugenProfile): Promise<void> => {
-  try {
-    await fs.ensureDir(DOKUGEN_CONFIG_DIR);
-    await fs.writeJson(DOKUGEN_CONFIG_FILE, profile, { spaces: 2 });
-  } catch {}
+  if (!saveStoredConfig(profile)) {
+    throw new Error("Could not save social profile");
+  }
 };
 
 export const askYesNo = async (message: string): Promise<boolean | "cancel"> => {

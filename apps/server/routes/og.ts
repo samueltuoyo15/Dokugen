@@ -104,13 +104,13 @@ router.post("/og-metadata", async (req: Request, res: Response): Promise<void> =
   try {
     const { summary } = req.body;
 
-    if (!summary) {
+    if (typeof summary !== "string" || !summary.trim()) {
       res.status(400).json({ error: "No codebase summary provided." });
       return;
     }
 
     const systemPrompt = getOgInstruction();
-    const userPrompt = `Generate the JSON metadata profile for this codebase summary:\n\n${summary}`;
+    const userPrompt = `Generate the JSON metadata profile for this codebase summary:\n\n${summary.slice(0, 100_000)}`;
     const openai = await createOpenAIClient();
     const model = getModelName(process.env.OG_MODEL_NAME || "gemini-3.1-flash-lite");
 
@@ -150,12 +150,22 @@ router.post("/render-og", async (req: Request, res: Response): Promise<void> => 
   try {
     const { title, tagline, techStack, theme, url, author, version, logo, buttons } = req.body;
 
-    if (!title) {
+    if (typeof title !== "string" || !title.trim() || title.length > 200) {
       res.status(400).json({ error: "Missing title in render request." });
       return;
     }
 
-    const svgString = generateSvgCard({ title, tagline, techStack, theme, url, author, version, logo, buttons });
+    const svgString = generateSvgCard({
+      title,
+      tagline,
+      techStack,
+      theme,
+      url,
+      author,
+      version,
+      logo,
+      buttons,
+    });
 
     const pngBuffer = await sharp(Buffer.from(svgString)).png().toBuffer();
 

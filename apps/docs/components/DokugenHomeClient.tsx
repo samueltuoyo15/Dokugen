@@ -144,16 +144,15 @@ export default function DokugenHomeClient() {
           transition={{ duration: 0.8 }}
           className="text-center mb-24"
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black mb-6 tracking-tight text-zinc-900 max-w-3xl mx-auto leading-[1.15]">
-            The easiest way to generate <br />
-            <span className="highlight highlight-purple">beautiful</span> and{" "}
-            <span className="highlight highlight-yellow">accurate</span> READMEs
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black mb-6 tracking-tight text-zinc-900 max-w-4xl mx-auto leading-[1.15]">
+            Turn your repositories into <br />
+            <span className="highlight highlight-purple">job-ready</span> portfolio pieces
           </h1>
 
-          <p className="text-lg md:text-xl text-zinc-500 mb-10 max-w-2xl mx-auto leading-relaxed font-light">
-            Writing READMEs is a chore, and keeping them updated is even worse. Dokugen takes that pain away by scanning
-            your codebase to generate a beautiful, detailed README in seconds. It lets you update it instantly as your
-            code changes, so you can spend your time building, not formatting markdown.
+          <p className="text-lg md:text-xl text-zinc-600 mb-10 max-w-2xl mx-auto leading-relaxed font-normal">
+            Poor documentation and messy git history cause hiring managers to skip over great code. Dokugen generates
+            recruiter-ready READMEs that make your projects instantly understood, and spotless Conventional Commits that
+            show senior engineering discipline.
           </p>
 
           <div className="mt-12 max-w-lg mx-auto">
@@ -415,9 +414,8 @@ export default function DokugenHomeClient() {
                   </div>
                   <h3 className="text-xl font-bold mb-3 text-[#312e81] tracking-tight">Zero-Config Experience</h3>
                   <p className="text-[#4338ca] leading-relaxed text-sm font-normal">
-                    No login, no API keys to copy, and zero setup friction. We believe you should experience value in
-                    less than 30 seconds. Just run Dokugen in your project and see the magic immediately, with no
-                    strings attached.
+                    No API keys to copy and no account form to fill out. Sign in once through GitHub's secure device
+                    flow, then run Dokugen directly in any project.
                   </p>
                 </div>
               </div>
@@ -572,8 +570,8 @@ export default function DokugenHomeClient() {
               <span className="text-2xl font-bold text-zinc-900">Dokugen</span>
             </div>
             <p className="text-base text-zinc-500 leading-relaxed font-light">
-              The easiest way to generate beautiful and accurate READMEs, colorized flowcharts, and quality commit
-              messages without leaving your terminal.
+              Turn your repositories into job-ready portfolio pieces with senior-grade READMEs, architecture flowcharts,
+              and spotless Conventional Commits directly from your terminal.
             </p>
           </div>
 

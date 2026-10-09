@@ -43,6 +43,12 @@ def main():
         register_aic_parser(subparsers)
         register_og_parser(subparsers)
         register_changelog_parser(subparsers)
+        subparsers.add_parser("login", help="Authenticate with GitHub using device authorization")
+        subparsers.add_parser("logout", help="Log out and clear stored Dokugen credentials")
+        config_parser = subparsers.add_parser("config", help="View or update Dokugen configuration")
+        preference_group = config_parser.add_mutually_exclusive_group()
+        preference_group.add_argument("--opt-out-leaderboard", action="store_true")
+        preference_group.add_argument("--opt-in-leaderboard", action="store_true")
 
         if len(sys.argv) == 1:
             utils.check_and_update()
@@ -58,6 +64,7 @@ def main():
                     questionary.Choice("Generate LICENSE - Protect your work and open the door to collaboration for {project_name}.", value="license"),
                     questionary.Choice(f"Generate CHANGELOG - Analyze commit history and update CHANGELOG.md for {project_name}", value="changelog"),
                     questionary.Choice(f"AI Git Commit    - Generate commit message and commit staged changes for {project_name}", value="aic"),
+                    questionary.Choice("Account Settings - Login or manage leaderboard privacy", value="config"),
                     questionary.Choice("View Help        - Show all available commands and options", value="help"),
                     questionary.Choice("Exit", value="exit"),
                 ],
@@ -91,6 +98,13 @@ def main():
                 cmd_changelog(Args())
             elif action == "aic":
                 cmd_aic(Args())
+            elif action == "config":
+                config = utils.get_stored_config()
+                if not config.get("username"):
+                    utils.login_with_github()
+                else:
+                    console.print(f"[bold]GitHub account:[/bold] @{config['username']}")
+                    console.print(f"[bold]Leaderboard:[/bold] {'Hidden' if config.get('opted_out') else 'Visible'}")
             elif action == "og":
                 cmd_og(Args())
             elif action == "help":
@@ -112,6 +126,23 @@ def main():
                 cmd_aic(args)
             elif args.command == "og":
                 cmd_og(args)
+            elif args.command == "login":
+                utils.login_with_github()
+            elif args.command == "logout":
+                config = utils.get_stored_config()
+                utils.clear_stored_config()
+                console.print(f"[green]Logged out from @{config.get('username', 'unknown')}. Local config cleared.[/green]")
+            elif args.command == "config":
+                if args.opt_out_leaderboard:
+                    utils.update_leaderboard_preference(True)
+                    console.print("[green]You are hidden from the public leaderboard.[/green]")
+                elif args.opt_in_leaderboard:
+                    utils.update_leaderboard_preference(False)
+                    console.print("[green]You are visible on the public leaderboard.[/green]")
+                else:
+                    config = utils.get_stored_config()
+                    console.print(f"[bold]GitHub account:[/bold] @{config.get('username', 'Not logged in')}")
+                    console.print(f"[bold]Leaderboard:[/bold] {'Hidden' if config.get('opted_out') else 'Visible'}")
             else:
                 parser.print_help()
     except KeyboardInterrupt:

@@ -11,6 +11,7 @@ console = Console()
 
 
 def cmd_changelog(args):
+    utils.ensure_authenticated()
     utils.check_and_update()
     if not utils.is_git_repository():
         console.print("[red]Opps... No Git repository found. Please navigate to a project directory that has a Git repository, or initialize one using 'git init'.[/red]")
@@ -104,6 +105,7 @@ def cmd_changelog(args):
             response = requests.post(
                 f"{backend_domain}/api/generate-changelog",
                 json=payload,
+                headers=utils.get_auth_headers(),
                 timeout=60,
             )
 

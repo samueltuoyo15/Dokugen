@@ -8,6 +8,8 @@ import helmet from "helmet";
 dns.setDefaultResultOrder("ipv4first");
 
 import { limiter } from "./middleware/rateLimiter";
+import { requireGitHubAuth } from "./middleware/githubAuth";
+import authRouter from "./routes/auth";
 import changelogRouter from "./routes/changelog";
 import commitRouter from "./routes/commit";
 import healthRouter from "./routes/health";
@@ -28,14 +30,15 @@ app.use(
   }),
 );
 app.use(helmet());
+app.use(limiter);
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
-app.use(limiter);
 app.use("/api", healthRouter);
-app.use("/api", readmeRouter);
-app.use("/api", commitRouter);
-app.use("/api", ogRouter);
-app.use("/api", changelogRouter);
+app.use("/api", requireGitHubAuth, authRouter);
+app.use("/api", requireGitHubAuth, readmeRouter);
+app.use("/api", requireGitHubAuth, commitRouter);
+app.use("/api", requireGitHubAuth, ogRouter);
+app.use("/api", requireGitHubAuth, changelogRouter);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Dokugen API is running");

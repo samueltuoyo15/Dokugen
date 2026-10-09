@@ -4,6 +4,7 @@ import chalk from "chalk";
 import type { Command } from "commander";
 import fs from "fs-extra";
 import { createSpinner } from "nanospinner";
+import { ensureAuthenticated } from "../helpers/auth.js";
 import { DOKUGEN_BANNER } from "../helpers/constants.js";
 import { scanFiles } from "../helpers/fileOps.js";
 import { getUserInfo, isGitRepository } from "../helpers/git.js";
@@ -39,6 +40,7 @@ export function registerGenerateCommand(program: Command) {
         process.exit(1);
       }
 
+      await ensureAuthenticated();
       await checkAndUpdate();
       await sleep(50);
       console.log(`\n${chalk.hex("#000080")(DOKUGEN_BANNER)}\n`);
@@ -83,7 +85,6 @@ export function registerGenerateCommand(program: Command) {
           } else {
             await generateReadme(projectType, projectFiles, projectDir, undefined, options.template);
           }
-          console.log(chalk.green("README.md generated from template!"));
           return;
         }
 

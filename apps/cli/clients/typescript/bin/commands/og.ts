@@ -4,6 +4,7 @@ import chalk from "chalk";
 import type { Command } from "commander";
 import fs from "fs-extra";
 import { createSpinner } from "nanospinner";
+import { ensureAuthenticated, getAuthHeaders } from "../helpers/auth.js";
 import { DOKUGEN_BANNER } from "../helpers/constants.js";
 import { isGitRepository } from "../helpers/git.js";
 import { checkAndUpdate, checkInternetConnection, getBackendDomain } from "../helpers/network.js";
@@ -46,6 +47,7 @@ export function registerOgCommand(program: Command) {
         process.exit(1);
       }
 
+      await ensureAuthenticated();
       await checkAndUpdate();
       console.log(`\n${chalk.hex("#000080")(DOKUGEN_BANNER)}\n`);
       const projectDir = process.cwd();
@@ -73,7 +75,9 @@ export function registerOgCommand(program: Command) {
         const metadataSpinner = createSpinner("Analyzing project to generate card profile...").start();
         const timerInterval = setInterval(() => {
           const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-          metadataSpinner.update({ text: `Analyzing project to generate card profile... (${elapsed}s)` });
+          metadataSpinner.update({
+            text: `Analyzing project to generate card profile... (${elapsed}s)`,
+          });
         }, 100);
 
         try {
@@ -117,7 +121,7 @@ export function registerOgCommand(program: Command) {
             {
               summary: codebaseSummary,
             },
-            { timeout: 30000 },
+            { timeout: 30000, headers: getAuthHeaders() },
           );
 
           clearInterval(timerInterval);
@@ -164,6 +168,7 @@ export function registerOgCommand(program: Command) {
         const response = await axios.post(`${backendUrl}/api/render-og`, renderPayload, {
           responseType: "arraybuffer",
           timeout: 20000,
+          headers: getAuthHeaders(),
         });
 
         clearInterval(renderTimerInterval);

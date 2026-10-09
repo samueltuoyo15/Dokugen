@@ -67,12 +67,21 @@ export default function PrivacyPage() {
                     <tbody className="divide-y divide-zinc-200 bg-white">
                       <tr>
                         <td className="px-6 py-4 font-mono text-zinc-800 text-xs">username</td>
-                        <td className="px-6 py-4 text-zinc-500 text-xs">To identify unique users and prevent spam.</td>
+                        <td className="px-6 py-4 text-zinc-500 text-xs">
+                          Your verified GitHub username, used to authenticate requests and prevent spam.
+                        </td>
                       </tr>
                       <tr>
                         <td className="px-6 py-4 font-mono text-zinc-800 text-xs">email</td>
                         <td className="px-6 py-4 text-zinc-500 text-xs">
-                          If available in git config, used for unique user identification.
+                          Your primary verified GitHub email, when available, used for unique user identification.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 font-mono text-zinc-800 text-xs">GitHub access token</td>
+                        <td className="px-6 py-4 text-zinc-500 text-xs">
+                          Stored locally with restricted file permissions and sent over HTTPS to authenticate API
+                          requests. The server validates it with GitHub and does not store the token.
                         </td>
                       </tr>
                       <tr>
@@ -149,7 +158,7 @@ export default function PrivacyPage() {
                 <p>
                   We use Supabase, a secure backend-as-a-service platform, to store usage metrics. The database is
                   secured with Row Level Security (RLS) policies and is only accessible by the Dokugen administration
-                  team.
+                  team. Your GitHub access token is not stored in this database or displayed on the leaderboard.
                 </p>
               </section>
 
@@ -162,7 +171,12 @@ export default function PrivacyPage() {
             </div>
 
             <div className="mt-12 pt-8 border-t border-zinc-200 text-xs text-zinc-400 text-center">
-              Last updated: {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+              Last updated:{" "}
+              {new Date().toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
             </div>
           </div>
         </motion.div>
