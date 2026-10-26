@@ -6,8 +6,8 @@ import axios from "axios";
 import chalk from "chalk";
 import fs from "fs-extra";
 import { createSpinner } from "nanospinner";
+import { withAuthenticatedRequest } from "./auth.js";
 import { API_TIMEOUT } from "./constants.js";
-import { getAuthHeaders } from "./auth.js";
 import { extractFullCode, getDokugenBackupPath, getFileHash, loadCache, saveCache } from "./fileOps.js";
 import { getGitRepoUrl, getUserInfo } from "./git.js";
 import { compressData, getBackendDomain } from "./network.js";
@@ -301,33 +301,32 @@ export const generateReadme = async (
     const linkedinUrl = linkedinUsername ? `https://linkedin.com/in/${linkedinUsername}` : undefined;
     const twitterUrl = twitterUsername ? `https://x.com/${twitterUsername}` : undefined;
 
-    const response = await axios.post(
-      `${backendDomain}/api/generate-readme`,
-      {
-        projectType,
-        projectFiles,
-        fullCode: compressedFullCode,
-        userInfo,
-        options: {
-          includeSetup: includeSetup === true,
-          includeContributionGuideLine: includeContributionGuideLine === true,
-          includeApiDocs: includeApiDocs === true,
-          includeDiagrams: includeDiagrams === true,
-          isIncremental,
-          modifiedFiles: isIncremental ? modifiedFiles : undefined,
-          linkedinUrl,
-          twitterUrl,
-        },
-        existingReadme: compressedExistingReadme,
-        repoUrl,
-        templateUrl,
-        compressed: true,
+    const payload = {
+      projectType,
+      projectFiles,
+      fullCode: compressedFullCode,
+      userInfo,
+      options: {
+        includeSetup: includeSetup === true,
+        includeContributionGuideLine: includeContributionGuideLine === true,
+        includeApiDocs: includeApiDocs === true,
+        includeDiagrams: includeDiagrams === true,
+        isIncremental,
+        modifiedFiles: isIncremental ? modifiedFiles : undefined,
+        linkedinUrl,
+        twitterUrl,
       },
-      {
+      existingReadme: compressedExistingReadme,
+      repoUrl,
+      templateUrl,
+      compressed: true,
+    };
+    const response = await withAuthenticatedRequest((headers) =>
+      axios.post(`${backendDomain}/api/generate-readme`, payload, {
         responseType: "stream",
         timeout: API_TIMEOUT,
-        headers: getAuthHeaders(),
-      },
+        headers,
+      }),
     );
 
     const fileStream = fs.createWriteStream(readmePath);
@@ -371,7 +370,12 @@ export const generateReadme = async (
           });
           console.log(
             chalk.cyan("\nYou like what you see? Support Dokugen financially: ") +
-              chalk.blue.underline(terminalLink("https://myhappr.com/samueltuoyo", "https://myhappr.com/samueltuoyo")) +
+              chalk.blue.underline(
+                terminalLink(
+                  "https://myhappr.com/samueltuoyo",
+                  "https://myhappr.com/samueltuoyo?utm_source=dokugen&utm_medium=cli&utm_campaign=readme_success",
+                ),
+              ) +
               chalk.dim(" (Ctrl+Click or Cmd+Click to follow link)"),
           );
           readmeBackup = null;
@@ -447,6 +451,12 @@ export const generateReadme = async (
     if (restoredContent === null && !readmeExistedBefore) {
       await fs.remove(readmePath).catch(() => {});
     }
-    throw error instanceof Error ? error : new Error("README generation failed");
+    const status = (error as { response?: { status?: number; data?: { error?: string } } })?.response?.status;
+    if (status === 401) {
+      throw new Error("GitHub authentication was rejected after retrying. Run 'dokugen login' and try again.");
+    }
+    const serverMessage = (error as { response?: { data?: { error?: string } } })?.response?.data?.error;
+    if (serverMessage) throw new Error(serverMessage);
+    throw new Error(getHttpErrorLabel(error));
   }
 };

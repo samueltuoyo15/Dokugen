@@ -4,7 +4,7 @@ import chalk from "chalk";
 import type { Command } from "commander";
 import fs from "fs-extra";
 import { createSpinner } from "nanospinner";
-import { ensureAuthenticated, getAuthHeaders } from "../helpers/auth.js";
+import { ensureAuthenticated, withAuthenticatedRequest } from "../helpers/auth.js";
 import { DOKUGEN_BANNER } from "../helpers/constants.js";
 import { isGitRepository } from "../helpers/git.js";
 import { checkAndUpdate, checkInternetConnection, getBackendDomain } from "../helpers/network.js";
@@ -116,12 +116,12 @@ export function registerOgCommand(program: Command) {
           }
 
           const backendUrl = await getBackendDomain();
-          const response = await axios.post<OgMetadata>(
-            `${backendUrl}/api/og-metadata`,
-            {
-              summary: codebaseSummary,
-            },
-            { timeout: 30000, headers: getAuthHeaders() },
+          const response = await withAuthenticatedRequest((headers) =>
+            axios.post<OgMetadata>(
+              `${backendUrl}/api/og-metadata`,
+              { summary: codebaseSummary },
+              { timeout: 30000, headers },
+            ),
           );
 
           clearInterval(timerInterval);
@@ -165,11 +165,13 @@ export function registerOgCommand(program: Command) {
         const renderPayload = { ...metadata, logo: logoData };
 
         const backendUrl = await getBackendDomain();
-        const response = await axios.post(`${backendUrl}/api/render-og`, renderPayload, {
-          responseType: "arraybuffer",
-          timeout: 20000,
-          headers: getAuthHeaders(),
-        });
+        const response = await withAuthenticatedRequest((headers) =>
+          axios.post(`${backendUrl}/api/render-og`, renderPayload, {
+            responseType: "arraybuffer",
+            timeout: 20000,
+            headers,
+          }),
+        );
 
         clearInterval(renderTimerInterval);
         renderSpinner.stop();

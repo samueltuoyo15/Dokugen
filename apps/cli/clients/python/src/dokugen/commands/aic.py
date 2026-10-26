@@ -59,13 +59,13 @@ def cmd_aic(args):
             backend_domain = utils.get_backend_domain()
             user_info = utils.get_user_info()
 
-            response = requests.post(
+            response = utils.authenticated_request(
+                "POST",
                 f"{backend_domain}/api/generate-commit",
                 json={
                     "diff": diff,
                     "userInfo": user_info,
                 },
-                headers=utils.get_auth_headers(),
                 timeout=30,
             )
 
@@ -115,13 +115,13 @@ def cmd_aic(args):
             elif action == "Regenerate message":
                 with utils.create_ticking_spinner("Regenerating commit message...") as spinner:
                     try:
-                        response = requests.post(
+                        response = utils.authenticated_request(
+                            "POST",
                             f"{backend_domain}/api/generate-commit",
                             json={
                                 "diff": diff,
                                 "userInfo": utils.get_user_info(),
                             },
-                            headers=utils.get_auth_headers(),
                             timeout=30,
                         )
                         if response.status_code == 200:

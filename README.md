@@ -5,21 +5,6 @@
 ## Overview
 Dokugen helps developers automate their documentation workflow by analyzing your codebase and generating exactly what you need. It takes a look at your codebase, figures out what your project does, and then writes a clear, detailed README so you don't have to spend time doing it yourself. It's built to make sure your project always has professional and accurate documentation. No complicated setup is required, just straightforward functionality that keeps your documentation in sync with your actual code.
 
-## Official AI Partner & Sponsor
-
-<p align="center">
-  <a href="https://www.apismart.ai" target="_blank" rel="noopener noreferrer">
-    <img src="./public/api-smart.png" alt="ApiSmart Logo" width="220" />
-  </a>
-</p>
-
-<p align="center">
-  <strong><a href="https://www.apismart.ai">ApiSmart</a></strong> is an official sponsor and the recommended AI routing infrastructure for Dokugen.
-</p>
-
-> ApiSmart provides unified access to leading AI models through a single API. Use one API key to connect with LLM, image, and video models through an OpenAI-compatible interface, without managing multiple providers separately. Switch models easily, simplify billing, and improve reliability with intelligent routing and automatic failover. Build and scale AI applications faster with one streamlined API platform.
-
-
 ## System Architecture / Design
 
 Dokugen uses a client-server architecture. CLI clients (Python, TypeScript) interact with a backend API server, which then communicates with Gemini AI for README generation and Git commit message creation. User profile data is stored securely in a Supabase database.
@@ -165,7 +150,7 @@ The server requires environment variables to run.
     NODE_ENV=development
     BACKEND_DOMAIN=http://localhost:3000
     OPENAI_API_KEY=your_api_key_here
-    OPENAI_BASE_URL=https://api.openai.com/v1 # Or any compatible provider like ApiSmart, OpenRouter
+    OPENAI_BASE_URL=https://api.openai.com/v1 # Or any compatible provider like OpenRouter, DeepSeek
     README_MODEL_NAME=gpt-4o
     COMMIT_MODEL_NAME=gpt-4o-mini
     SUPABASE_CLIENT_URL=your_supabase_url

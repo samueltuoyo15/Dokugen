@@ -108,7 +108,9 @@ export function registerUpdateCommand(program: Command) {
 
         await generateReadme(projectType, projectFiles, projectDir, existingContent, options.template);
       } catch (error) {
-        console.error(chalk.red("Error updating README:"), error);
+        console.error(
+          chalk.red(`Error updating README: ${error instanceof Error ? error.message : "README generation failed"}`),
+        );
         await restoreReadme();
         process.exit(1);
       }

@@ -1,13 +1,13 @@
 {
   "name": "dokugen",
-  "version": "14.2.0",
+  "version": "14.2.2",
   "private": false,
   "main": "dist/bin/dokugen.mjs",
   "type": "module",
   "scripts": {
     "build": "tsc",
     "postinstall": "node -e \"import('fs').then(fs => { if (fs.existsSync('dist/scripts/postinstall.mjs')) import('./dist/scripts/postinstall.mjs'); }).catch(() => {})\"",
-    "test": "npm run build && node dist/_tests_/security.test.mjs",
+    "test": "npm run build && node --test dist/_tests_/*.test.mjs",
     "postbuild": "node --no-warnings --loader ts-node/esm lib/rename.ts",
     "build:binaries": "bun run scripts/build-binaries.ts"
   },

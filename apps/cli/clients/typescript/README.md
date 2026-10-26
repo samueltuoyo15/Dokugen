@@ -2,28 +2,10 @@
 
 ![Demo GIF](./public/Demo.gif)
 
-[![Sponsor Dokugen](https://img.shields.io/badge/Sponsor-Dokugen-red?style=for-the-badge&logo=ko-fi&logoColor=white)](https://myhappr.com/samueltuoyo)
+[![Sponsor Dokugen](https://img.shields.io/badge/Sponsor-Dokugen-red?style=for-the-badge&logo=ko-fi&logoColor=white)](https://myhappr.com/samueltuoyo?utm_source=dokugen&utm_medium=readme_npm&utm_campaign=badge)
 
 Dokugen is a lightweight, AI-powered CLI tool that automatically generates and maintains `README.md` files and `LICENSE` files for your projects. It scans your codebase, understands what your project does, and produces clean, professional documentation, so you don't have to.
 
----
-
-## Official AI Partner & Sponsor
-
-<p align="center">
-  <a href="https://www.apismart.ai" target="_blank" rel="noopener noreferrer">
-    <img src="https://raw.githubusercontent.com/samueltuoyo15/Dokugen/main/public/api-smart.png" alt="ApiSmart Logo" width="200" />
-  </a>
-</p>
-
-<p align="center">
-  <strong><a href="https://www.apismart.ai">ApiSmart</a></strong> is an official sponsor and the recommended AI routing infrastructure for Dokugen.
-</p>
-
-> ApiSmart provides unified access to leading AI models through a single API. Use one API key to connect with LLM, image, and video models through an OpenAI-compatible interface, without managing multiple providers separately.
-
-
----
 
 ## Quick Start
 

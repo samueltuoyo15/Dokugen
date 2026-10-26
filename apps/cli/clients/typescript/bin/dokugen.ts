@@ -21,6 +21,13 @@ program
   .version(CURRENT_VERSION)
   .description(`Automatically generate high-quality README for ${projectName}`);
 
+program
+  .command("version")
+  .description("Display the installed Dokugen version")
+  .action(() => {
+    console.log(CURRENT_VERSION);
+  });
+
 registerGenerateCommand(program);
 registerUpdateCommand(program);
 registerAicCommand(program);

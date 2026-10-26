@@ -11,7 +11,7 @@ body:
     id: company_name
     attributes:
       label: Company / Organization Name
-      placeholder: e.g., ApiSmart
+      placeholder: e.g., AcmeCorp
     validations:
       required: true
   - type: textarea

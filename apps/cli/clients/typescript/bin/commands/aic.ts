@@ -4,7 +4,7 @@ import axios from "axios";
 import chalk from "chalk";
 import type { Command } from "commander";
 import { createSpinner } from "nanospinner";
-import { ensureAuthenticated, getAuthHeaders } from "../helpers/auth.js";
+import { ensureAuthenticated, withAuthenticatedRequest } from "../helpers/auth.js";
 import { getUserInfo, isGitRepository } from "../helpers/git.js";
 import { checkAndUpdate, checkInternetConnection, getBackendDomain } from "../helpers/network.js";
 
@@ -83,13 +83,8 @@ export function registerAicCommand(program: Command) {
           const backendDomain = await getBackendDomain();
           const userInfo = getUserInfo();
 
-          const response = await axios.post<{ message: string }>(
-            `${backendDomain}/api/generate-commit`,
-            {
-              diff,
-              userInfo,
-            },
-            { headers: getAuthHeaders() },
+          const response = await withAuthenticatedRequest((headers) =>
+            axios.post<{ message: string }>(`${backendDomain}/api/generate-commit`, { diff, userInfo }, { headers }),
           );
 
           commitMessage = response.data.message;
@@ -160,13 +155,12 @@ export function registerAicCommand(program: Command) {
           } else if (action === "regenerate") {
             const regenSpinner = createSpinner(chalk.blue("Regenerating commit message...")).start();
             try {
-              const response = await axios.post<{ message: string }>(
-                `${backendDomain}/api/generate-commit`,
-                {
-                  diff,
-                  userInfo: getUserInfo(),
-                },
-                { headers: getAuthHeaders() },
+              const response = await withAuthenticatedRequest((headers) =>
+                axios.post<{ message: string }>(
+                  `${backendDomain}/api/generate-commit`,
+                  { diff, userInfo: getUserInfo() },
+                  { headers },
+                ),
               );
               finalCommitMessage = response.data.message;
               if (!finalCommitMessage) {

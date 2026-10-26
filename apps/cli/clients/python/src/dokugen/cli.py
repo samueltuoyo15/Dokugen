@@ -36,6 +36,7 @@ def main():
         subparsers = parser.add_subparsers(dest="command")
 
         # Register subcommand parsers
+        subparsers.add_parser("version", help="Display the installed Dokugen version")
         register_generate_parser(subparsers)
         register_update_parser(subparsers)
         register_revert_parser(subparsers)
@@ -112,7 +113,9 @@ def main():
 
         else:
             args = parser.parse_args()
-            if args.command == "generate":
+            if args.command == "version":
+                console.print(__version__)
+            elif args.command == "generate":
                 cmd_generate(args)
             elif args.command == "update":
                 cmd_update(args)

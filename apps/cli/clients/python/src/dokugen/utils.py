@@ -69,7 +69,7 @@ def login_with_github():
     try:
         device_response = requests.post(
             "https://github.com/login/device/code",
-            json={"client_id": GITHUB_CLIENT_ID, "scope": "read:user user:email"},
+            json={"client_id": GITHUB_CLIENT_ID, "scope": "read:user user:email offline_access"},
             headers={"Accept": "application/json"},
             timeout=15,
         )
@@ -123,6 +123,14 @@ def login_with_github():
                 "email": email,
                 "opted_out": bool(existing.get("opted_out", False)),
                 "access_token": access_token,
+                "refresh_token": data.get("refresh_token"),
+                "access_token_expires_at": time.time() + int(data["expires_in"])
+                if data.get("expires_in")
+                else None,
+                "refresh_token_expires_at": time.time()
+                + int(data["refresh_token_expires_in"])
+                if data.get("refresh_token_expires_in")
+                else None,
             }
             if not save_stored_config(config):
                 return None
@@ -133,10 +141,53 @@ def login_with_github():
     return None
 
 
+def refresh_github_access_token():
+    config = get_stored_config()
+    refresh_token = config.get("refresh_token")
+    if not refresh_token:
+        return False
+
+    try:
+        response = requests.post(
+            "https://github.com/login/oauth/access_token",
+            json={
+                "client_id": GITHUB_CLIENT_ID,
+                "grant_type": "refresh_token",
+                "refresh_token": refresh_token,
+            },
+            headers={"Accept": "application/json"},
+            timeout=15,
+        )
+        data = response.json()
+        if response.status_code != 200 or data.get("error") or not data.get("access_token"):
+            return False
+
+        return save_stored_config(
+            {
+                "access_token": data["access_token"],
+                "refresh_token": data.get("refresh_token", refresh_token),
+                "access_token_expires_at": time.time() + int(data["expires_in"])
+                if data.get("expires_in")
+                else None,
+                "refresh_token_expires_at": time.time()
+                + int(data["refresh_token_expires_in"])
+                if data.get("refresh_token_expires_in")
+                else config.get("refresh_token_expires_at"),
+            }
+        )
+    except Exception:
+        return False
+
+
 def ensure_authenticated():
     config = get_stored_config()
     if config.get("username") and config.get("access_token"):
-        return config
+        expires_at = config.get("access_token_expires_at")
+        if not expires_at or float(expires_at) > time.time() + 60:
+            return config
+        if refresh_github_access_token():
+            return get_stored_config()
+        clear_stored_config()
     console.print("[cyan]GitHub authentication required. Please log in to continue.[/cyan]")
     config = login_with_github()
     if not config:
@@ -152,12 +203,32 @@ def get_auth_headers():
     return {"Authorization": f"Bearer {token}"}
 
 
-def update_leaderboard_preference(opted_out):
+def authenticated_request(method, url, **kwargs):
     ensure_authenticated()
-    response = requests.post(
+    kwargs["headers"] = {**kwargs.get("headers", {}), **get_auth_headers()}
+    response = requests.request(method, url, **kwargs)
+    if response.status_code != 401:
+        return response
+
+    response.close()
+    if not refresh_github_access_token():
+        clear_stored_config()
+        console.print("[yellow]Your GitHub session expired. Please authenticate again.[/yellow]")
+        if not login_with_github():
+            raise RuntimeError("GitHub authentication failed. Run 'dokugen login'.")
+
+    kwargs["headers"] = {**kwargs.get("headers", {}), **get_auth_headers()}
+    retry_response = requests.request(method, url, **kwargs)
+    if retry_response.status_code == 401:
+        clear_stored_config()
+    return retry_response
+
+
+def update_leaderboard_preference(opted_out):
+    response = authenticated_request(
+        "POST",
         f"{get_backend_domain()}/api/auth/preferences",
         json={"opted_out": bool(opted_out)},
-        headers=get_auth_headers(),
         timeout=10,
     )
     response.raise_for_status()
@@ -273,48 +344,94 @@ def check_and_update():
                 f"\n[cyan]New version available: {latest_version} (current: {current_version})[/cyan]"
             )
 
+            try:
+                executable_path = str(Path(sys.argv[0]).resolve()).lower()
+            except Exception:
+                executable_path = (sys.argv[0] or "").lower()
+            is_uv_tool = "uv/tools" in executable_path or "uv\\tools" in executable_path
+            is_pipx = "pipx" in executable_path
+
+            if is_uv_tool:
+                update_command = ["uv", "tool", "upgrade", PACKAGE_NAME]
+                force_update_command = [
+                    "uv",
+                    "tool",
+                    "install",
+                    "--force",
+                    f"{PACKAGE_NAME}=={latest_version}",
+                ]
+                update_hint = f"uv tool install --force {PACKAGE_NAME}=={latest_version}"
+            elif is_pipx:
+                update_command = ["pipx", "upgrade", PACKAGE_NAME]
+                force_update_command = [
+                    "pipx",
+                    "install",
+                    "--force",
+                    f"{PACKAGE_NAME}=={latest_version}",
+                ]
+                update_hint = f"pipx install --force {PACKAGE_NAME}=={latest_version}"
+            else:
+                update_command = [
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "install",
+                    "--upgrade",
+                    f"{PACKAGE_NAME}=={latest_version}",
+                ]
+                force_update_command = [
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "install",
+                    "--upgrade",
+                    "--force-reinstall",
+                    f"{PACKAGE_NAME}=={latest_version}",
+                ]
+                update_hint = (
+                    f"{sys.executable} -m pip install --upgrade --force-reinstall "
+                    f"{PACKAGE_NAME}=={latest_version}"
+                )
+
+            updated = False
             with create_spinner(f"Updating {PACKAGE_NAME}..."):
                 try:
                     subprocess.run(
-                        [
-                            sys.executable,
-                            "-m",
-                            "uv",
-                            "pip",
-                            "install",
-                            "--upgrade",
-                            f"{PACKAGE_NAME}=={latest_version}",
-                        ],
+                        update_command,
                         capture_output=True,
                         timeout=60,
                         check=True,
                     )
-                except (subprocess.CalledProcessError, FileNotFoundError):
+                    # A package-manager command can update a different environment.
+                    # Only claim success when this interpreter resolves the new version.
+                    updated = get_installed_version() == latest_version
+                except Exception:
+                    updated = False
+
+                if not updated:
+                    console.print("[yellow]Normal update did not replace this installation. Retrying forcefully...[/yellow]")
                     try:
                         subprocess.run(
-                            [
-                                sys.executable,
-                                "-m",
-                                "pip",
-                                "install",
-                                "--upgrade",
-                                f"{PACKAGE_NAME}=={latest_version}",
-                            ],
+                            force_update_command,
                             capture_output=True,
                             timeout=60,
                             check=True,
                         )
+                        updated = get_installed_version() == latest_version
                     except Exception:
-                        console.print(
-                            f"[yellow]Auto-update failed. Please run: pip install --upgrade {PACKAGE_NAME}[/yellow]"
-                        )
-                        return
+                        updated = False
 
-            console.print(f"[green]Successfully updated to v{latest_version}![/green]")
-            console.print(
-                "[yellow]Please re-run your command to use the new version.\n[/yellow]"
-            )
-            sys.exit(0)
+            if updated:
+                console.print(f"[green]Successfully updated to v{latest_version}![/green]")
+                console.print(
+                    "[yellow]Please re-run your command to use the new version.\n[/yellow]"
+                )
+                sys.exit(0)
+            else:
+                console.print(
+                    f"[red]Update required, but this installation could not be replaced. Run: {update_hint}[/red]"
+                )
+                raise SystemExit(1)
     except Exception:
         return
 

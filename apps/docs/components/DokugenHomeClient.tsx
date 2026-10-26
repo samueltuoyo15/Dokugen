@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
-  ArrowRight,
   ChevronDown,
   GitBranch,
   Github,
@@ -169,46 +168,7 @@ export default function DokugenHomeClient() {
           </div>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.1 }}
-          className="mb-16 mt-12"
-        >
-          <h2 className="text-3xl font-bold mb-10 text-zinc-900 tracking-tight text-left">Sponsors</h2>
-          <div className="bg-white p-8 rounded-3xl border border-zinc-200/80 flex flex-col md:flex-row items-center md:items-start gap-8">
-            <div className="shrink-0 bg-zinc-50 border border-zinc-100 p-4 rounded-2xl flex items-center justify-center w-full md:w-48 h-32">
-              <Image src="/api-smart.png" alt="ApiSmart Logo" width={160} height={80} className="object-contain" />
-            </div>
-            <div className="flex-grow text-left">
-              <h3 className="text-xl font-bold text-zinc-900 mb-2">
-                Powered & Sponsored by{" "}
-                <a
-                  href="https://www.apismart.ai"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
-                >
-                  ApiSmart
-                </a>
-              </h3>
-              <p className="text-zinc-600 text-sm leading-relaxed mb-4 font-normal">
-                ApiSmart provides unified access to leading AI models through a single API. Use one API key to connect
-                with LLM, image, and video models through an OpenAI-compatible interface, without managing multiple
-                providers separately.
-              </p>
-              <a
-                href="https://www.apismart.ai"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-5 py-2.5 bg-zinc-900 text-white hover:bg-zinc-800 text-sm font-medium rounded-xl transition-colors"
-              >
-                Explore ApiSmart
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </a>
-            </div>
-          </div>
-        </motion.div>
+
 
         {searchQuery && (
           <motion.div

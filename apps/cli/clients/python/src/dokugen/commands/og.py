@@ -2,7 +2,6 @@ import os
 import sys
 import json
 import base64
-import requests
 from rich.console import Console
 from dokugen import utils
 from dokugen.project_detect import detect_project_type
@@ -94,10 +93,10 @@ def cmd_og(args):
                         break
 
                 backend_url = utils.get_backend_domain()
-                res = requests.post(
+                res = utils.authenticated_request(
+                    "POST",
                     f"{backend_url}/api/og-metadata",
                     json={"summary": codebase_summary},
-                    headers=utils.get_auth_headers(),
                     timeout=30,
                 )
 
@@ -130,10 +129,10 @@ def cmd_og(args):
                     metadata["logo"] = f"data:{mime};base64,{encoded}"
 
             backend_url = utils.get_backend_domain()
-            res = requests.post(
+            res = utils.authenticated_request(
+                "POST",
                 f"{backend_url}/api/render-og",
                 json=metadata,
-                headers=utils.get_auth_headers(),
                 timeout=20,
             )
 

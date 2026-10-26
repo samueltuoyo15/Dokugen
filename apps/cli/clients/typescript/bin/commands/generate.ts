@@ -111,7 +111,7 @@ export function registerGenerateCommand(program: Command) {
           await generateReadme(projectType, projectFiles, projectDir, undefined, undefined);
         }
       } catch (error) {
-        console.error(error);
+        console.error(chalk.red(error instanceof Error ? error.message : "README generation failed"));
         await restoreReadme();
         process.exit(1);
       }

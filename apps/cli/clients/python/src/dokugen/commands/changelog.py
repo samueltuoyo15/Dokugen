@@ -102,10 +102,10 @@ def cmd_changelog(args):
             if model_name:
                 payload["model"] = model_name
 
-            response = requests.post(
+            response = utils.authenticated_request(
+                "POST",
                 f"{backend_domain}/api/generate-changelog",
                 json=payload,
-                headers=utils.get_auth_headers(),
                 timeout=60,
             )
 

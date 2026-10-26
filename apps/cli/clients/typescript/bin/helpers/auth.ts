@@ -13,6 +13,9 @@ export interface DokugenConfig {
   email?: string;
   opted_out?: boolean;
   access_token?: string;
+  refresh_token?: string | null;
+  access_token_expires_at?: number | null;
+  refresh_token_expires_at?: number | null;
   linkedinUsername?: string;
   twitterUsername?: string;
 }
@@ -51,18 +54,78 @@ export function clearStoredConfig(): void {
 }
 
 export async function ensureAuthenticated(): Promise<DokugenConfig> {
-  const config = getStoredConfig();
+  let config = getStoredConfig();
   if (config.username && config.access_token) {
-    return config;
+    const expiresSoon = !!config.access_token_expires_at && config.access_token_expires_at <= Date.now() + 60_000;
+    if (!expiresSoon) return config;
+    if (await refreshGitHubAccessToken()) return getStoredConfig();
+    clearStoredConfig();
+    config = {};
   }
 
   console.log(chalk.cyan("\nGitHub authentication required. Please log in to continue."));
   const loggedIn = await loginWithGitHub();
   if (!loggedIn || !loggedIn.username) {
-    console.log(chalk.red("\nAuthentication required to use Dokugen. Run 'dokugen login' to sign in."));
-    process.exit(1);
+    throw new Error("Authentication required. Run 'dokugen login' to sign in.");
   }
   return loggedIn;
+}
+
+export async function refreshGitHubAccessToken(clientId = GITHUB_CLIENT_ID): Promise<boolean> {
+  const config = getStoredConfig();
+  if (!config.refresh_token) return false;
+
+  try {
+    const response = await axios.post<AccessTokenResponse>(
+      "https://github.com/login/oauth/access_token",
+      {
+        client_id: clientId,
+        grant_type: "refresh_token",
+        refresh_token: config.refresh_token,
+      },
+      { headers: { Accept: "application/json" }, timeout: 15_000 },
+    );
+    if (!response.data.access_token || response.data.error) return false;
+
+    const now = Date.now();
+    return saveStoredConfig({
+      access_token: response.data.access_token,
+      refresh_token: response.data.refresh_token || config.refresh_token,
+      access_token_expires_at: response.data.expires_in ? now + response.data.expires_in * 1000 : null,
+      refresh_token_expires_at: response.data.refresh_token_expires_in
+        ? now + response.data.refresh_token_expires_in * 1000
+        : config.refresh_token_expires_at,
+    });
+  } catch {
+    return false;
+  }
+}
+
+async function recoverAuthentication(): Promise<void> {
+  if (await refreshGitHubAccessToken()) return;
+  clearStoredConfig();
+  console.log(chalk.yellow("\nYour GitHub session expired. Please authenticate again."));
+  const loggedIn = await loginWithGitHub();
+  if (!loggedIn?.access_token) throw new Error("GitHub authentication failed. Please run 'dokugen login'.");
+}
+
+export async function withAuthenticatedRequest<T>(
+  request: (headers: { Authorization: string }) => PromiseLike<T>,
+): Promise<T> {
+  await ensureAuthenticated();
+  try {
+    return await request(getAuthHeaders());
+  } catch (error: unknown) {
+    const status = (error as { response?: { status?: number } })?.response?.status;
+    if (status !== 401) throw error;
+    await recoverAuthentication();
+    try {
+      return await request(getAuthHeaders());
+    } catch (retryError: unknown) {
+      if ((retryError as { response?: { status?: number } })?.response?.status === 401) clearStoredConfig();
+      throw retryError;
+    }
+  }
 }
 
 export function getAuthHeaders(): { Authorization: string } {
@@ -74,12 +137,9 @@ export function getAuthHeaders(): { Authorization: string } {
 }
 
 export async function updateLeaderboardPreference(optedOut: boolean): Promise<void> {
-  await ensureAuthenticated();
   const backendDomain = await getBackendDomain();
-  await axios.post(
-    `${backendDomain}/api/auth/preferences`,
-    { opted_out: optedOut },
-    { headers: getAuthHeaders(), timeout: 10000 },
+  await withAuthenticatedRequest((headers) =>
+    axios.post(`${backendDomain}/api/auth/preferences`, { opted_out: optedOut }, { headers, timeout: 10000 }),
   );
   if (!saveStoredConfig({ opted_out: optedOut })) {
     throw new Error("The server preference was updated, but the local config could not be saved.");
@@ -137,6 +197,9 @@ interface DeviceCodeResponse {
 
 interface AccessTokenResponse {
   access_token?: string;
+  refresh_token?: string;
+  expires_in?: number;
+  refresh_token_expires_in?: number;
   error?: string;
   error_description?: string;
   interval?: number;
@@ -161,7 +224,7 @@ export async function loginWithGitHub(clientId = GITHUB_CLIENT_ID): Promise<Doku
       "https://github.com/login/device/code",
       {
         client_id: clientId,
-        scope: "read:user user:email",
+        scope: "read:user user:email offline_access",
       },
       {
         headers: { Accept: "application/json" },
@@ -244,12 +307,22 @@ export async function loginWithGitHub(clientId = GITHUB_CLIENT_ID): Promise<Doku
 
           const existingConfig = getStoredConfig();
           const optedOut = existingConfig.opted_out ?? false;
-          if (!saveStoredConfig({ username, email, opted_out: optedOut, access_token: accessToken })) {
+          const now = Date.now();
+          const tokenConfig: DokugenConfig = {
+            username,
+            email,
+            opted_out: optedOut,
+            access_token: accessToken,
+            refresh_token: data.refresh_token || null,
+            access_token_expires_at: data.expires_in ? now + data.expires_in * 1000 : null,
+            refresh_token_expires_at: data.refresh_token_expires_in ? now + data.refresh_token_expires_in * 1000 : null,
+          };
+          if (!saveStoredConfig(tokenConfig)) {
             pollSpinner.error({ text: chalk.red("Authenticated, but failed to save credentials.") });
             return null;
           }
           pollSpinner.success({ text: chalk.green(`Successfully authenticated as @${username}!`) });
-          return { username, email, opted_out: optedOut, access_token: accessToken };
+          return tokenConfig;
         }
       } catch {
         // Ignore polling errors while pending

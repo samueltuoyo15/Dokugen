@@ -279,10 +279,10 @@ def generate_readme_remote(project_type, project_files, project_dir, existing_re
         response = None
         with utils.create_ticking_spinner("Generating README...") as spinner:
             try:
-                response = requests.post(
+                response = utils.authenticated_request(
+                    "POST",
                     f"{backend_domain}/api/generate-readme",
                     json=payload,
-                    headers=utils.get_auth_headers(),
                     stream=True,
                     timeout=API_TIMEOUT,
                 )
@@ -318,7 +318,7 @@ def generate_readme_remote(project_type, project_files, project_dir, existing_re
         elapsed_str = utils.format_elapsed_time(start_time)
         console.print(f"\n[green]README.md created successfully in {elapsed_str}[/green]")
         console.print("[cyan]\nYou like what you see? Support Dokugen financially: [/cyan]"
-                      "[blue underline][link=https://myhappr.com/samueltuoyo]https://myhappr.com/samueltuoyo[/link][/blue underline]"
+                      "[blue underline][link=https://myhappr.com/samueltuoyo?utm_source=dokugen&utm_medium=cli&utm_campaign=readme_success]https://myhappr.com/samueltuoyo[/link][/blue underline]"
                       "[dim] (Ctrl+Click or Cmd+Click to follow link)[/dim]")
         utils.discard_readme_backup()
 

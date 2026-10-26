@@ -5,7 +5,7 @@ import chalk from "chalk";
 import type { Command } from "commander";
 import fs from "fs-extra";
 import { createSpinner } from "nanospinner";
-import { ensureAuthenticated, getAuthHeaders } from "../helpers/auth.js";
+import { ensureAuthenticated, withAuthenticatedRequest } from "../helpers/auth.js";
 import { getUserInfo, isGitRepository } from "../helpers/git.js";
 import { checkAndUpdate, checkInternetConnection, getBackendDomain } from "../helpers/network.js";
 
@@ -117,16 +117,18 @@ export function registerChangelogCommand(program: Command) {
         const backendDomain = await getBackendDomain();
         const userInfo = getUserInfo();
 
-        const response = await axios.post<{ changelog: string }>(
-          `${backendDomain}/api/generate-changelog`,
-          {
-            logs: gitLogs,
-            version,
-            existingChangelog,
-            userInfo,
-            model: options.model || process.env.OPENAI_MODEL,
-          },
-          { headers: getAuthHeaders() },
+        const response = await withAuthenticatedRequest((headers) =>
+          axios.post<{ changelog: string }>(
+            `${backendDomain}/api/generate-changelog`,
+            {
+              logs: gitLogs,
+              version,
+              existingChangelog,
+              userInfo,
+              model: options.model || process.env.OPENAI_MODEL,
+            },
+            { headers },
+          ),
         );
 
         const generatedContent = response.data.changelog;

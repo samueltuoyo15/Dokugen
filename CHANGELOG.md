@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [14.2.2] - 2026-10-17
+
+### Fixed
+- **Multi-Package Manager Auto-Updating**: Enhanced CLI auto-updaters to detect and support global installations via pnpm, npm, yarn, bun (TypeScript CLI) and uv tool, pipx, pip (Python CLI), preventing update loops.
+- **Reliable Update Status**: Verify that the active installation actually changed before reporting a successful auto-update.
+- **Forced Update Recovery**: Retry a failed update with an exact-version forced reinstall and stop safely when the active installation still cannot be replaced.
+- **CLI Version Command**: Added `dokugen version` alongside the existing `dokugen --version` flag.
+- **Refreshing GitHub Sessions**: Store and rotate GitHub refresh tokens, refresh shortly before expiry, and retry protected requests once before falling back to device login.
+- **Safe Authentication Errors**: Rejected credentials are cleared without printing request details or bearer tokens.
+
 ## [14.1.0] - 2026-10-09
 
 ### Added
@@ -10,9 +20,6 @@ All notable changes to this project will be documented in this file.
 - **Leaderboard Privacy Config (`dokugen config`)**: Added an opt-out toggle (`--opt-out-leaderboard`) that hides the user from the public leaderboard while preserving aggregate usage counts.
 
 ## [14.0.12] - 2026-09-23
-
-### Added
-- **Official Sponsorship**: Added ApiSmart as an official project sponsor and partner.
 
 ### Changed
 - **Documentation UI overhaul**: Cleaned up the docs landing page layout, streamlined the "Contribute" and "Sponsors" sections into a cleaner side-by-side view, added native FAQ accordions, and fully modernized the footer.
