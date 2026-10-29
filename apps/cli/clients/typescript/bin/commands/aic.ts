@@ -158,7 +158,7 @@ export function registerAicCommand(program: Command) {
               const response = await withAuthenticatedRequest((headers) =>
                 axios.post<{ message: string }>(
                   `${backendDomain}/api/generate-commit`,
-                  { diff, userInfo: getUserInfo() },
+                  { diff, userInfo: getUserInfo(), previousMessage: finalCommitMessage },
                   { headers },
                 ),
               );

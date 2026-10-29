@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "node --watch -r ts-node/register server.ts",
     "build": "tsc",
+    "test": "pnpm run build && node --test dist/tests/*.test.js",
     "start": "node dist/server.js"
   },
   "keywords": ["open source", "readme generator", "cli tool", "OritseWeyinmi samuel Tuoyo"],

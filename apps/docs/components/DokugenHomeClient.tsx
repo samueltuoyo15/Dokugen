@@ -168,8 +168,6 @@ export default function DokugenHomeClient() {
           </div>
         </motion.div>
 
-
-
         {searchQuery && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -58,13 +58,28 @@ export const getUpdateCommand = (version = "latest"): UpdateCommand => {
   const pathStr = `${process.argv[1] || ""} ${getInstallationPath()}`.toLowerCase();
 
   if (pathStr.includes("pnpm") || process.env.PNPM_HOME) {
-    return { executable: "pnpm", args: ["add", "-g", spec], forceArgs: ["add", "-g", "--force", spec], hint: `pnpm add -g --force ${spec}` };
+    return {
+      executable: "pnpm",
+      args: ["add", "-g", spec],
+      forceArgs: ["add", "-g", "--force", spec],
+      hint: `pnpm add -g --force ${spec}`,
+    };
   }
   if (pathStr.includes("yarn")) {
-    return { executable: "yarn", args: ["global", "add", spec], forceArgs: ["global", "add", "--force", spec], hint: `yarn global add --force ${spec}` };
+    return {
+      executable: "yarn",
+      args: ["global", "add", spec],
+      forceArgs: ["global", "add", "--force", spec],
+      hint: `yarn global add --force ${spec}`,
+    };
   }
   if (pathStr.includes(`${path.sep}.bun${path.sep}`) || pathStr.includes("bun-install")) {
-    return { executable: "bun", args: ["add", "-g", spec], forceArgs: ["add", "-g", "--force", spec], hint: `bun add -g --force ${spec}` };
+    return {
+      executable: "bun",
+      args: ["add", "-g", spec],
+      forceArgs: ["add", "-g", "--force", spec],
+      hint: `bun add -g --force ${spec}`,
+    };
   }
   return {
     executable: "npm",
