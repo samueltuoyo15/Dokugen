@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [14.2.4] - 2026-10-30
+
+### Fixed
+- **Active-Install Auto-Updates**: Select npm, pnpm, yarn, or Bun from the running Dokugen executable instead of allowing an unrelated package-manager environment variable to redirect the update.
+- **Commit Provider Resilience**: Safely handle malformed AI-provider responses and return a controlled timeout before the hosting proxy produces a 524.
+- **Python Commit Regeneration**: Send the prior suggestion from the Python CLI so regenerated messages are meaningfully different, matching the TypeScript client.
+- **Friendlier CLI Exit**: Use a warmer sign-off across both CLI clients.
+
 ## [14.2.3] - 2026-10-30
 
 ### Fixed
