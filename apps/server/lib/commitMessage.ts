@@ -5,6 +5,22 @@ export type SanitizedCommitMessage =
   | { message: string; repaired: boolean }
   | { message?: never; repaired: false; reason: string };
 
+export function extractCompletionMessage(completion: unknown): string {
+  if (!completion || typeof completion !== "object") return "";
+
+  const choices = (completion as { choices?: unknown }).choices;
+  if (!Array.isArray(choices) || choices.length === 0) return "";
+
+  const firstChoice = choices[0];
+  if (!firstChoice || typeof firstChoice !== "object") return "";
+
+  const message = (firstChoice as { message?: unknown }).message;
+  if (!message || typeof message !== "object") return "";
+
+  const content = (message as { content?: unknown }).content;
+  return typeof content === "string" ? content.trim() : "";
+}
+
 export function sanitizeCommitMessage(raw: string): SanitizedCommitMessage {
   if (!raw || !raw.trim()) {
     return { repaired: false, reason: "The model returned an empty response" };

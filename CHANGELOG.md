@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [14.2.3] - 2026-10-30
+
+### Fixed
+- **Reliable AI Commit Messages**: Sanitize and validate generated messages before returning them, safely reject malformed provider responses, and time out before the hosting proxy returns a 524.
+- **Meaningful Commit Regeneration**: Send the previous suggestion from both TypeScript and Python CLIs so regenerated commit messages are more specific and meaningfully different.
+- **Correct Auto-Update Targeting**: Detect the package manager from the running Dokugen installation, preventing a configured `PNPM_HOME` from redirecting updates away from an npm-installed CLI.
+- **Friendlier CLI Exit**: Replace the abrupt goodbye message with a warmer sign-off across both CLI clients.
+
 ## [14.2.2] - 2026-10-17
 
 ### Fixed

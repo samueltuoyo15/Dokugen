@@ -1,6 +1,19 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { sanitizeCommitMessage } from "../lib/commitMessage";
+import { extractCompletionMessage, sanitizeCommitMessage } from "../lib/commitMessage";
+
+describe("extractCompletionMessage", () => {
+  it("extracts text from a valid chat completion", () => {
+    assert.equal(
+      extractCompletionMessage({ choices: [{ message: { content: "  fix(api): handle missing choices  " } }] }),
+      "fix(api): handle missing choices",
+    );
+  });
+
+  it("returns an empty string when the provider omits choices", () => {
+    assert.equal(extractCompletionMessage({ promptFeedback: { blockReason: "OTHER" } }), "");
+  });
+});
 
 describe("sanitizeCommitMessage", () => {
   it("returns a diagnostic error for empty model output", () => {

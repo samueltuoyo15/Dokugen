@@ -121,6 +121,7 @@ def cmd_aic(args):
                             json={
                                 "diff": diff,
                                 "userInfo": utils.get_user_info(),
+                                "previousMessage": final_commit_message,
                             },
                             timeout=30,
                         )

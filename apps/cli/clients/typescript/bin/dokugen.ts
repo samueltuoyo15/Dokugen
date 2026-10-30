@@ -59,7 +59,7 @@ main();
 
 process.on("SIGINT", async () => {
   process.stdout.write(process.platform === "win32" ? "\x1B[2J\x1B[0f" : "\x1B[2J\x1B[3J\x1B[H");
-  console.log(chalk.bold.hex("#000080")("Dokugen: Goodbye!"));
+  console.log(chalk.bold.hex("#000080")("Dokugen: See you next time!"));
   try {
     const { restoreReadme } = await import("./helpers/readme.js");
     await restoreReadme();

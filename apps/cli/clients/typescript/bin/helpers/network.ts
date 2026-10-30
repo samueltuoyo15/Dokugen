@@ -44,8 +44,7 @@ interface UpdateCommand {
   hint: string;
 }
 
-const getInstallationPath = (): string => {
-  const entrypoint = process.argv[1] || "";
+const getInstallationPath = (entrypoint = process.argv[1] || ""): string => {
   try {
     return fs.realpathSync(entrypoint).toLowerCase();
   } catch {
@@ -53,11 +52,46 @@ const getInstallationPath = (): string => {
   }
 };
 
-export const getUpdateCommand = (version = "latest"): UpdateCommand => {
-  const spec = `dokugen@${version}`;
-  const pathStr = `${process.argv[1] || ""} ${getInstallationPath()}`.toLowerCase();
+type PackageManager = "npm" | "pnpm" | "yarn" | "bun";
 
-  if (pathStr.includes("pnpm") || process.env.PNPM_HOME) {
+export const detectPackageManager = (
+  entrypoint = process.argv[1] || "",
+  environment: NodeJS.ProcessEnv = process.env,
+): PackageManager => {
+  const normalize = (value: string): string => value.replace(/\\/g, "/").toLowerCase().replace(/\/$/, "");
+  const paths = [normalize(entrypoint), normalize(getInstallationPath(entrypoint))].filter(Boolean);
+  const pnpmHome = normalize(environment.PNPM_HOME || "");
+
+  if (
+    (pnpmHome && paths.some((candidate) => candidate === pnpmHome || candidate.startsWith(`${pnpmHome}/`))) ||
+    paths.some(
+      (candidate) =>
+        candidate.includes("/.pnpm/") ||
+        candidate.includes("/pnpm/global/") ||
+        candidate.includes("/pnpm-global/") ||
+        candidate.includes("/share/pnpm/"),
+    )
+  ) {
+    return "pnpm";
+  }
+  if (paths.some((candidate) => candidate.includes("/yarn/global/") || candidate.includes("/.yarn/"))) {
+    return "yarn";
+  }
+  if (paths.some((candidate) => candidate.includes("/.bun/") || candidate.includes("/bun-install/"))) {
+    return "bun";
+  }
+  return "npm";
+};
+
+export const getUpdateCommand = (
+  version = "latest",
+  entrypoint = process.argv[1] || "",
+  environment: NodeJS.ProcessEnv = process.env,
+): UpdateCommand => {
+  const spec = `dokugen@${version}`;
+  const packageManager = detectPackageManager(entrypoint, environment);
+
+  if (packageManager === "pnpm") {
     return {
       executable: "pnpm",
       args: ["add", "-g", spec],
@@ -65,7 +99,7 @@ export const getUpdateCommand = (version = "latest"): UpdateCommand => {
       hint: `pnpm add -g --force ${spec}`,
     };
   }
-  if (pathStr.includes("yarn")) {
+  if (packageManager === "yarn") {
     return {
       executable: "yarn",
       args: ["global", "add", spec],
@@ -73,7 +107,7 @@ export const getUpdateCommand = (version = "latest"): UpdateCommand => {
       hint: `yarn global add --force ${spec}`,
     };
   }
-  if (pathStr.includes(`${path.sep}.bun${path.sep}`) || pathStr.includes("bun-install")) {
+  if (packageManager === "bun") {
     return {
       executable: "bun",
       args: ["add", "-g", spec],

@@ -1,6 +1,6 @@
 import { type Request, type Response, Router } from "express";
 import { v4 as uuidv4 } from "uuid";
-import { sanitizeCommitMessage } from "../lib/commitMessage";
+import { extractCompletionMessage, sanitizeCommitMessage } from "../lib/commitMessage";
 import { createOpenAIClient, getModelName } from "../lib/openaiClient";
 import { trackUser } from "../lib/supabaseTracker";
 import { getVerifiedGitHubUser } from "../middleware/githubAuth";
@@ -40,25 +40,28 @@ router.post("/generate-commit", async (req: Request, res: Response): Promise<voi
 
     const openai = await createOpenAIClient();
 
-    const completion = await openai.chat.completions.create({
-      model: modelName,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        {
-          role: "user",
-          content: `Git diff:\n\n${diff}\n\nGenerate the single-line conventional commit message:${
-            typeof previousMessage === "string" && previousMessage.trim()
-              ? `\nThe previous suggestion was "${previousMessage.trim()}". Generate a meaningfully different, more specific message.`
-              : ""
-          }`,
-        },
-      ],
-      max_tokens: 150,
-      temperature: 0.2,
-    });
+    const completion = await openai.chat.completions.create(
+      {
+        model: modelName,
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          {
+            role: "user",
+            content: `Git diff:\n\n${diff}\n\nGenerate the single-line conventional commit message:${
+              typeof previousMessage === "string" && previousMessage.trim()
+                ? `\nThe previous suggestion was "${previousMessage.trim()}". Generate a meaningfully different, more specific message.`
+                : ""
+            }`,
+          },
+        ],
+        max_tokens: 150,
+        temperature: 0.2,
+      },
+      { timeout: 25_000, maxRetries: 0 },
+    );
 
-    const choice = completion.choices[0];
-    const rawMessage = choice?.message?.content?.trim() || "";
+    const choice = completion.choices?.[0];
+    const rawMessage = extractCompletionMessage(completion);
     const result = sanitizeCommitMessage(rawMessage);
 
     if ("reason" in result) {
@@ -80,8 +83,11 @@ router.post("/generate-commit", async (req: Request, res: Response): Promise<voi
       response?: { data?: { error?: { message?: string } } };
       message?: string;
     };
-    const errorMessage = err?.response?.data?.error?.message || err?.message || "Internal Server Error";
-    res.status(500).json({ error: errorMessage });
+    const isTimeout = (error as { name?: string }).name === "APIConnectionTimeoutError";
+    const errorMessage = isTimeout
+      ? "Commit-message generation timed out. Please try again."
+      : err?.response?.data?.error?.message || err?.message || "Internal Server Error";
+    res.status(isTimeout ? 504 : 500).json({ error: errorMessage });
   }
 });
 

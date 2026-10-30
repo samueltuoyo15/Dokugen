@@ -74,7 +74,7 @@ def main():
             if action == "exit" or action is None:
                 sys.stdout.write('\x1b[2J\x1b[3J\x1b[H')
                 sys.stdout.flush()
-                console.print("[bold #000080]Dokugen: Goodbye![/bold #000080]")
+                console.print("[bold #000080]Dokugen: See you next time![/bold #000080]")
                 return
 
             class Args:
@@ -151,7 +151,7 @@ def main():
     except KeyboardInterrupt:
         sys.stdout.write('\x1b[2J\x1b[3J\x1b[H')
         sys.stdout.flush()
-        console.print("[bold #000080]Dokugen: Goodbye![/bold #000080]")
+        console.print("[bold #000080]Dokugen: See you next time![/bold #000080]")
         sys.exit(0)
 
 

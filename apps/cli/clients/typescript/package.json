@@ -1,6 +1,6 @@
 {
   "name": "dokugen",
-  "version": "14.2.2",
+  "version": "14.2.3",
   "private": false,
   "main": "dist/bin/dokugen.mjs",
   "type": "module",
