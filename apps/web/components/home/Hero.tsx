@@ -17,7 +17,7 @@ export default function Hero({ starsCount }: HeroProps) {
       transition={{ duration: 0.7 }}
       className="pt-16 pb-20"
     >
-      <h1 className="text-4xl font-bold leading-[1.08] tracking-tight text-zinc-950 sm:text-5xl md:text-6xl">
+      <h1 className="text-3xl font-bold leading-[1.08] tracking-tight text-zinc-950 min-[400px]:text-4xl sm:text-5xl md:text-6xl">
         Turn your <span className="sm:hidden">repos</span><span className="hidden sm:inline">repositories</span> into
         <span className="block text-violet-600">job-ready portfolio pieces</span>
       </h1>
@@ -27,10 +27,10 @@ export default function Hero({ starsCount }: HeroProps) {
         recruiter-ready READMEs and spotless Conventional Commits directly from your terminal.
       </p>
 
-      <div className="mt-8 flex flex-wrap items-center gap-3">
+      <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <Link
           href="#get-started"
-          className="inline-flex h-11 items-center rounded-lg bg-zinc-950 px-5 text-sm font-semibold text-white transition-colors hover:bg-zinc-800"
+          className="inline-flex h-11 items-center justify-center whitespace-nowrap rounded-lg bg-zinc-950 px-5 text-sm font-semibold text-white transition-colors hover:bg-zinc-800"
         >
           Get started
         </Link>
@@ -38,10 +38,10 @@ export default function Hero({ starsCount }: HeroProps) {
           href="https://github.com/samueltuoyo15/Dokugen"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex h-11 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-5 text-sm font-semibold text-zinc-900 transition-colors hover:border-zinc-300"
+          className="inline-flex h-11 items-center justify-center whitespace-nowrap gap-2 rounded-lg border border-zinc-200 bg-white px-5 text-sm font-semibold text-zinc-900 transition-colors hover:border-zinc-300"
         >
           {starsCount ? <Star className="h-4 w-4" /> : <Github className="h-4 w-4" />}
-          Star on Github
+          Star on GitHub
           {starsCount ? <span className="font-mono text-xs text-zinc-500">{starsCount.toLocaleString()}</span> : null}
         </Link>
       </div>
