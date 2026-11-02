@@ -429,9 +429,9 @@ def check_and_update():
                 sys.exit(0)
             else:
                 console.print(
-                    f"[red]Update required, but this installation could not be replaced. Run: {update_hint}[/red]"
+                    f"[yellow]Could not update automatically. Continuing with v{current_version}. "
+                    f"Update manually with: {update_hint}[/yellow]"
                 )
-                raise SystemExit(1)
     except Exception:
         return
 

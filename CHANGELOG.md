@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [14.2.6] - 2026-11-02
+
+### Fixed
+- **Multi-Package Manager Shadowing**: Enhanced package manager resolution across npm, pnpm, yarn, and bun to prevent updater shadowing loops.
+
+## [14.2.5] - 2026-11-01
+
+### Fixed
+- **Updates Never Lock You Out**: A failed auto-update now prints the manual command and continues running your command instead of exiting. Applies to both the TypeScript and Python CLIs.
+- **Shadowed Installs**: The TypeScript CLI now updates every package manager that owns a `dokugen` binary on your PATH, so an old npm copy can no longer shadow a newer pnpm copy (or the reverse). Success is verified against the binary your shell resolves next, then your command is relaunched on the new version.
+- **Shadow Notice**: When an update cannot take effect, the CLI lists the duplicate installs and the exact command to remove the one in the way.
+- **Gemini Commit Messages**: `dokugen aic` now generates messages with Gemini 2.5 Flash through Google directly, avoiding gateway timeouts on large diffs.
+
+### Notes
+- Set `DOKUGEN_SKIP_UPDATE=1` to skip the update check.
+- If you are stuck on a version older than 14.2.4, run `npm install -g dokugen@latest` once.
+
 ## [14.2.4] - 2026-10-30
 
 ### Fixed

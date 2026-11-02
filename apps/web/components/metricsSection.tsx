@@ -5,6 +5,7 @@ import { ArrowDown, ArrowUpDown, Award, Code2, FileText, Flame, GitCommit, Users
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { Bar, CartesianGrid, ComposedChart, Legend, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { useSiteStats } from "@/lib/useSiteStats";
 
 interface UserMetrics {
   id: string;
@@ -117,34 +118,7 @@ export default function MetricsSection() {
     staleTime: 1000 * 60 * 10,
   });
 
-  const { data: statsData } = useQuery<{
-    totalUsers: number;
-    totalGenerations: number;
-    totalReadmes: number;
-    totalCommits: number;
-  }>({
-    queryKey: ["siteStats"],
-    queryFn: async () => {
-      try {
-        const res = await fetch("/api/stats");
-        if (!res.ok) {
-          const fallbackRes = await fetch("https://dokugen.samueltuoyo.com/api/stats");
-          if (!fallbackRes.ok)
-            return {
-              totalUsers: 238,
-              totalGenerations: 2137,
-              totalReadmes: 2084,
-              totalCommits: 49,
-            };
-          return fallbackRes.json();
-        }
-        return res.json();
-      } catch {
-        return { totalUsers: 238, totalGenerations: 2137, totalReadmes: 2084, totalCommits: 49 };
-      }
-    },
-    staleTime: 1000 * 60 * 5,
-  });
+  const { data: statsData } = useSiteStats();
 
   const toggleLine = (dataKey: string) => {
     setHiddenLines((prev) => ({

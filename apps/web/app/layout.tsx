@@ -75,12 +75,45 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Caveat:wght@700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
           rel="stylesheet"
         />
       </head>
       <body className="antialiased">
         <Providers>{children}</Providers>
+        <script
+          src="https://cdn.usemadeby.com/v1/embed.js"
+          data-key="mb_live_481be9f586b3f23df7a1924267bd298d7543a25ac78b8ceb"
+          data-position="br"
+          data-docked="true"
+          data-offset="16"
+          data-trigger="hover"
+          data-appear="now"
+          data-phones="always"
+          data-palette="plum"
+          data-font="geometric"
+          data-shape="pill"
+          data-size="m"
+          data-effect="solid"
+          data-border="hair"
+          data-shadow="soft"
+          data-pattern="rays"
+          data-label="Created by"
+          data-icon="photo"
+          data-emoji="🚀"
+          data-layout="list"
+          data-app-arrow="diagonal"
+          data-icon-colors="brand"
+          data-social-colors="badge"
+          data-show-bio="true"
+          data-show-socials="true"
+          data-show-all="true"
+          data-footer="true"
+          data-face="name"
+          data-theme="fixed"
+          defer
+        />
+        <script src="https://myhappr.com/widget.js" defer />
       </body>
     </html>
   );

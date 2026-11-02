@@ -1,7 +1,7 @@
 import { type Request, type Response, Router } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { extractCompletionMessage, sanitizeCommitMessage } from "../lib/commitMessage";
-import { createOpenAIClient, getModelName } from "../lib/openaiClient";
+import { createGeminiCommitClient } from "../lib/openaiClient";
 import { trackUser } from "../lib/supabaseTracker";
 import { getVerifiedGitHubUser } from "../middleware/githubAuth";
 import logger from "../utils/logger";
@@ -32,13 +32,8 @@ router.post("/generate-commit", async (req: Request, res: Response): Promise<voi
     const verifiedUser = getVerifiedGitHubUser(res);
     trackUser({ ...userInfo, ...verifiedUser, id: userInfo?.id || uuidv4() }, "commit").catch(() => {});
 
-    const configuredModelName = process.env.COMMIT_MODEL_NAME;
-    if (!configuredModelName) {
-      throw new Error("COMMIT_MODEL_NAME is missing");
-    }
-    const modelName = getModelName(configuredModelName);
-
-    const openai = await createOpenAIClient();
+    const modelName = process.env.COMMIT_MODEL_NAME || "gemini-2.5-flash";
+    const openai = createGeminiCommitClient();
 
     const completion = await openai.chat.completions.create(
       {

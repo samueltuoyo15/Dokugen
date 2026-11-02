@@ -138,3 +138,20 @@ export const getModelName = (modelName: string): string => {
   const baseURL = getBaseURL();
   return isVertexOpenAIEndpoint(baseURL) && !modelName.includes("/") ? `google/${modelName}` : modelName;
 };
+
+const GOOGLE_OPENAI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/";
+
+/**
+ * Creates an OpenAI SDK client pointed directly to Google Gemini endpoint.
+ * Commit generation exclusively uses Gemini with no fallback.
+ */
+export const createGeminiCommitClient = (): OpenAI => {
+  const apiKey = (process.env.GEMINI_API_KEY || process.env.GEMINI_COMMIT_MESSAGE_API_KEY)?.trim();
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY is required for commit generation");
+  }
+  return new OpenAI({
+    apiKey,
+    baseURL: GOOGLE_OPENAI_BASE_URL,
+  });
+};

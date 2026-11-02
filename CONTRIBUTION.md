@@ -5,7 +5,7 @@ Thanks for wanting to contribute to Dokugen! We appreciate your help making this
 We accept contributions across these main parts of the project:
 - **CLI** (`apps/cli/clients`)
 - **Server** (`apps/server`)
-- **Docs** (`apps/docs`)
+- **Web** (`apps/web`)
 - **VSCode Extension** (`apps/vscode-extension`)
 
 ---
@@ -63,8 +63,8 @@ Run `pnpm install` at the project root to install dependencies for all apps.
 
 ---
 
-### 3. Docs (`apps/docs`)
-1. Go to `apps/docs`.
+### 3. Web (`apps/web`)
+1. Go to `apps/web`.
 2. Run `pnpm run dev` to preview the Next.js site locally.
 3. Run `pnpm run build` to make sure the site builds cleanly.
 
