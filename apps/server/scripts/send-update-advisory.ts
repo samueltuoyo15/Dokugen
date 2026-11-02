@@ -1,15 +1,11 @@
-import nodemailer from "nodemailer";
+import fs from "fs";
+import path from "path";
 import dotenv from "dotenv";
 import { supabase } from "../supabase";
 
 dotenv.config();
 
-const SMTP_HOST = process.env.SMTP_HOST;
-const SMTP_PORT = Number(process.env.SMTP_PORT || "587");
-const SMTP_USER = process.env.SMTP_USER;
-const SMTP_PASS = process.env.SMTP_PASS;
-const EMAIL_FROM = process.env.EMAIL_FROM || '"Dokugen" <hello@samueltuoyo.com>';
-
+const SENDLIBERTY_API_KEY = process.env.SENDLIBERTY_API_KEY;
 const EMAIL_SUBJECT = "Quick fix for Dokugen update loop";
 
 const EMAIL_TEXT = `Hi there,
@@ -83,38 +79,41 @@ const EMAIL_HTML = `<!DOCTYPE html>
 </body>
 </html>`;
 
-async function getTransporter() {
-  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
-    throw new Error(
-      "Missing SMTP configuration. Please set SMTP_HOST, SMTP_PORT, SMTP_USER, and SMTP_PASS in your environment."
-    );
+async function sendEmailViaSendLiberty(to: string, retries = 2): Promise<Record<string, unknown>> {
+  if (!SENDLIBERTY_API_KEY) {
+    throw new Error("Missing SENDLIBERTY_API_KEY in environment.");
   }
 
-  return nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: SMTP_PORT,
-    secure: SMTP_PORT === 465,
-    auth: {
-      user: SMTP_USER,
-      pass: SMTP_PASS,
+  console.log(`Sending advisory email to ${to} via SendLiberty...`);
+
+  const response = await fetch("https://sendliberty.com/api/send", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${SENDLIBERTY_API_KEY}`,
+      "Content-Type": "application/json",
     },
-  });
-}
-
-async function sendAdvisoryEmail(to: string) {
-  const transporter = await getTransporter();
-  console.log(`Sending advisory email to ${to}...`);
-
-  const info = await transporter.sendMail({
-    from: EMAIL_FROM,
-    to,
-    subject: EMAIL_SUBJECT,
-    text: EMAIL_TEXT,
-    html: EMAIL_HTML,
+    body: JSON.stringify({
+      to,
+      subject: EMAIL_SUBJECT,
+      text: EMAIL_TEXT,
+      html: EMAIL_HTML,
+    }),
   });
 
-  console.log(`Email successfully sent to ${to}: messageId = ${info.messageId}`);
-  return info;
+  const data = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+
+  if (response.status === 429 && retries > 0) {
+    console.warn(`Rate limit hit (429). Pausing 3 seconds before retrying ${to}...`);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    return sendEmailViaSendLiberty(to, retries - 1);
+  }
+
+  if (!response.ok) {
+    throw new Error(`SendLiberty API error (${response.status}): ${JSON.stringify(data)}`);
+  }
+
+  console.log(`Email successfully sent to ${to}:`, data);
+  return data;
 }
 
 async function fetchAllUserEmails(): Promise<string[]> {
@@ -131,11 +130,40 @@ async function fetchAllUserEmails(): Promise<string[]> {
     new Set(
       (data || [])
         .map((row) => row.email?.trim())
-        .filter((email): email is string => Boolean(email && email.includes("@")))
+        .filter((email): email is string => {
+          if (!email || !email.includes("@")) return false;
+          const lower = email.toLowerCase();
+          if (lower.includes("noreply") || lower.includes("github.com")) return false;
+          return true;
+        })
     )
   );
 
   return emails;
+}
+
+const ALREADY_SENT_FILE = path.resolve(__dirname, "already_sent.json");
+
+function loadSentEmails(): Set<string> {
+  if (fs.existsSync(ALREADY_SENT_FILE)) {
+    try {
+      const content = fs.readFileSync(ALREADY_SENT_FILE, "utf8");
+      const list = JSON.parse(content) as string[];
+      return new Set(list.map((e) => e.toLowerCase()));
+    } catch {
+      return new Set();
+    }
+  }
+  return new Set();
+}
+
+function recordSentEmail(email: string, sentSet: Set<string>) {
+  sentSet.add(email.toLowerCase());
+  try {
+    fs.writeFileSync(ALREADY_SENT_FILE, JSON.stringify(Array.from(sentSet), null, 2), "utf8");
+  } catch (err) {
+    console.error("Failed to write to already_sent.json:", err);
+  }
 }
 
 async function main() {
@@ -145,26 +173,36 @@ async function main() {
   const targetEmail = toArgIndex !== -1 ? args[toArgIndex + 1] : "hello@samueltuoyo.com";
 
   if (isSendAll) {
-    console.log("Fetching all user emails from database...");
-    const emails = await fetchAllUserEmails();
-    console.log(`Found ${emails.length} unique user emails.`);
+    const sentSet = loadSentEmails();
+    console.log(`Loaded ${sentSet.size} already sent emails.`);
+    console.log("Fetching eligible user emails from database...");
+    const allEmails = await fetchAllUserEmails();
+    const pendingEmails = allEmails.filter((e) => !sentSet.has(e.toLowerCase()));
 
-    for (const email of emails) {
+    console.log(`Total eligible users: ${allEmails.length}. Already sent: ${sentSet.size}. Pending to send: ${pendingEmails.length}`);
+
+    for (let i = 0; i < pendingEmails.length; i++) {
+      const email = pendingEmails[i];
       try {
-        await sendAdvisoryEmail(email);
-        await new Promise((resolve) => setTimeout(resolve, 300));
+        console.log(`[${i + 1}/${pendingEmails.length}] Sending to ${email}...`);
+        await sendEmailViaSendLiberty(email);
+        recordSentEmail(email, sentSet);
       } catch (err) {
-        console.error(`Error sending to ${email}:`, err);
+        const error = err as Error;
+        console.error(`Error sending to ${email}:`, error.message);
       }
+      // Respect SendLiberty 30 req/min rate limit (1 email per 2.2 seconds)
+      await new Promise((resolve) => setTimeout(resolve, 2200));
     }
-    console.log("Finished sending advisory emails to all users.");
+    console.log("Finished sending advisory emails to all remaining users.");
   } else {
     console.log(`Running in test mode. Target: ${targetEmail}`);
-    await sendAdvisoryEmail(targetEmail);
+    await sendEmailViaSendLiberty(targetEmail);
   }
 }
 
 main().catch((err) => {
-  console.error("Advisory email script error:", err.message);
+  const error = err as Error;
+  console.error("Advisory email script error:", error.message);
   process.exit(1);
 });
