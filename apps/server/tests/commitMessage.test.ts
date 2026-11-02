@@ -30,6 +30,16 @@ describe("sanitizeCommitMessage", () => {
     });
   });
 
+  it("handles numbered lists and markdown bold formatting", () => {
+    assert.deepEqual(
+      sanitizeCommitMessage("Here is the suggested commit:\n1. **feat(payouts)**: add payout modal"),
+      {
+        message: "feat(payouts): add payout modal",
+        repaired: true,
+      },
+    );
+  });
+
   it("shortens long messages to the 72-character limit", () => {
     const result = sanitizeCommitMessage(
       "feat(portfolio): add a very detailed portfolio redesign with refreshed projects tools metadata images and navigation",

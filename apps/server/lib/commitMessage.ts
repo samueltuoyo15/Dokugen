@@ -37,9 +37,10 @@ export function sanitizeCommitMessage(raw: string): SanitizedCommitMessage {
 
   for (const line of lines) {
     const cleaned = line
-      .replace(/^[-*•]\s+/, "")
-      .replace(/^["'`]|["'`]$/g, "")
-      .replace(/^(commit message|commit|suggested commit|generated commit):\s*/i, "")
+      .replace(/^(?:\d+[\.\)]|[-*•])\s+/, "")
+      .replace(/^(?:conventional\s+)?(?:commit(?:\s+message)?|suggested(?:\s+commit)?|generated(?:\s+commit)?|subject|title):\s*/i, "")
+      .replace(/[*_`]/g, "")
+      .replace(/^["']|["']$/g, "")
       .trim();
 
     const match = cleaned.match(CONVENTIONAL_COMMIT_REGEX);
@@ -67,7 +68,7 @@ export function sanitizeCommitMessage(raw: string): SanitizedCommitMessage {
       if (GENERIC_FALLBACK_MESSAGES.has(message)) {
         return { repaired: false, reason: "The model returned a generic, non-specific commit message" };
       }
-      return { message, repaired: message !== cleaned };
+      return { message, repaired: message !== line };
     }
   }
 

@@ -18,7 +18,9 @@ Rules:
 1. Output ONLY the single commit message line.
 2. Do NOT output markdown formatting, code fences, backticks, quotes, explanations, or multiple lines.
 3. Start the description with a lowercase imperative verb.
-4. Keep the entire message concise and under 72 characters.`;
+4. Keep the entire message concise and under 72 characters.
+5. If the diff touches multiple unrelated files or modules, pick the dominant feature or use a broad scope like (repo), (app), or (core). Never refuse or suggest splitting the commit.
+6. Absolutely no preamble, thinking tokens, apologies, or conversational filler. Your entire response must be strictly the single commit message line.`;
 
 router.post("/generate-commit", async (req: Request, res: Response): Promise<void> => {
   try {
@@ -28,6 +30,10 @@ router.post("/generate-commit", async (req: Request, res: Response): Promise<voi
       res.status(400).json({ error: "No git diff provided" });
       return;
     }
+
+    const MAX_DIFF_CHARS = 60_000;
+    const processedDiff =
+      diff.length > MAX_DIFF_CHARS ? `${diff.slice(0, MAX_DIFF_CHARS)}\n\n[Diff truncated for payload size]` : diff;
 
     const verifiedUser = getVerifiedGitHubUser(res);
     trackUser({ ...userInfo, ...verifiedUser, id: userInfo?.id || uuidv4() }, "commit").catch(() => {});
@@ -42,14 +48,14 @@ router.post("/generate-commit", async (req: Request, res: Response): Promise<voi
           { role: "system", content: SYSTEM_PROMPT },
           {
             role: "user",
-            content: `Git diff:\n\n${diff}\n\nGenerate the single-line conventional commit message:${
+            content: `Git diff:\n\n${processedDiff}\n\nGenerate the single-line conventional commit message:${
               typeof previousMessage === "string" && previousMessage.trim()
                 ? `\nThe previous suggestion was "${previousMessage.trim()}". Generate a meaningfully different, more specific message.`
                 : ""
-            }`,
+            }\n\nRemember: Output ONLY the single commit message line, nothing else.`,
           },
         ],
-        max_tokens: 150,
+        max_tokens: 300,
         temperature: 0.2,
       },
       { timeout: 25_000, maxRetries: 0 },
